@@ -27,6 +27,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .r2{background:linear-gradient(135deg,#94a3b8,#cbd5e1);color:#000}
 .r3{background:linear-gradient(135deg,#cd853f,#d2a679);color:#000}
 .name{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block}
+.row-me td{background:rgba(99,102,241,.12)!important}
 .token{font-family:'SF Mono',monospace;text-align:right}
 .load{text-align:center;padding:60px;color:rgba(255,255,255,.4)}
 @media(max-width:600px){.summary{grid-template-columns:repeat(2,1fr)}}
@@ -74,7 +75,10 @@ async function load(t){
       {v:fmt(d.totalTokens),l:'总Token'},
       {v:(d.totalTokens/Math.max(1,d.totalSessions)).toFixed(0),l:'平均/会话'}
     ].map(c=>'<div class="card"><div class="card-val">'+c.v+'</div><div class="card-label">'+c.l+'</div></div>').join('');
-    document.getElementById('rank').innerHTML='<table><thead><tr><th>#</th><th>用户</th><th>邮箱</th><th>注册时间</th><th>最后登录</th><th class="token">Token</th></tr></thead><tbody>'+d.users.map((u,i)=>'<tr><td>'+rk(i)+'</td><td><span class="name">'+esc(u.username)+'</span></td><td>'+esc(u.email||'-')+'</td><td>'+u.created+'</td><td>'+u.lastLogin+'</td><td class="token">'+fmt(u.totalTokens)+'</td></tr>').join('')+'</tbody></table>';
+    document.getElementById('rank').innerHTML='<table><thead><tr><th>#</th><th>用户</th><th>邮箱</th><th>注册时间</th><th>最后登录</th><th>状态</th></tr></thead><tbody>'+d.users.map((u,i)=>{
+      var cls = u.isMe ? ' class="row-me"' : '';
+      return '<tr'+cls+'><td>'+rk(i)+'</td><td><span class="name">'+esc(u.username)+'</span></td><td>'+esc(u.email||'-')+'</td><td>'+u.created+'</td><td>'+u.lastLogin+'</td><td>'+(u.isMe?'&#x1F449; 我':'&#x1F7E2; 在线')+'</td></tr>';
+    }).join('')+'</tbody></table>';
   }
 }
 load('projects');
