@@ -221,3 +221,29 @@ app.get('/api/stats/ranking', auth, async (req, res) => {
     res.status(500).json({ success: false, message: e.message });
   }
 });
+
+// 用户排名
+app.get('/api/stats/users', auth, async (req, res) => {
+  try {
+    const [users] = await db.query('SELECT id, username, email, created_at, last_login FROM users WHERE status = ? ORDER BY last_login DESC', ['active']);
+    
+    // 获取所有 session 数据
+    const resp = await fetch('http://localhost:4096/api/session');
+    const data = await resp.json();
+    const sessions = data.data || [];
+    
+    const totalTokens = sessions.reduce((sum, s) => sum + (s.tokens?.input||0) + (s.tokens?.output||0) + (s.tokens?.reasoning||0), 0);
+    
+    const userList = users.map(u => ({
+      ...u,
+      sessions: sessions.length,
+      totalTokens: totalTokens,
+      lastLogin: u.last_login ? new Date(u.last_login).toLocaleString('zh-CN') : '从未登录',
+      created: new Date(u.created_at).toLocaleString('zh-CN'),
+    }));
+    
+    res.json({ success: true, users: userList, totalSessions: sessions.length, totalTokens });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
