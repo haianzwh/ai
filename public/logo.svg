@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4"/>
+      <stop offset="100%" style="stop-color:#6366f1"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景圆角方形 -->
+  <rect x="40" y="40" width="432" height="432" rx="100" fill="url(#bg)" opacity="0.15"/>
+  <rect x="60" y="60" width="392" height="392" rx="88" fill="url(#bg)"/>
+
+  <!-- AI 文字 -->
+  <text x="256" y="340" text-anchor="middle" font-family="Arial,sans-serif" font-size="180" font-weight="700" fill="white" letter-spacing="-8">AI</text>
+
+  <!-- 点缀1 - 左上角火花 -->
+  <circle cx="130" cy="130" r="20" fill="white" opacity="0.6" filter="url(#glow)"/>
+  <circle cx="130" cy="130" r="8" fill="white"/>
+
+  <!-- 点缀2 - 右上角钻石 -->
+  <path d="M370 110 L390 140 L370 170 L350 140 Z" fill="url(#bg2)" opacity="0.8"/>
+  <path d="M370 120 L382 140 L370 160 L358 140 Z" fill="white" opacity="0.9"/>
+
+  <!-- 点缀3 - 左下角聊天气泡 -->
+  <path d="M140 370 Q140 350 160 350 L220 350 Q240 350 240 370 Q240 390 220 390 L190 390 L170 410 L180 390 L160 390 Q140 390 140 370 Z" fill="white" opacity="0.3"/>
+  <circle cx="175" cy="370" r="5" fill="white" opacity="0.5"/>
+  <circle cx="195" cy="370" r="5" fill="white" opacity="0.5"/>
+  <circle cx="215" cy="370" r="5" fill="white" opacity="0.5"/>
+
+  <!-- 底部弧线 -->
+  <path d="M140 420 Q256 450 372 420" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- 神经节点连线 -->
+  <line x1="90" y1="180" x2="140" y2="200" stroke="white" stroke-width="2" opacity="0.3"/>
+  <line x1="130" y1="170" x2="160" y2="150" stroke="white" stroke-width="2" opacity="0.3"/>
+  <line x1="420" y1="180" x2="380" y2="210" stroke="white" stroke-width="2" opacity="0.3"/>
+  <line x1="390" y1="220" x2="360" y2="250" stroke="white" stroke-width="2" opacity="0.3"/>
+  <circle cx="90" cy="180" r="4" fill="white" opacity="0.4"/>
+  <circle cx="160" cy="150" r="4" fill="white" opacity="0.4"/>
+  <circle cx="420" cy="180" r="4" fill="white" opacity="0.4"/>
+  <circle cx="360" cy="250" r="4" fill="white" opacity="0.4"/>
+</svg>
