@@ -75,9 +75,11 @@ async function load(t){
       {v:fmt(d.totalTokens),l:'总Token'},
       {v:(d.totalTokens/Math.max(1,d.totalSessions)).toFixed(0),l:'平均/会话'}
     ].map(c=>'<div class="card"><div class="card-val">'+c.v+'</div><div class="card-label">'+c.l+'</div></div>').join('');
-    document.getElementById('rank').innerHTML='<table><thead><tr><th>#</th><th>用户</th><th>邮箱</th><th>注册时间</th><th>最后登录</th><th>状态</th></tr></thead><tbody>'+d.users.map((u,i)=>{
+    document.getElementById('rank').innerHTML='<table><thead><tr><th>#</th><th>用户</th><th>邮箱</th><th>Token消耗</th><th>最后登录</th><th>状态</th></tr></thead><tbody>'+d.users.map((u,i)=>{
       var cls = u.isMe ? ' class="row-me"' : '';
-      return '<tr'+cls+'><td>'+rk(i)+'</td><td><span class="name">'+esc(u.username)+'</span></td><td>'+esc(u.email||'-')+'</td><td>'+u.created+'</td><td>'+u.lastLogin+'</td><td>'+(u.isMe?'&#x1F449; 我':'&#x1F7E2; 在线')+'</td></tr>';
+      var st = u.isOnline ? '&#x1F7E2; 在线' : '&#x26AA; 离线';
+      if(u.isMe) st = '&#x1F449; 我 ('+st+')';
+      return '<tr'+cls+'><td>'+rk(i)+'</td><td><span class="name">'+esc(u.username)+'</span></td><td>'+esc(u.email||'-')+'</td><td class="token">'+fmt(u.totalTokens)+'</td><td>'+u.lastLogin+'</td><td>'+st+'</td></tr>';
     }).join('')+'</tbody></table>';
   }
 }
