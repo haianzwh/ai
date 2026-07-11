@@ -9,64 +9,75 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;background:#0f1729;color:#fff;min-height:100vh}
 .h{background:rgba(99,102,241,.1);border-bottom:1px solid rgba(99,102,241,.2);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
 .h h1{font-size:20px}
-.h a{color:rgba(255,255,255,.6);text-decoration:none;font-size:14px;padding:6px 14px;border:1px solid rgba(255,255,255,.2);border-radius:6px}
+.h nav a{color:rgba(255,255,255,.5);text-decoration:none;font-size:14px;padding:6px 14px;border:1px solid rgba(255,255,255,.2);border-radius:6px;margin-left:8px}
 .list{padding:24px;max-width:900px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.info{color:rgba(255,255,255,.5);font-size:14px}
+.btn{border:none;border-radius:8px;font-size:14px;cursor:pointer;padding:10px 20px;transition:.2s}
+.btn-new{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
+.btn-new:hover{transform:translateY(-1px)}
 .item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;margin-bottom:12px;overflow:hidden}
-.ih{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;transition:.2s}
+.ih{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer}
 .ih:hover{background:rgba(255,255,255,.06)}
 .it{font-size:15px;font-weight:500}
 .im{font-size:12px;color:rgba(255,255,255,.4);margin-top:4px}
-.ib{display:flex;gap:8px;flex-shrink:0;margin-left:12px;align-items:center}
-.b{border:none;border-radius:6px;font-size:13px;cursor:pointer;text-decoration:none;transition:.2s;padding:6px 14px}
-.bl{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;display:inline-block}
-.bl:hover{transform:translateY(-1px)}
-.be{background:transparent;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.2)}
+.b{font-size:13px;cursor:pointer;text-decoration:none;padding:6px 14px;border-radius:6px;display:inline-block}
+.bl{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
 .files{display:none;border-top:1px solid rgba(255,255,255,.08);padding:12px 20px}
 .files.open{display:block}
 .file{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:4px 0;background:rgba(255,255,255,.03);border-radius:8px}
 .fn{font-size:13px;color:rgba(255,255,255,.7);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.ft{font-size:11px;color:rgba(255,255,255,.25);white-space:nowrap;flex-shrink:0}
-.fs{font-size:11px;color:rgba(255,255,255,.35);white-space:nowrap;flex-shrink:0;text-align:right;min-width:60px}
-.fd{border:none;padding:4px 10px;font-size:12px;background:rgba(99,102,241,.2);color:#6366f1;border-radius:4px;cursor:pointer;text-decoration:none;flex-shrink:0}
+.ft{font-size:11px;color:rgba(255,255,255,.25);white-space:nowrap}
+.fs{font-size:11px;color:rgba(255,255,255,.35);min-width:60px;text-align:right}
+.fd{border:none;padding:4px 10px;font-size:12px;background:rgba(99,102,241,.2);color:#6366f1;border-radius:4px;cursor:pointer;text-decoration:none}
 .load{text-align:center;padding:60px;color:rgba(255,255,255,.4)}
-.info{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:rgba(255,255,255,.7)}
 </style>
 </head>
 <body>
-<div class="h"><h1>&#x1F4C1; 项目管理</h1><a href="/">&#x2190; 返回</a></div>
-<div class="list" id="list"><div class="load">加载中...</div></div>
+<div class="h"><h1>&#x1F4C1; 项目管理</h1><nav><a href="/">首页</a><a href="/ranking.html">排行榜</a></nav></div>
+<div class="list">
+  <div class="top">
+    <span class="info" id="userInfo"></span>
+    <button class="btn btn-new" onclick="createProject()">+ 新建项目</button>
+  </div>
+  <div id="list"></div>
+</div>
 <script>
-var TOKEN = localStorage.getItem('auth_token');
-if (!TOKEN) { location.href = '/login.html'; }
+var T = localStorage.getItem('auth_token');
+if (!T) { location.href = '/login.html'; }
+var H = { Authorization: 'Bearer ' + T };
 
-function authFetch(url, opts) {
-  opts = opts || {};
-  opts.headers = opts.headers || {};
-  opts.headers['Authorization'] = 'Bearer ' + TOKEN;
-  return fetch(url, opts);
+async function createProject() {
+  document.getElementById('list').innerHTML = '<div class="load">创建中...</div>';
+  try {
+    var r = await fetch('/auth/api/projects', { method: 'POST', headers: H });
+    var d = await r.json();
+    if (d.success) { alert('项目已创建: ' + d.title); load(); }
+    else { alert(d.message || '创建失败'); load(); }
+  } catch(e) { load(); }
 }
 
 async function load() {
   try {
-    var res = await authFetch('/auth/api/projects');
-    var data = await res.json();
-    if (data.error) { alert(data.error); location.href='/login.html'; return }
-    if (!data.projects.length) {
-      document.getElementById('list').innerHTML = '<div class="load">暂无项目</div>';
+    var r = await fetch('/auth/api/projects', { headers: H });
+    var d = await r.json();
+    if (d.error) { alert(d.error); location.href='/login.html'; return; }
+    
+    document.getElementById('userInfo').textContent = '用户: ' + (d.username||'') + ' | ' + d.projects.length + ' 个项目';
+    
+    if (!d.projects.length) {
+      document.getElementById('list').innerHTML = '<div class="load">还没有项目，点上方按钮创建</div>';
       return;
     }
-    document.getElementById('list').innerHTML = 
-      '<div class="info">每个项目最多保存100个文件，超出自动覆盖旧文件</div>' +
-      data.projects.map(function(p) {
-        return '<div class="item">' +
-          '<div class="ih" onclick="toggle(\''+p.id+'\')">' +
-            '<div><div class="it">'+esc(p.title)+'</div><div class="im">'+esc(p.dir)+' · '+p.updated+'</div></div>' +
-            '<div class="ib"><span class="b be expand">▾ 展开</span><a class="b bl" href="/auth/api/download/project/'+p.id+'" onclick="event.stopPropagation()">下载全部</a></div>' +
-          '</div><div class="files" id="f-'+p.id+'"></div></div>';
-      }).join('');
-  } catch(e) {
-    document.getElementById('list').innerHTML = '<div class="load">加载失败</div>';
-  }
+    
+    document.getElementById('list').innerHTML = d.projects.map(p =>
+      '<div class="item">' +
+        '<div class="ih" onclick="toggle(\''+p.id+'\')">' +
+          '<div><div class="it">'+esc(p.title)+'</div><div class="im">'+esc(p.dir)+' · '+p.updated+' · '+fmt(p.tokens)+' tok</div></div>' +
+          '<div style="display:flex;gap:8px;align-items:center"><span class="b" style="color:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.1)">展开</span><a class="b bl" href="/auth/api/download/project/'+p.id+'" onclick="event.stopPropagation()">下载</a></div>' +
+        '</div><div class="files" id="f-'+p.id+'"></div></div>'
+    ).join('');
+  } catch(e) { document.getElementById('list').innerHTML = '<div class="load">加载失败</div>'; }
 }
 
 async function toggle(id) {
@@ -75,18 +86,19 @@ async function toggle(id) {
   el.innerHTML = '<div style="padding:8px;color:rgba(255,255,255,.3)">加载...</div>';
   el.classList.add('open');
   try {
-    var res = await authFetch('/auth/api/projects/'+id+'/files');
-    var data = await res.json();
-    if (!data.files.length) { el.innerHTML = '<div style="padding:8px;color:rgba(255,255,255,.3)">无文件</div>'; return }
-    el.innerHTML = data.files.map(function(f) {
-      var d = new Date(f.mtime);
-      var t = d.getMonth()+1+'/'+d.getDate()+' '+d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
-      return '<div class="file"><span class="fn">'+esc(f.name)+'</span><span class="ft">'+t+'</span><span class="fs">'+fsize(f.size)+'</span><a class="fd" href="/auth/api/download/file?path='+encodeURIComponent(f.path)+'">下载</a></div>';
+    var r = await fetch('/auth/api/projects/'+id+'/files', { headers: H });
+    var d = await r.json();
+    if (!d.files.length) { el.innerHTML = '<div style="padding:8px;color:rgba(255,255,255,.3)">无文件</div>'; return }
+    el.innerHTML = d.files.map(f => {
+      var dt = new Date(f.mtime);
+      var t = (dt.getMonth()+1)+'/'+dt.getDate()+' '+dt.getHours().toString().padStart(2,'0')+':'+dt.getMinutes().toString().padStart(2,'0');
+      return '<div class="file"><span class="fn">'+esc(f.name)+'</span><span class="ft">'+t+'</span><span class="fs">'+fsz(f.size)+'</span><a class="fd" href="/auth/api/download/file?path='+encodeURIComponent(f.path)+'">下载</a></div>';
     }).join('');
   } catch(e) { el.innerHTML = '<div style="padding:8px;color:red">加载失败</div>'; }
 }
 
-function fsize(b) { return b < 1024 ? b+'B' : b < 1048576 ? (b/1024).toFixed(1)+'KB' : (b/1048576).toFixed(1)+'MB' }
+function fsz(b) { return b < 1024 ? b+'B' : b < 1048576 ? (b/1024).toFixed(1)+'KB' : (b/1048576).toFixed(1)+'MB' }
+function fmt(n) { return n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : String(n) }
 function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML }
 load();
 </script>

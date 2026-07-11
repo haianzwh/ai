@@ -84,18 +84,51 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// 项目列表（需登录）
+// 项目列表（按当前用户过滤）
 app.get('/api/projects', auth, async (req, res) => {
   try {
+    const currentUser = req.user.username;
     const resp = await fetch('http://localhost:4096/api/session');
     const data = await resp.json();
-    const projects = (data.data || []).slice(0, 30).map(s => ({
-      id: s.id, title: s.title || '未命名',
-      dir: s.location?.directory || '/home',
-      updated: new Date(s.time.updated).toLocaleString('zh-CN'),
-    }));
-    res.json({ success: true, projects });
+    
+    // 获取用户关联的 session
+    const [userSessions] = await db.query('SELECT session_id FROM user_sessions WHERE username = ?', [currentUser]);
+    const userSessionIds = new Set(userSessions.map(r => r.session_id));
+    
+    const projects = (data.data || [])
+      .filter(s => userSessionIds.has(s.id))
+      .map(s => ({
+        id: s.id, title: s.title || '未命名',
+        dir: s.location?.directory || '/home',
+        updated: new Date(s.time.updated).toLocaleString('zh-CN'),
+        tokens: (s.tokens?.input||0) + (s.tokens?.output||0),
+      }));
+    
+    res.json({ success: true, projects, username: currentUser });
   } catch (e) { res.json({ success: true, projects: [] }); }
+});
+
+// 创建新项目
+app.post('/api/projects', auth, async (req, res) => {
+  try {
+    const resp = await fetch('http://localhost:4096/api/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    const data = await resp.json();
+    const sessionId = data.data?.id;
+    
+    if (sessionId) {
+      await db.query('INSERT IGNORE INTO user_sessions (username, session_id, tokens_input, tokens_output, tokens_reasoning) VALUES (?, ?, 0, 0, 0)',
+        [req.user.username, sessionId]);
+      res.json({ success: true, id: sessionId, title: data.data.title || '新项目' });
+    } else {
+      res.status(500).json({ success: false, message: '创建失败' });
+    }
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
 });
 
 // 清理文件夹：保留最新 MAX_FILES 个文件
