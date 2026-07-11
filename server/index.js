@@ -232,34 +232,43 @@ app.get('/api/stats/users', auth, async (req, res) => {
     const currentUser = req.user;
     const isAdmin = currentUser.username === 'admin';
     
-    // 获取当前 opencode tokens
+    // 获取所有 opencode sessions
     const resp = await fetch('http://localhost:4096/api/session');
     const data = await resp.json();
     const sessions = data.data || [];
-    const totalInput = sessions.reduce((s, x) => s + (x.tokens?.input||0), 0);
-    const totalOutput = sessions.reduce((s, x) => s + (x.tokens?.output||0), 0);
-    const totalReasoning = sessions.reduce((s, x) => s + (x.tokens?.reasoning||0), 0);
-    const totalTokens = totalInput + totalOutput + totalReasoning;
     
-    // 获取上次快照
-    const [lastSnapshot] = await db.query('SELECT * FROM token_daily ORDER BY id DESC LIMIT 1');
-    const prevTotal = lastSnapshot.length ? (lastSnapshot[0].total_input + lastSnapshot[0].total_output + lastSnapshot[0].total_reasoning) : 0;
-    const delta = Math.max(0, totalTokens - prevTotal);
+    // 获取已记录的 session
+    const [recorded] = await db.query('SELECT session_id FROM user_sessions');
+    const recordedIds = new Set(recorded.map(r => r.session_id));
     
-    // 保存新快照
-    await db.query('INSERT INTO token_daily (total_input, total_output, total_reasoning) VALUES (?, ?, ?)', [totalInput, totalOutput, totalReasoning]);
-    
-    // 如果有增量，归属给当前登录用户
-    if (delta > 0 && currentUser.username) {
-      await db.query('UPDATE users SET total_tokens = COALESCE(total_tokens,0) + ? WHERE username = ?', [delta, currentUser.username]);
+    // 归还未记录的 sessions 给当前用户
+    let newTokens = 0;
+    for (const s of sessions) {
+      if (!recordedIds.has(s.id)) {
+        const input = s.tokens?.input || 0;
+        const output = s.tokens?.output || 0;
+        const reasoning = s.tokens?.reasoning || 0;
+        const total = input + output + reasoning;
+        if (total > 0) {
+          await db.query('INSERT IGNORE INTO user_sessions (username, session_id, tokens_input, tokens_output, tokens_reasoning) VALUES (?, ?, ?, ?, ?)',
+            [currentUser.username, s.id, input, output, reasoning]);
+          newTokens += total;
+        }
+      }
     }
     
-    // 更新当前用户的最后活跃时间
-    await db.query('UPDATE users SET last_active = NOW() WHERE username = ?', [currentUser.username]);
+    // 更新当前用户token
+    if (newTokens > 0) {
+      await db.query('UPDATE users SET total_tokens = COALESCE(total_tokens,0) + ?, last_active = NOW() WHERE username = ?', [newTokens, currentUser.username]);
+    } else {
+      await db.query('UPDATE users SET last_active = NOW() WHERE username = ?', [currentUser.username]);
+    }
+    
+    const totalTokens = sessions.reduce((s, x) => s + (x.tokens?.input||0) + (x.tokens?.output||0) + (x.tokens?.reasoning||0), 0);
     
     const [users] = await db.query('SELECT id, username, email, created_at, last_login, last_active, COALESCE(total_tokens,0) AS total_tokens FROM users WHERE status = ? ORDER BY COALESCE(total_tokens,0) DESC', ['active']);
     
-    const ONLINE_THRESHOLD = 30 * 60 * 1000; // 30分钟
+    const ONLINE_THRESHOLD = 30 * 60 * 1000;
     const now = Date.now();
     
     function mask(s) {
@@ -278,7 +287,6 @@ app.get('/api/stats/users', auth, async (req, res) => {
         isMe,
         isOnline: u.last_active ? (now - new Date(u.last_active).getTime()) < ONLINE_THRESHOLD : false,
         lastLogin: u.last_login ? new Date(u.last_login).toLocaleString('zh-CN') : '从未登录',
-        created: new Date(u.created_at).toLocaleString('zh-CN'),
       };
     });
     
