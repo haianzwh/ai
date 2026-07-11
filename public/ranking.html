@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Token 排行榜</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;background:#0f1729;color:#fff;min-height:100vh}
+.h{background:rgba(99,102,241,.1);border-bottom:1px solid rgba(99,102,241,.2);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.h h1{font-size:20px}
+.h nav a{color:rgba(255,255,255,.5);text-decoration:none;font-size:14px;padding:6px 14px;border:1px solid rgba(255,255,255,.2);border-radius:6px;margin-left:8px}
+.h nav a:hover{color:#fff;border-color:rgba(255,255,255,.4)}
+.list{padding:24px;max-width:900px;margin:0 auto}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;text-align:center}
+.card-val{font-size:28px;font-weight:700;background:linear-gradient(135deg,#6366f1,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.card-label{font-size:12px;color:rgba(255,255,255,.4);margin-top:4px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 12px;font-size:12px;color:rgba(255,255,255,.4);border-bottom:1px solid rgba(255,255,255,.1)}
+td{padding:12px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.05)}
+tr:hover td{background:rgba(255,255,255,.02)}
+.rank{width:32px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.r1{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000}
+.r2{background:linear-gradient(135deg,#94a3b8,#cbd5e1);color:#000}
+.r3{background:linear-gradient(135deg,#cd853f,#d2a679);color:#000}
+.name{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block}
+.token{font-family:'SF Mono',monospace;text-align:right}
+.load{text-align:center;padding:60px;color:rgba(255,255,255,.4)}
+@media(max-width:600px){.summary{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="h">
+  <h1>&#x1F3C6; Token 排行榜</h1>
+  <nav>
+    <a href="/">首页</a>
+    <a href="/projects.html">项目管理</a>
+  </nav>
+</div>
+<div class="list">
+  <div class="summary" id="summary"></div>
+  <div id="rank"><div class="load">加载中...</div></div>
+</div>
+<script>
+var TOKEN = localStorage.getItem('auth_token');
+if (!TOKEN) { location.href = '/login.html'; }
+
+async function load() {
+  try {
+    var res = await fetch('/auth/api/stats/ranking', { headers: { Authorization: 'Bearer ' + TOKEN } });
+    var data = await res.json();
+    if (data.error) { alert(data.error); location.href='/login.html'; return; }
+    
+    var t = data.totals;
+    document.getElementById('summary').innerHTML = [
+      { v: ftoken(t.total), l: '总 Token 消耗' },
+      { v: t.sessions, l: '总会话数' },
+      { v: ftoken(t.input), l: '输入 Token' },
+      { v: ftoken(t.output), l: '输出 Token' },
+    ].map(c => '<div class="card"><div class="card-val">'+c.v+'</div><div class="card-label">'+c.l+'</div></div>').join('');
+    
+    var rows = data.ranking.map(function(p, i) {
+      var rk = i < 3 ? '<span class="rank r'+(i+1)+'">'+(i+1)+'</span>' : i+1;
+      return '<tr><td>'+rk+'</td><td><span class="name" title="'+esc(p.name)+'">'+esc(p.name)+'</span></td><td class="token">'+ftoken(p.total)+'</td><td class="token">'+ftoken(p.input)+'</td><td class="token">'+ftoken(p.output)+'</td><td class="token">'+p.sessions+'</td></tr>';
+    }).join('');
+    
+    document.getElementById('rank').innerHTML = '<table><thead><tr><th>#</th><th>项目名称</th><th class="token">总Token</th><th class="token">输入</th><th class="token">输出</th><th class="token">会话数</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  } catch(e) {
+    document.getElementById('rank').innerHTML = '<div class="load">加载失败</div>';
+  }
+}
+
+function ftoken(n) { return n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : n.toString(); }
+function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+load();
+</script>
+</body>
+</html>

@@ -182,3 +182,42 @@ app.get('/api/download/latest', auth, (req, res) => {
 });
 
 app.listen(3001, '0.0.0.0', () => console.log('running'));
+
+// Token 统计排名
+app.get('/api/stats/ranking', auth, async (req, res) => {
+  try {
+    const resp = await fetch('http://localhost:4096/api/session');
+    const data = await resp.json();
+    const sessions = data.data || [];
+    
+    // 按项目/目录聚合 token
+    const projectStats = {};
+    for (const s of sessions) {
+      const key = s.title || '未命名';
+      if (!projectStats[key]) {
+        projectStats[key] = { name: key, input: 0, output: 0, reasoning: 0, sessions: 0, dir: s.location?.directory || '' };
+      }
+      projectStats[key].input += s.tokens?.input || 0;
+      projectStats[key].output += s.tokens?.output || 0;
+      projectStats[key].reasoning += s.tokens?.reasoning || 0;
+      projectStats[key].sessions += 1;
+    }
+    
+    const ranking = Object.values(projectStats)
+      .map(p => ({ ...p, total: p.input + p.output + p.reasoning }))
+      .sort((a, b) => b.total - a.total);
+    
+    const totals = ranking.reduce((acc, p) => {
+      acc.input += p.input;
+      acc.output += p.output;
+      acc.reasoning += p.reasoning;
+      acc.total += p.total;
+      acc.sessions += p.sessions;
+      return acc;
+    }, { input: 0, output: 0, reasoning: 0, total: 0, sessions: 0 });
+    
+    res.json({ success: true, ranking: ranking.slice(0, 50), totals });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});

@@ -43,12 +43,16 @@
 
   var m = document.createElement('div');
   m.className = 'cm';
-  m.innerHTML = '<div class="ca">'+av+'</div><span class="cd" style="cursor:pointer" title="项目管理" id="projLink">&#x1F4C1;</span><span class="cn">'+name+'</span><button class="co">退出</button>';
+  m.innerHTML = '<div class="ca">'+av+'</div><span class="cd" style="cursor:pointer" title="项目管理" id="projLink">&#x1F4C1;</span><span class="cd" style="cursor:pointer" title="排行榜" id="rankLink">&#x1F3C6;</span><span class="cn">'+name+'</span><button class="co">退出</button>';
   document.body.appendChild(m);
 
   document.getElementById('projLink').addEventListener('click', function(e) {
     e.preventDefault(); e.stopPropagation();
     window.top.location = '/projects.html';
+  });
+  document.getElementById('rankLink').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    window.top.location = '/ranking.html';
   });
 
   m.querySelector('.co').addEventListener('click', function(e) {
