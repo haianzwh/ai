@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Login</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input { display: block; margin: 10px 0; padding: 8px; width: 200px; }
+    button { padding: 10px 20px; cursor: pointer; }
+    #result { margin-top: 20px; padding: 10px; background: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h2>Login Test</h2>
+  <form id="testForm">
+    <input type="text" id="username" placeholder="Username" value="admin">
+    <input type="password" id="password" placeholder="Password" value="996qwerasdfzxcv!">
+    <button type="submit">Login</button>
+  </form>
+  <div id="result"></div>
+  <script>
+    document.getElementById('testForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const result = document.getElementById('result');
+      
+      result.textContent = 'Logging in...';
+      
+      try {
+        const response = await fetch('/auth/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await response.json();
+        result.textContent = JSON.stringify(data, null, 2);
+        
+        if (data.success) {
+          localStorage.setItem('auth_token', data.token);
+          localStorage.setItem('user_info', JSON.stringify(data.user));
+          setTimeout(() => {
+            result.textContent += '\nRedirecting...';
+            window.location.href = 'http://www.zwhnb.top:4097';
+          }, 1000);
+        }
+      } catch (error) {
+        result.textContent = 'Error: ' + error.message;
+      }
+    });
+  </script>
+</body>
+</html>
