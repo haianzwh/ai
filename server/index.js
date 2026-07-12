@@ -131,16 +131,17 @@ app.post('/api/projects', auth, async (req, res) => {
   }
 });
 
-// 清理文件夹：保留最新 MAX_FILES 个文件
+// 清理项目文件夹：保留最新 MAX_FILES 个文件
 function cleanDir(dir) {
+  if (!dir.includes('generated_files')) return; // 安全检查：只清理 generated_files 目录
   try {
     const files = fs.readdirSync(dir).map(f => {
       const fp = path.join(dir, f);
-      return { name: f, mtime: fs.statSync(fp).mtime };
+      return { name: f, path: fp, mtime: fs.statSync(fp).mtime };
     }).sort((a, b) => b.mtime - a.mtime);
     
     for (let i = MAX_FILES; i < files.length; i++) {
-      fs.unlinkSync(path.join(dir, files[i].name));
+      fs.unlinkSync(files[i].path);
     }
   } catch(e) {}
 }
@@ -153,7 +154,7 @@ app.get('/api/projects/:id/files', auth, async (req, res) => {
   
   for (const d of dirs) {
     try {
-      const out = execSync(`find ${d} -maxdepth 3 -type f -newer /tmp/opencode/ai-chat -not -path '*/node_modules/*' -not -path '*/.git/*' -not -path '*/ai-chat/*' -not -path '*/.cache/*' -not -path '*/.npm/*' -not -path '*/server/node_modules/*' 2>/dev/null || true`, { encoding: 'utf8', timeout: 5000 });
+      const out = execSync(`find ${d} -maxdepth 3 -type f -newer /tmp/opencode/ai-chat -not -path '*/node_modules/*' -not -path '*/.git/*' -not -path '*/ai-chat/*' -not -path '*/.cache/*' -not -path '*/.npm/*' -not -path '*/server/*' -not -path '*/src/*' -not -name '*.js' -not -name '*.ts' -not -name '*.vue' -not -name '*.json' -not -name '*.css' -not -name '*.lock' -not -name '*.log' -not -name '*.toml' -not -name '*.cfg' -not -name '.*' 2>/dev/null || true`, { encoding: 'utf8', timeout: 5000 });
       for (const f of out.trim().split('\n')) {
         if (!f || seen.has(f) || f.endsWith('.log') || f.endsWith('.lock')) continue;
         const stat = fs.statSync(f);
