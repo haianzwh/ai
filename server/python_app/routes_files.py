@@ -159,9 +159,9 @@ async def upload_file(
     支持任意文件类型，保存到 generated_files/uploads/ 目录。
     文件名自动加时间戳前缀，防止重名覆盖。
     """
-    # 生成带时间戳的文件名（避免重名冲突）
+    # 生成带时间戳+用户名的文件名（避免重名冲突）
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    safe_name = f"{timestamp}_{file.filename}"
+    safe_name = f"{user['username']}_{timestamp}_{file.filename}"
 
     dest = UPLOAD_DIR / safe_name
 
@@ -192,14 +192,15 @@ async def list_uploads(user: dict = Depends(get_current_user)):
             reverse=True,
         ):
             if f.is_file():
-                # 文件名格式: YYYYMMDD_HHMMSS_原始名 → 提取原始名
+                # 文件名格式: 用户名_YYYYMMDD_HHMMSS_原始名 → 提取原始名
                 name = f.name
-                if name[0].isdigit() and "_" in name:
-                    parts = name.split("_", 2)
-                    if len(parts) >= 3:
-                        orig = parts[2]
-                    else:
-                        orig = name
+                parts = name.split("_")
+                # 格式: 至少 username(1) + date(2) + time(3) + original(4+)
+                # 旧格式: date(1) + time(2) + original(3+)
+                if len(parts) >= 4 and not parts[0].isdigit():
+                    orig = "_".join(parts[3:])  # 用户名开头的格式
+                elif len(parts) >= 3 and parts[0].isdigit():
+                    orig = "_".join(parts[2:])  # 旧日期开头的格式
                 else:
                     orig = name
                 files.append({
