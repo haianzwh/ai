@@ -150,7 +150,17 @@ async function switchModel() {
 async function send() {
   var input = document.getElementById('input');
   var text = input.value.trim();
-  if (!text || !curSession) return;
+  if (!text) return;
+  // 没有选中会话时自动创建
+  if (!curSession) {
+    var r = await fetch('/auth/api/chat/sessions', { method: 'POST', headers: H });
+    var d = await r.json();
+    if (!d.success) { alert('创建会话失败'); return; }
+    curSession = d.id;
+loadSessions();
+// 自动创建默认会话
+(async function(){ await newChat(); })();
+  }
   input.value = '';
   input.style.height = 'auto';
   document.getElementById('sendBtn').disabled = true;
