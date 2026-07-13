@@ -62,6 +62,8 @@ async def poll_response(session_id: str, timeout: int = 120) -> AsyncGenerator[d
                 )
                 messages = resp.json().get("data", [])
             except Exception:
+                await asyncio.sleep(1)
+                continue
 
             # 找没见过的消息
             for msg in messages:
