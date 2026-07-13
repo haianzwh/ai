@@ -57,7 +57,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 <body>
 <div class="h">
   <button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')" style="display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer">☰</button>
-  <h1>🤖 AI Chat</h1>
+  <h1>🤖 AI Chat <span style="font-size:10px;color:rgba(255,255,255,.3)">v2</span></h1>
   <div style="display:flex;align-items:center;gap:6px">
     <select id="modelSelectMobile" onchange="switchModelMobile()" style="display:none;padding:4px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#fff;font-size:11px;outline:none"></select>
     <nav>
@@ -89,6 +89,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 var T = localStorage.getItem('auth_token');
 if (!T) location.href = '/login.html';
 var H = { Authorization: 'Bearer ' + T };
+
+// 调试：验证 token + 网络
+(async function checkConn(){
+  try {
+    var r = await fetch('/auth/api/chat/models', {headers: H});
+    var d = await r.json();
+    console.log('✅ 连接正常, 模型数:', d.models?d.models.length:'?');
+  } catch(e) {
+    console.error('❌ 连接失败:', e.message);
+    alert('连接服务器失败: '+e.message);
+  }
+})();
 var curSession = null;
 var curModel = 'deepseek-v4-flash-free';
 
