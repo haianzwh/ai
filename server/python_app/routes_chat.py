@@ -154,19 +154,18 @@ async def _stream_response(sid: str, content: str):
             oc_id = oc.get("id", "")
             await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
 
-        # 2. 发送消息
+        # 2. 发送消息前，记录 opencode 已有的消息 ID
         yield f"data: {json.dumps({'status': 'sending'})}\n\n"
         
-        # 记录发送前的消息 ID，只返回之后的新消息
-        before_msgs = await execute(
-            "SELECT id FROM chat_messages WHERE session_id=%s",
-            (sid,),
-        )
-        before_ids = {str(m['id']) for m in before_msgs}
+        # 获取 opencode 当前的 message ID 列表（发送前）
+        import httpx as _hx
+        async with _hx.AsyncClient() as oc_client:
+            r = await oc_client.get(f"http://localhost:4096/api/session/{oc_id}/message", params={"from": 0, "to": 100})
+            before_ids = {m["id"] for m in r.json().get("data", []) if m.get("id")}
         
         await send_prompt(oc_id, content)
 
-        # 3. 轮询 AI 回复（只返回新消息）
+        # 3. 轮询 AI 回复（只返回发送后的新消息）
         yield f"data: {json.dumps({'status': 'thinking'})}\n\n"
         async for chunk in poll_response(oc_id, after_ids=before_ids):
             if chunk.get("done"):
