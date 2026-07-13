@@ -125,22 +125,67 @@ async def _do_send_message(sid: str, req: SendReq, user: dict):
         "INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)",
         (sid, "user", content),
     )
+
+    # 获取或创建 opencode 会话
+    session = await execute_one("SELECT oc_session_id FROM chat_sessions WHERE id=%s", (sid,))
+    oc_id = session["oc_session_id"] if session else ""
+
+    if not oc_id:
+        oc = await create_opencode_session()
+        oc_id = oc.get("id", "")
+        await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
+
     # 首次发消息更新标题
     count_rows = await execute("SELECT COUNT(*) as c FROM chat_messages WHERE session_id=%s AND role='user'", (sid,))
     if count_rows and count_rows[0]["c"] == 1:
         title = content[:30] + ("..." if len(content) > 30 else "")
         await execute_write("UPDATE chat_sessions SET title=%s WHERE id=%s", (title, sid))
 
-    # 立刻返回 StreamingResponse，heavy work 在 generator 里做
+    # 发 prompt
+    await send_prompt(oc_id, content)
+
+    # 返回流式响应
     return StreamingResponse(
-        _stream_response(sid, content),
+        _stream_response(sid, oc_id),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
 
-async def _stream_response(sid: str, content: str):
-    """流式返回 AI 回复，包括连接/发送/轮询全流程"""
+async def _stream_response(sid: str, oc_id: str):
+    """流式返回 AI 回复（只做轮询，不创建会话/发消息）"""
+    full = ""
+    thinking = ""
+    try:
+        async for chunk in poll_response(oc_id):
+            if chunk.get("done"):
+                if chunk.get("error"):
+                    yield f"data: {json.dumps({'error': chunk['error'], 'done': True})}\n\n"
+                else:
+                    if full:
+                        await execute_write(
+                            "INSERT INTO chat_messages (session_id, role, content, thinking) VALUES (%s,%s,%s,%s)",
+                            (sid, "assistant", full, thinking),
+                        )
+                    yield f"data: {json.dumps({'done': True})}\n\n"
+                return
+
+            if chunk.get("thinking"):
+                delta = chunk["thinking"]
+                thinking += delta
+                yield f"data: {json.dumps({'thinking': delta})}\n\n"
+
+            delta = chunk.get("content", "")
+            if delta:
+                full += delta
+                yield f"data: {json.dumps({'content': delta})}\n\n"
+    except Exception as e:
+        if full:
+            await execute_write(
+                "INSERT INTO chat_messages (session_id, role, content, thinking) VALUES (%s,%s,%s,%s)",
+                (sid, "assistant", full, thinking),
+            )
+        yield f"data: {json.dumps({'error': str(e), 'done': True})}\n\n"
     full = ""
     thinking = ""
     try:

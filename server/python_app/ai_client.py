@@ -21,31 +21,18 @@ async def create_opencode_session(model: str = DEFAULT_MODEL) -> dict:
                 f"{OPENCODE_URL}/api/session/{sid}/model",
                 json={"modelID": model},
             )
-            await asyncio.sleep(1)  # 等模型切换生效
         return session
 
 
 async def send_prompt(session_id: str, text: str) -> str:
     """通过 opencode 发送消息"""
-    def _do():
-        import httpx as _h
-        resp = _h.post(
+    async with httpx.AsyncClient() as client:
+        resp = await client.post(
             f"{OPENCODE_URL}/api/session/{session_id}/prompt",
             json={"prompt": {"text": text}},
-            timeout=30,
         )
-        return resp.json().get("data", {}).get("id", "")
-    return await asyncio.to_thread(_do)
-
-
-def _sync_get_messages(session_id: str) -> list:
-    import httpx as _h
-    resp = _h.get(
-        f"{OPENCODE_URL}/api/session/{session_id}/message",
-        params={"from": 0, "to": 100},
-        timeout=10,
-    )
-    return resp.json().get("data", [])
+        data = resp.json()
+        return data.get("data", {}).get("id", "")
 
 
 async def poll_response(session_id: str, timeout: int = 120) -> AsyncGenerator[dict, None]:
@@ -54,20 +41,25 @@ async def poll_response(session_id: str, timeout: int = 120) -> AsyncGenerator[d
     seen: set[str] = set()
     full_text = ""
 
-    while True:
-        elapsed = asyncio.get_event_loop().time() - start
-        if elapsed > timeout:
-            if full_text:
-                yield {"content": full_text, "done": True, "error": None}
-            else:
-                yield {"content": "", "done": True, "error": "超时"}
-            return
+    async with httpx.AsyncClient() as client:
+        while True:
+            elapsed = asyncio.get_event_loop().time() - start
+            if elapsed > timeout:
+                if full_text:
+                    yield {"content": full_text, "done": True, "error": None}
+                else:
+                    yield {"content": "", "done": True, "error": "超时"}
+                return
 
-        try:
-            messages = await asyncio.to_thread(_sync_get_messages, session_id)
-        except Exception:
-            await asyncio.sleep(1)
-            continue
+            try:
+                resp = await client.get(
+                    f"{OPENCODE_URL}/api/session/{session_id}/message",
+                    params={"from": 0, "to": 100},
+                )
+                messages = resp.json().get("data", [])
+            except Exception:
+                await asyncio.sleep(1)
+                continue
 
             for msg in messages:
                 mid = msg.get("id", "")
