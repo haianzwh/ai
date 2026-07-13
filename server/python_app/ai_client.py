@@ -21,6 +21,7 @@ async def create_opencode_session(model: str = DEFAULT_MODEL) -> dict:
                 f"{OPENCODE_URL}/api/session/{sid}/model",
                 json={"modelID": model},
             )
+            await asyncio.sleep(1)  # 等模型切换生效
         return session
 
 
