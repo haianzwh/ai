@@ -1,20 +1,27 @@
 """
 =============================================================================
-  文件下载路由
-  单文件下载 / 按项目打包下载 / 一键下载最新文件
+  文件上传 & 下载路由
+  单文件上传 / 文件列表 / 单文件下载 / 项目打包 / 一键下载
 =============================================================================
 """
 import subprocess
 import shutil
+import aiofiles
+import os
 from pathlib import Path
-from fastapi import APIRouter, HTTPException, Depends, Query
-from fastapi.responses import FileResponse
+from datetime import datetime
+from fastapi import APIRouter, HTTPException, Depends, Query, UploadFile
+from fastapi.responses import FileResponse, JSONResponse
 from starlette.background import BackgroundTask
 
 from .auth import get_current_user
 from .config import ALLOWED_DIRS, FILE_DIR, OPENCODE_BASE_URL, MAX_FILES
 
-router = APIRouter(prefix="/api", tags=["下载"])
+# 用户上传文件存放目录
+UPLOAD_DIR = FILE_DIR / "uploads"
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+router = APIRouter(prefix="/api", tags=["文件"])
 
 
 def _is_path_allowed(target: str) -> bool:
@@ -137,3 +144,59 @@ async def download_latest(user: dict = Depends(get_current_user)):
         media_type="application/gzip",
         background=BackgroundTask(_cleanup_file, tar_path),
     )
+
+
+# ========== 文件上传 ==========
+
+@router.post("/upload")
+async def upload_file(
+    file: UploadFile,
+    user: dict = Depends(get_current_user),
+):
+    """
+    上传文件到服务器。
+    
+    支持任意文件类型，保存到 generated_files/uploads/ 目录。
+    文件名自动加时间戳前缀，防止重名覆盖。
+    """
+    # 生成带时间戳的文件名（避免重名冲突）
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    safe_name = f"{timestamp}_{file.filename}"
+
+    dest = UPLOAD_DIR / safe_name
+
+    # 异步写入文件
+    async with aiofiles.open(str(dest), "wb") as f:
+        content = await file.read()
+        await f.write(content)
+
+    return JSONResponse(content={
+        "success": True,
+        "filename": safe_name,
+        "original": file.filename,
+        "size": len(content),
+        "path": str(dest),
+    })
+
+
+@router.get("/uploads")
+async def list_uploads(user: dict = Depends(get_current_user)):
+    """
+    列出所有上传的文件（按时间倒序）。
+    """
+    files = []
+    if UPLOAD_DIR.exists():
+        for f in sorted(
+            UPLOAD_DIR.iterdir(),
+            key=lambda x: x.stat().st_mtime,
+            reverse=True,
+        ):
+            if f.is_file():
+                files.append({
+                    "name": f.name,
+                    "size": f.stat().st_size,
+                    "time": datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d %H:%M"),
+                    "path": str(f),
+                })
+
+    return {"success": True, "files": files}
