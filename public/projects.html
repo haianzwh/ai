@@ -31,10 +31,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 .fs{font-size:11px;color:rgba(255,255,255,.35);min-width:60px;text-align:right}
 .fd{border:none;padding:4px 10px;font-size:12px;background:rgba(99,102,241,.2);color:#6366f1;border-radius:4px;cursor:pointer;text-decoration:none}
 .load{text-align:center;padding:60px;color:rgba(255,255,255,.4)}
+@media(max-width:480px){
+  .h h1{font-size:16px}
+  .top{flex-direction:column;gap:8px;align-items:flex-start}
+  .ih{padding:12px 14px}
+  .it{font-size:14px}
+}
 </style>
 </head>
 <body>
-<div class="h"><h1>&#x1F4C1; 项目管理</h1><nav><a href="/">首页</a><a href="/ranking.html">排行榜</a></nav></div>
+<div class="h"><h1>&#x1F4C1; 项目管理</h1><nav><a href="/">首页</a><a href="/upload.html">上传</a><a href="/ranking.html">排行榜</a></nav></div>
 <div class="list">
   <div class="top">
     <span class="info" id="userInfo"></span>

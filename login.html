@@ -11,7 +11,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;min-h
 .glow{position:fixed;border-radius:50%;filter:blur(80px);opacity:.3;z-index:0}
 .g1{width:400px;height:400px;background:radial-gradient(circle,#6366f1,transparent 70%);top:-100px;left:-100px}
 .g2{width:500px;height:500px;background:radial-gradient(circle,#8b5cf6,transparent 70%);bottom:-150px;right:-150px}
-.card{position:relative;z-index:10;width:420px;background:rgba(255,255,255,.04);backdrop-filter:blur(20px);border-radius:20px;border:1px solid rgba(255,255,255,.1);padding:40px;box-shadow:0 25px 50px rgba(0,0,0,.3)}
+.card{position:relative;z-index:10;width:100%;max-width:420px;margin:20px;background:rgba(255,255,255,.04);backdrop-filter:blur(20px);border-radius:20px;border:1px solid rgba(255,255,255,.1);padding:32px 24px;box-shadow:0 25px 50px rgba(0,0,0,.3)}
 .logo{width:64px;height:64px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 10px 30px rgba(99,102,241,.4)}
 .logo svg{width:32px;height:32px;color:#fff}
 h1{text-align:center;color:#fff;font-size:24px;margin-bottom:8px}
@@ -42,6 +42,13 @@ h1{text-align:center;color:#fff;font-size:24px;margin-bottom:8px}
 .link-row{text-align:center;margin-top:24px;color:rgba(255,255,255,.4);font-size:13px}
 .link-row a{color:#6366f1;text-decoration:none;margin-left:4px}
 .link-row a:hover{color:#8b5cf6}
+@media(max-width:480px){
+  .card{padding:24px 16px;border-radius:16px}
+  h1{font-size:20px}
+  .sub{font-size:12px}
+  .input-wrap input{font-size:16px;padding:12px 12px 12px 40px}
+  .btn{padding:12px;font-size:15px}
+}
 </style>
 </head>
 <body>
