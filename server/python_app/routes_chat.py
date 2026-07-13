@@ -19,6 +19,9 @@ class SendReq(BaseModel):
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/chat", tags=["聊天"])
 
+# 发送锁：每个会话同时只允许一个发送请求
+_send_locks: dict[str, asyncio.Lock] = {}
+
 # 内存中缓存：chat_session_id → opencode_session_id
 # 重启丢失，聊天会话需重建
 _oc_cache: dict[str, str] = {}
@@ -112,6 +115,15 @@ async def send_message(
     user: dict = Depends(get_current_user),
 ):
     """发送消息 → SSE 流式返回 AI 回复"""
+    # 获取或创建发送锁
+    if sid not in _send_locks:
+        _send_locks[sid] = asyncio.Lock()
+
+    async with _send_locks[sid]:
+        return await _do_send_message(sid, req, user)
+
+
+async def _do_send_message(sid: str, req: SendReq, user: dict):
     content = req.content
     # 保存用户消息
     await execute_write(
