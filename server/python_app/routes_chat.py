@@ -156,11 +156,19 @@ async def _stream_response(sid: str, content: str):
 
         # 2. 发送消息
         yield f"data: {json.dumps({'status': 'sending'})}\n\n"
+        
+        # 记录发送前的消息 ID，只返回之后的新消息
+        before_msgs = await execute(
+            "SELECT id FROM chat_messages WHERE session_id=%s",
+            (sid,),
+        )
+        before_ids = {str(m['id']) for m in before_msgs}
+        
         await send_prompt(oc_id, content)
 
-        # 3. 轮询 AI 回复
+        # 3. 轮询 AI 回复（只返回新消息）
         yield f"data: {json.dumps({'status': 'thinking'})}\n\n"
-        async for chunk in poll_response(oc_id):
+        async for chunk in poll_response(oc_id, after_ids=before_ids):
             if chunk.get("done"):
                 if chunk.get("error"):
                     yield f"data: {json.dumps({'error': chunk['error'], 'done': True})}\n\n"
