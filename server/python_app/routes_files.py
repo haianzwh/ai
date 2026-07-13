@@ -192,8 +192,19 @@ async def list_uploads(user: dict = Depends(get_current_user)):
             reverse=True,
         ):
             if f.is_file():
+                # 文件名格式: YYYYMMDD_HHMMSS_原始名 → 提取原始名
+                name = f.name
+                if name[0].isdigit() and "_" in name:
+                    parts = name.split("_", 2)
+                    if len(parts) >= 3:
+                        orig = parts[2]
+                    else:
+                        orig = name
+                else:
+                    orig = name
                 files.append({
-                    "name": f.name,
+                    "name": name,
+                    "orig": orig,
                     "size": f.stat().st_size,
                     "time": datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d %H:%M"),
                     "path": str(f),

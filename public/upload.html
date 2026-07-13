@@ -9,53 +9,69 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;background:#0f1729;color:#fff;min-height:100vh}
 .h{background:rgba(99,102,241,.1);border-bottom:1px solid rgba(99,102,241,.2);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
 .h h1{font-size:18px}
-.h nav a{color:rgba(255,255,255,.5);text-decoration:none;font-size:13px;padding:6px 14px;border:1px solid rgba(255,255,255,.2);border-radius:6px;margin-left:8px}
-.list{padding:20px;max-width:700px;margin:0 auto}
+.h nav a{color:rgba(255,255,255,.5);text-decoration:none;font-size:13px;padding:6px 14px;border:1px solid rgba(255,255,255,.2);border-radius:6px;margin-left:4px}
 
-.upload{background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.15);border-radius:16px;padding:32px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:20px}
+.list{padding:20px;max-width:750px;margin:0 auto}
+
+.upload{background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.15);border-radius:16px;padding:32px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:16px}
 .upload:hover,.drag{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.08)}
 .upload svg{width:48px;height:48px;margin-bottom:12px;opacity:.4}
 .upload p{color:rgba(255,255,255,.4);font-size:14px}
 .upload .or{color:rgba(255,255,255,.2);font-size:12px;margin:8px 0}
 .upload .btn{display:inline-block;padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none}
 
-.status{text-align:center;padding:12px;font-size:13px;border-radius:8px;margin-bottom:12px;display:none}
-.status.err{background:rgba(239,68,68,.15);color:#ef4444;display:block}
-.status.ok{background:rgba(34,197,94,.15);color:#22c55e;display:block}
-.status.info{background:rgba(99,102,241,.15);color:#818cf8;display:block}
+.status-bar{margin-bottom:16px}
+.st{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:6px}
+.st.ok{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#86efac}
+.st.err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#fca5a5}
+.st.info{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);color:#a5b4fc}
+.st svg{width:16px;height:16px;flex-shrink:0}
 
-.file{display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:8px}
+.file{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:6px}
 .file:nth-child(even){background:rgba(255,255,255,.02)}
-.fn{flex:1;font-size:14px;color:rgba(255,255,255,.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.fm{font-size:11px;color:rgba(255,255,255,.25);white-space:nowrap;margin-right:8px}
-.fd{color:#6366f1;text-decoration:none;font-size:13px;padding:4px 12px;border:1px solid rgba(99,102,241,.3);border-radius:6px;white-space:nowrap}
+.thumb{width:40px;height:40px;border-radius:8px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thicon{font-size:20px;opacity:.5}
+.fn{flex:1;min-width:0}
+.fn .orig{font-size:13px;color:rgba(255,255,255,.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fn .saved{font-size:10px;color:rgba(255,255,255,.3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fm{font-size:10px;color:rgba(255,255,255,.25);white-space:nowrap}
+.fd{color:#6366f1;text-decoration:none;font-size:12px;padding:4px 10px;border:1px solid rgba(99,102,241,.3);border-radius:6px;white-space:nowrap}
 .fd:hover{background:rgba(99,102,241,.1)}
-.del{color:#ef4444;cursor:pointer;font-size:13px;padding:4px 8px;border:none;background:none;white-space:nowrap}
 .empty{text-align:center;padding:40px;color:rgba(255,255,255,.3);font-size:14px}
 .loading{text-align:center;padding:40px;color:rgba(255,255,255,.3)}
-#progress{width:100%;height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:12px;display:none;overflow:hidden}
-#progress div{height:100%;background:linear-gradient(90deg,#6366f1,#a855f7);border-radius:2px;width:0;transition:width .3s}
+
+.progress-wrap{display:none;margin-top:8px;text-align:left}
+.progress-wrap .name{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px}
+.progress-wrap progress{width:100%;height:6px;border-radius:3px;appearance:none}
+.progress-wrap progress::-webkit-progress-bar{background:rgba(255,255,255,.1);border-radius:3px}
+.progress-wrap progress::-webkit-progress-value{background:linear-gradient(90deg,#6366f1,#a855f7);border-radius:3px}
+
+.tip{text-align:center;padding:10px;font-size:11px;color:rgba(255,255,255,.2);margin-top:16px}
 
 input[type=file]{display:none}
 @media(max-width:480px){
   .h h1{font-size:16px}
+  .h nav a{font-size:11px;padding:4px 8px}
   .upload{padding:24px 12px;border-radius:12px}
   .upload svg{width:36px;height:36px}
   .upload p{font-size:13px}
   .upload .btn{padding:8px 20px;font-size:13px}
-  .file{padding:10px 12px;gap:8px}
-  .fn{font-size:12px}
-  .fm{font-size:10px}
-  .fd{padding:3px 10px;font-size:11px}
+  .file{padding:8px 10px;gap:6px}
+  .thumb{width:32px;height:32px}
+  .fn .orig{font-size:11px}
+  .fn .saved{font-size:9px}
+  .fm{font-size:9px}
+  .fd{padding:3px 8px;font-size:10px}
 }
 </style>
 </head>
 <body>
 <div class="h">
-  <h1>📂 文件管理</h1>
+  <h1>&#x1F4C2; 文件管理</h1>
   <nav>
     <a href="/">返回</a>
-    <a href="/projects.html">项目文件管理</a>
+    <a href="/projects.html">项目文件</a>
     <a href="/ranking.html">排行</a>
   </nav>
 </div>
@@ -63,26 +79,35 @@ input[type=file]{display:none}
   <div class="upload" id="dropZone">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V4m0 0L8 8m4-4l4 4M20 16v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2"/></svg>
     <p>点击或拖拽文件到此处上传</p>
-    <div class="or">支持任意文件类型，单个最大 500MB</div>
+    <div class="or">最大 100MB · 文件名自动加时间戳避免覆盖</div>
     <button class="btn" onclick="document.getElementById('fileInput').click()">选择文件</button>
     <input type="file" id="fileInput" multiple>
-    <div id="progress"><div></div></div>
+    <div class="progress-wrap" id="prog">
+      <div class="name" id="progName"></div>
+      <progress id="progBar" value="0" max="100"></progress>
+    </div>
   </div>
-  <div class="status" id="status"></div>
+  <div class="status-bar" id="statusBar"></div>
   <div id="fileList"><div class="loading">加载中...</div></div>
+  <div class="tip">&#x26A0; 上传后记下<b style="color:rgba(255,255,255,.5)">文件名</b>发给AI助手，它才能找到这个文件</div>
 </div>
 <script>
 var T = localStorage.getItem('auth_token');
 if (!T) { location.href = '/login.html'; }
-var H = { Authorization: 'Bearer ' + T };
+var H_API = { Authorization: 'Bearer ' + T };
 
-function showStatus(msg, cls) {
-  var s = document.getElementById('status');
-  s.textContent = msg; s.className = 'status ' + cls;
-  setTimeout(function() { s.className = 'status'; }, 4000);
+// 状态提示（不消失，新提示追加）
+function addStatus(msg, cls) {
+  var bar = document.getElementById('statusBar');
+  var d = document.createElement('div');
+  d.className = 'st ' + cls;
+  d.innerHTML = (cls==='ok'?'&#x2705;':cls==='err'?'&#x274C;':'&#x1F4E4;')+' '+msg;
+  bar.insertBefore(d, bar.firstChild);
+  // 最多保留5条
+  while (bar.children.length > 5) bar.removeChild(bar.lastChild);
 }
 
-// 拖拽上传
+// 拖拽
 var dz = document.getElementById('dropZone');
 dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('drag'); });
 dz.addEventListener('dragleave', function() { dz.classList.remove('drag'); });
@@ -96,49 +121,113 @@ dz.addEventListener('click', function(e) {
 });
 
 document.getElementById('fileInput').addEventListener('change', function() {
-  if (this.files.length) uploadFiles(this.files);
+  if (this.files.length) { uploadFiles(this.files); this.value = ''; }
 });
 
-async function uploadFiles(files) {
-  for (var i = 0; i < files.length; i++) {
-    var f = files[i];
-    showStatus('上传中: ' + f.name + ' (' + fmtSize(f.size) + ')', 'info');
-    
+// XHR 上传（支持进度条）
+function uploadFileXHR(file) {
+  return new Promise(function(resolve, reject) {
+    var xhr = new XMLHttpRequest();
     var fd = new FormData();
-    fd.append('file', f);
-    
+    fd.append('file', file);
+
+    var bar = document.getElementById('prog');
+    var barName = document.getElementById('progName');
+    var barVal = document.getElementById('progBar');
+    bar.style.display = 'block';
+    barName.textContent = file.name + ' (' + fmtSize(file.size) + ')';
+    barVal.value = 0;
+
+    xhr.upload.addEventListener('progress', function(e) {
+      if (e.lengthComputable) barVal.value = Math.round(e.loaded / e.total * 100);
+    });
+
+    xhr.addEventListener('load', function() {
+      bar.style.display = 'none';
+      try {
+        var d = JSON.parse(xhr.responseText);
+        if (d.success) resolve(d);
+        else reject(new Error(d.message || '服务器错误'));
+      } catch(e) { reject(new Error('响应解析失败')); }
+    });
+
+    xhr.addEventListener('error', function() {
+      bar.style.display = 'none';
+      reject(new Error('网络错误'));
+    });
+
+    xhr.open('POST', '/auth/api/upload');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + T);
+    xhr.send(fd);
+  });
+}
+
+async function uploadFiles(files) {
+  var ok = 0, fail = 0;
+  for (var i = 0; i < files.length; i++) {
+    addStatus('正在上传: ' + files[i].name, 'info');
     try {
-      var r = await fetch('/auth/api/upload', { method: 'POST', headers: H, body: fd });
-      var d = await r.json();
-      if (d.success) {
-        showStatus('上传成功: ' + d.original + ' (' + fmtSize(d.size) + ')', 'ok');
-      } else {
-        showStatus('上传失败: ' + (d.error || d.message || '未知错误'), 'err');
-      }
+      var d = await uploadFileXHR(files[i]);
+      addStatus('上传成功: ' + d.original + ' (' + fmtSize(d.size) + ')', 'ok');
+      ok++;
     } catch(e) {
-      showStatus('网络错误: ' + e.message, 'err');
+      addStatus('上传失败: ' + files[i].name + ' - ' + e.message, 'err');
+      fail++;
     }
+  }
+  if (ok > 0 || fail > 0) {
+    addStatus('完成: ' + ok + '个成功, ' + fail + '个失败', 'info');
   }
   loadFiles();
 }
 
+// 判断文件类型图标
+function fileIcon(name) {
+  var ext = name.split('.').pop().toLowerCase();
+  if (['jpg','jpeg','png','gif','webp','svg','bmp'].includes(ext)) return 'img';
+  if (['pdf'].includes(ext)) return 'pdf';
+  if (['zip','tar','gz','rar','7z'].includes(ext)) return 'zip';
+  if (['doc','docx'].includes(ext)) return 'doc';
+  if (['xls','xlsx'].includes(ext)) return 'xls';
+  if (['ppt','pptx'].includes(ext)) return 'ppt';
+  if (['mp4','mov','avi','mkv'].includes(ext)) return 'vid';
+  if (['mp3','wav','flac'].includes(ext)) return 'aud';
+  return 'file';
+}
+
+var ICONS = {
+  img: '&#x1F5BC;', pdf: '&#x1F4C4;', zip: '&#x1F4E6;',
+  doc: '&#x1F4DD;', xls: '&#x1F4CA;', ppt: '&#x1F4CA;',
+  vid: '&#x1F3AC;', aud: '&#x1F3B5;', file: '&#x1F4CE;'
+};
+
 async function loadFiles() {
   try {
-    var r = await fetch('/auth/api/uploads', { headers: H });
+    var r = await fetch('/auth/api/uploads', { headers: H_API });
     var d = await r.json();
     var el = document.getElementById('fileList');
-    
+
     if (!d.files.length) {
       el.innerHTML = '<div class="empty">还没有上传过文件</div>';
       return;
     }
-    
+
     el.innerHTML = d.files.map(function(f) {
+      var fi = fileIcon(f.name);
+      var isImg = fi === 'img';
+      var thumb = isImg
+        ? '<img src="/auth/api/download/file?path='+encodeURIComponent(f.path)+'" loading="lazy" onerror="this.parentElement.innerHTML=\'<span class=thicon>'+ICONS.img+'</span>\'">'
+        : '<span class="thicon">'+ICONS[fi]+'</span>';
+
       return '<div class="file">' +
-        '<span class="fn" title="' + esc(f.name) + '">' + esc(f.name) + '</span>' +
-        '<span class="fm">' + f.time + '</span>' +
-        '<span class="fm">' + fmtSize(f.size) + '</span>' +
-        '<a class="fd" href="/auth/api/download/file?path=' + encodeURIComponent(f.path || '/tmp/opencode/generated_files/uploads/' + f.name) + '">下载</a>' +
+        '<div class="thumb">'+thumb+'</div>' +
+        '<div class="fn">' +
+          '<div class="orig" title="原始名称: '+esc(f.orig||f.name)+'">'+esc(f.orig||f.name)+'</div>' +
+          '<div class="saved">保存为: '+esc(f.name)+'</div>' +
+        '</div>' +
+        '<span class="fm">'+f.time+'</span>' +
+        '<span class="fm">'+fmtSize(f.size)+'</span>' +
+        '<a class="fd" href="/auth/api/download/file?path='+encodeURIComponent(f.path)+'">下载</a>' +
         '</div>';
     }).join('');
   } catch(e) {
