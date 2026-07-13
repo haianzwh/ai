@@ -59,24 +59,31 @@ async def poll_response(session_id: str, existing_ids: set[str] = None, timeout:
                 await asyncio.sleep(1)
                 continue
 
-            for msg in messages:
+            # 只处理新消息
+            new_messages = [m for m in messages if m.get("id") not in seen]
+            print(f"[DEBUG] poll: total={len(messages)} new={len(new_messages)} seen={len(seen)}", flush=True)
+            
+            for msg in new_messages:
                 mid = msg.get("id", "")
-                if mid in seen:
-                    continue
+                seen.add(mid)  # 立即标记为已见
+                print(f"[DEBUG] processing msg: id={mid[:20]} type={msg.get('type')} finish={msg.get('finish')}", flush=True)
+                
                 mtype = msg.get("type", "")
                 if mtype == "user":
-                    seen.add(mid)
                     continue
 
                 if mtype == "assistant":
-                    seen.add(mid)
                     if msg.get("finish") == "error":
                         continue
+                    
+                    # 提取文本内容
                     for block in msg.get("content", []):
                         text = block.get("text", "") if isinstance(block, dict) else str(block)
                         if text:
                             yield {"content": text, "done": False}
-                    if msg.get("finish") == "stop":
+                    
+                    # finish 为 stop/None 都视为完成
+                    if msg.get("finish") in ("stop", None, ""):
                         yield {"content": "", "done": True}
                         return
 
