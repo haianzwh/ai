@@ -67,7 +67,7 @@ async def list_sessions(user: dict = Depends(get_current_user)):
 async def create_session(user: dict = Depends(get_current_user)):
     sid = f"chat_{uuid.uuid4().hex[:12]}"
 
-    # 在 opencode 中创建对应会话
+    # 提前创建 opencode 会话（预热，后续发消息不用等）
     oc_id = ""
     try:
         oc = await create_opencode_session()
