@@ -48,6 +48,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
   .sidebar{display:none}
   .sidebar.open{display:block;position:fixed;top:0;left:0;bottom:0;z-index:100;width:260px}
   .h .menu-btn{display:block!important}
+  #modelSelectMobile{display:inline-block!important}
+  .h nav a{font-size:11px;padding:3px 6px}
 }
 </style>
 </head>
@@ -55,12 +57,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 <div class="h">
   <button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')" style="display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer">☰</button>
   <h1>🤖 AI Chat</h1>
-  <nav>
-    <a href="/upload.html">📤 上传</a>
-    <a href="/projects.html">📁 项目</a>
-    <a href="/ranking.html">🏆 排行</a>
-    <a href="#" onclick="logout()">退出</a>
-  </nav>
+  <div style="display:flex;align-items:center;gap:6px">
+    <select id="modelSelectMobile" onchange="switchModelMobile()" style="display:none;padding:4px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#fff;font-size:11px;outline:none">
+      <option value="deepseek-v4-flash-free">DeepSeek V4 Flash</option>
+      <option value="north-mini-code-free">North Mini Code</option>
+      <option value="mimo-v2.5-free">Mimo V2.5</option>
+    </select>
+    <nav>
+      <a href="/upload.html">📤</a>
+      <a href="/projects.html">📁</a>
+      <a href="/ranking.html">🏆</a>
+      <a href="#" onclick="logout()" style="color:rgba(239,68,68,.6)">退出</a>
+    </nav>
+  </div>
 </div>
 <div class="main">
   <div class="sidebar" id="sidebar">
@@ -142,9 +151,15 @@ async function del(sid) {
 
 async function switchModel() {
   curModel = document.getElementById('modelSelect').value;
+  document.getElementById('modelSelectMobile').value = curModel;
   if (curSession) {
     await fetch('/auth/api/chat/sessions/' + curSession + '/model?model=' + curModel, { method: 'PUT', headers: H });
   }
+}
+function switchModelMobile() {
+  curModel = document.getElementById('modelSelectMobile').value;
+  document.getElementById('modelSelect').value = curModel;
+  switchModel();
 }
 
 async function send() {

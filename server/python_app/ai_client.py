@@ -7,7 +7,7 @@ import httpx, json, asyncio
 from typing import AsyncGenerator
 
 OPENCODE_URL = "http://localhost:4096"
-DEFAULT_MODEL = "north-mini-code-free"
+DEFAULT_MODEL = "deepseek-v4-flash-free"
 
 
 async def create_opencode_session(model: str = DEFAULT_MODEL) -> dict:
