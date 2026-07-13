@@ -142,6 +142,7 @@ async def send_message(
 
 async def _stream_response(sid: str, oc_id: str):
     full = ""
+    thinking = ""
     try:
         async for chunk in poll_response(oc_id):
             if chunk.get("done"):
@@ -149,19 +150,28 @@ async def _stream_response(sid: str, oc_id: str):
                     yield f"data: {json.dumps({'error': chunk['error'], 'done': True})}\n\n"
                 else:
                     await execute_write(
-                        "INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)",
-                        (sid, "assistant", full),
+                        "INSERT INTO chat_messages (session_id, role, content, thinking) VALUES (%s,%s,%s,%s)",
+                        (sid, "assistant", full, thinking),
                     )
                     yield f"data: {json.dumps({'done': True})}\n\n"
                 return
+
+            # 思考过程
+            if chunk.get("thinking"):
+                delta = chunk["thinking"]
+                thinking += delta
+                yield f"data: {json.dumps({'thinking': delta})}\n\n"
+
+            # 正文
             delta = chunk.get("content", "")
-            full += delta
-            yield f"data: {json.dumps({'content': delta})}\n\n"
+            if delta:
+                full += delta
+                yield f"data: {json.dumps({'content': delta})}\n\n"
     except Exception as e:
         if full:
             await execute_write(
-                "INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)",
-                (sid, "assistant", full),
+                "INSERT INTO chat_messages (session_id, role, content, thinking) VALUES (%s,%s,%s,%s)",
+                (sid, "assistant", full, thinking),
             )
         yield f"data: {json.dumps({'error': str(e), 'done': True})}\n\n"
 

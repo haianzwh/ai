@@ -95,7 +95,16 @@ async def poll_response(session_id: str, timeout: int = 120) -> AsyncGenerator[d
                         continue
 
                     for block in content_blocks:
+                        btype = block.get("type", "text")
                         block_text = block.get("text", "") if isinstance(block, dict) else str(block)
+
+                        # reasoning/thinking 类型
+                        if btype in ("reasoning", "thinking", "thought"):
+                            if block_text:
+                                yield {"thinking": block_text, "done": False}
+                            continue
+
+                        # 主文本
                         if block_text:
                             if block_text != full_text and block_text.startswith(full_text):
                                 delta = block_text[len(full_text):]
