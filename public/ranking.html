@@ -39,6 +39,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="tabs">
     <button class="tab active" id="tb-proj" onclick="load('projects')">&#x1F4CA; 项目排名</button>
     <button class="tab" id="tb-user" onclick="load('users')">&#x1F465; 人员排名</button>
+    <span style="display:flex;align-items:center;margin-left:auto;gap:4px">
+      <button class="tab active" id="tb-daily" onclick="changeType('daily')" style="font-size:12px">今日</button>
+      <button class="tab" id="tb-all" onclick="changeType('all')" style="font-size:12px">累计</button>
+    </span>
   </div>
   <div class="summary" id="sum"></div>
   <div id="rank"><div class="load">加载中...</div></div>
@@ -46,10 +50,18 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <script>
 var T = localStorage.getItem('auth_token');
 if(!T)location.href='/login.html';
+var rankType = 'daily';
 
 function fmt(n){return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(n)}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function rk(i){return i<3?'<span class="rank r'+(i+1)+'">'+(i+1)+'</span>':i+1}
+
+function changeType(t){
+  rankType = t;
+  document.getElementById('tb-daily').classList.toggle('active', t==='daily');
+  document.getElementById('tb-all').classList.toggle('active', t==='all');
+  load('projects');
+}
 
 async function load(t){
   document.getElementById('tb-proj').classList.toggle('active',t==='projects');
@@ -57,15 +69,16 @@ async function load(t){
   document.getElementById('rank').innerHTML='<div class="load">加载中...</div>';
   
   if(t==='projects'){
-    var r=await fetch('/auth/api/stats/ranking',{headers:{Authorization:'Bearer '+T}});
+    var r=await fetch('/auth/api/stats/ranking?type='+rankType,{headers:{Authorization:'Bearer '+T}});
     var d=await r.json();
+    var label = rankType==='daily' ? '今日' : '累计';
     document.getElementById('sum').innerHTML=[
-      {v:fmt(d.totals.total),l:'总 Token'},
-      {v:d.totals.sessions,l:'会话数'},
+      {v:fmt(d.totals.total),l:label+' Token'},
+      {v:d.totals.sessions,l:label+'会话'},
       {v:fmt(d.totals.input),l:'输入'},
       {v:fmt(d.totals.output),l:'输出'}
     ].map(c=>'<div class="card"><div class="card-val">'+c.v+'</div><div class="card-label">'+c.l+'</div></div>').join('');
-    document.getElementById('rank').innerHTML='<table><thead><tr><th>#</th><th>项目</th><th class="token">总Token</th><th class="token">输入</th><th class="token">输出</th><th class="token">会话</th></tr></thead><tbody>'+d.ranking.map((p,i)=>'<tr><td>'+rk(i)+'</td><td><span class="name">'+esc(p.name)+'</span></td><td class="token">'+fmt(p.total)+'</td><td class="token">'+fmt(p.input)+'</td><td class="token">'+fmt(p.output)+'</td><td class="token">'+p.sessions+'</td></tr>').join('')+'</tbody></table>';
+    document.getElementById('rank').innerHTML='<table><thead><tr><th>#</th><th>项目</th><th class="token">'+label+'Token</th><th class="token">输入</th><th class="token">输出</th><th class="token">会话</th></tr></thead><tbody>'+d.ranking.map((p,i)=>'<tr><td>'+rk(i)+'</td><td><span class="name">'+esc(p.name)+'</span></td><td class="token">'+fmt(p.total)+'</td><td class="token">'+fmt(p.input)+'</td><td class="token">'+fmt(p.output)+'</td><td class="token">'+p.sessions+'</td></tr>').join('')+'</tbody></table>';
   }else{
     var r=await fetch('/auth/api/stats/users',{headers:{Authorization:'Bearer '+T}});
     var d=await r.json();

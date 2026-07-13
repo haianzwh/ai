@@ -6,7 +6,7 @@
 """
 from datetime import datetime, timezone, timedelta
 import httpx
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from .database import execute, execute_write
 from .auth import get_current_user
@@ -26,16 +26,32 @@ def _mask(s: str) -> str:
 
 
 @router.get("/ranking")
-async def project_ranking(user: dict = Depends(get_current_user)):
+async def project_ranking(
+    user: dict = Depends(get_current_user),
+    type: str = Query("daily", description="daily=今日, all=累计"),
+):
     """
-    项目 Token 排名。
-    
+    项目 Token 排名（默认按今日消耗排序）。
+
     从 opencode 获取所有会话，按标题聚合 Token 用量，
     按 total 降序排列返回前 50 名。
+    
+    参数 type=daily → 仅统计今日会话（默认）
+    参数 type=all   → 统计全部历史会话
     """
     async with httpx.AsyncClient() as client:
         resp = await client.get(f"{OPENCODE_BASE_URL}/api/session")
         sessions = resp.json().get("data", [])
+
+    # 如果是 daily 模式，过滤出今日有活动的 session
+    if type == "daily":
+        today_ms_start = int(datetime.now(timezone.utc).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        ).timestamp() * 1000)
+        sessions = [
+            s for s in sessions
+            if (s.get("time", {}).get("updated", 0) or 0) >= today_ms_start
+        ]
 
     # 按标题聚合
     stats: dict[str, dict] = {}
