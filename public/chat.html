@@ -195,12 +195,13 @@ loadSessions();
   if (msgs.querySelector('.empty')) msgs.innerHTML = '';
   msgs.innerHTML += '<div class="msg user"><div class="msg-content">'+esc(text)+'</div></div>';
 
-  var aiDiv = document.createElement('div');
-  aiDiv.className = 'msg assistant';
-  aiDiv.innerHTML = '<div class="msg-content"></div>';
-  msgs.appendChild(aiDiv);
-  var aiContent = aiDiv.querySelector('.msg-content');
-  msgs.scrollTop = msgs.scrollHeight;
+var aiDiv = document.createElement('div');
+aiDiv.className = 'msg assistant';
+aiDiv.innerHTML = '<div class="msg-content" style="color:rgba(255,255,255,.3);font-size:12px">⏳ 等待中...</div>';
+msgs.appendChild(aiDiv);
+var aiContent = aiDiv.querySelector('.msg-content');
+aiContent.textContent = '';  // 清掉等待文案
+msgs.scrollTop = msgs.scrollHeight;
 
   try {
     var r = await fetch('/auth/api/chat/sessions/'+curSession+'/send', {
@@ -224,6 +225,12 @@ loadSessions();
         try {
           var d = JSON.parse(l.slice(6));
           if (d.done) break;
+          // 状态反馈
+          if (d.status) {
+            var statusTexts = {connecting:'⏳ 连接中...', sending:'📤 发送中...', thinking:'💭 思考中...'};
+            aiContent.textContent = statusTexts[d.status] || d.status;
+            continue;
+          }
           // 思考过程
           if (d.thinking) {
             if (!thinkingAdded) {
