@@ -1,20 +1,31 @@
 """
 =============================================================================
   AI 客户端 — 通过 opencode web API 调用模型
-  opencode 管理模型选择、API key、流式输出
 =============================================================================
 """
 import httpx, json, asyncio
 from typing import AsyncGenerator
 
 OPENCODE_URL = "http://localhost:4096"
+DEFAULT_MODEL = "north-mini-code-free"
 
 
-async def create_opencode_session() -> dict:
-    """在 opencode 中创建新会话"""
+async def create_opencode_session(model: str = DEFAULT_MODEL) -> dict:
+    """在 opencode 中创建新会话，并切换到指定模型"""
     async with httpx.AsyncClient() as client:
+        # 1. 创建会话
         resp = await client.post(f"{OPENCODE_URL}/api/session", json={})
-        return resp.json().get("data", {})
+        session = resp.json().get("data", {})
+        sid = session.get("id", "")
+
+        # 2. 切换到指定模型
+        if sid and model:
+            await client.put(
+                f"{OPENCODE_URL}/api/session/{sid}/model",
+                json={"modelID": model},
+            )
+
+        return session
 
 
 async def send_prompt(session_id: str, text: str) -> str:
@@ -28,13 +39,13 @@ async def send_prompt(session_id: str, text: str) -> str:
         return data.get("data", {}).get("id", "")
 
 
-async def poll_response(session_id: str, after_seq: int = 0, timeout: int = 120) -> AsyncGenerator[dict, None]:
+async def poll_response(session_id: str, timeout: int = 120) -> AsyncGenerator[dict, None]:
     """
     轮询 opencode 消息，获取 AI 回复。
-    返回 AsyncGenerator，逐条 yield 消息增量。
+    追踪已处理的消息 ID，逐条 yield 新消息增量。
     """
     start = asyncio.get_event_loop().time()
-    last_seq = after_seq
+    seen: set[str] = set()  # 已处理的消息 ID
     full_text = ""
 
     async with httpx.AsyncClient() as client:
@@ -57,40 +68,49 @@ async def poll_response(session_id: str, after_seq: int = 0, timeout: int = 120)
                 await asyncio.sleep(1)
                 continue
 
-            # 找新增的 assistant 消息
-            new_messages = [m for m in messages if m.get("seq", 0) > last_seq]
-            if not new_messages:
-                await asyncio.sleep(0.5)
-                continue
+            # 找没见过的 assistant 消息
+            for msg in messages:
+                mid = msg.get("id", "")
+                if mid in seen:
+                    continue
 
-            for msg in new_messages:
-                last_seq = max(last_seq, msg.get("seq", 0))
+                mtype = msg.get("type", "")
 
-                if msg.get("role") == "assistant" or msg.get("type") == "text":
-                    content = msg.get("text", "") or msg.get("content", "")
-                    if isinstance(content, dict):
-                        content = content.get("text", "")
-                    if not content:
-                        continue
-
-                    # 增量返回（避免重复）
-                    if content != full_text and content.startswith(full_text):
-                        delta = content[len(full_text):]
-                        full_text = content
-                        yield {"content": delta, "done": False}
-                    elif content != full_text:
-                        full_text = content
-                        yield {"content": content, "done": False}
-
-                elif msg.get("type") == "error" or msg.get("error"):
-                    yield {"content": "", "done": True, "error": str(msg.get("error", "未知错误"))}
+                # 检测错误
+                error = msg.get("error")
+                if error:
+                    yield {"content": "", "done": True, "error": str(error.get("message", error))}
                     return
 
-            if any(m.get("complete") for m in new_messages if m.get("role") == "assistant"):
-                yield {"content": "", "done": True, "error": None}
-                return
+                if mtype == "assistant":
+                    seen.add(mid)
 
-            await asyncio.sleep(0.3)
+                    # 跳过未完成的消息
+                    if msg.get("finish") == "error":
+                        continue
+
+                    # 从 content 数组中提取文本
+                    content_blocks = msg.get("content", [])
+                    if not content_blocks:
+                        continue
+
+                    for block in content_blocks:
+                        block_text = block.get("text", "") if isinstance(block, dict) else str(block)
+                        if block_text:
+                            if block_text != full_text and block_text.startswith(full_text):
+                                delta = block_text[len(full_text):]
+                            else:
+                                delta = block_text
+                                full_text = ""
+                            full_text += delta
+                            yield {"content": delta, "done": False}
+
+                    # 消息完成后退出
+                    if msg.get("finish") == "stop":
+                        yield {"content": "", "done": True, "error": None}
+                        return
+
+            await asyncio.sleep(0.5)
 
 
 async def get_session_messages(session_id: str) -> list[dict]:

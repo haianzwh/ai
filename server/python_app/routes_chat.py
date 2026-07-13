@@ -4,8 +4,13 @@
 =============================================================================
 """
 import json, uuid, asyncio, logging
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Body
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+
+
+class SendReq(BaseModel):
+    content: str
 
 from .database import execute, execute_write
 from .auth import get_current_user
@@ -54,7 +59,7 @@ async def create_session(user: dict = Depends(get_current_user)):
 
     await execute_write(
         "INSERT INTO chat_sessions (id, username, title, model) VALUES (%s,%s,%s,%s)",
-        (sid, user["username"], "新对话", model),
+        (sid, user["username"], "新对话", "hy3-free"),
     )
     return {"success": True, "id": sid, "title": "新对话"}
 
@@ -89,10 +94,11 @@ async def get_messages(sid: str, user: dict = Depends(get_current_user)):
 @router.post("/sessions/{sid}/send")
 async def send_message(
     sid: str,
-    content: str = Query(..., description="消息"),
+    req: SendReq,
     user: dict = Depends(get_current_user),
 ):
     """发送消息 → SSE 流式返回 AI 回复"""
+    content = req.content
     # 保存用户消息
     await execute_write(
         "INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)",
@@ -137,7 +143,7 @@ async def send_message(
 async def _stream_response(sid: str, oc_id: str):
     full = ""
     try:
-        async for chunk in poll_response(oc_id, after_seq=0):
+        async for chunk in poll_response(oc_id):
             if chunk.get("done"):
                 if chunk.get("error"):
                     yield f"data: {json.dumps({'error': chunk['error'], 'done': True})}\n\n"

@@ -67,8 +67,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
     <div class="new-btn"><button onclick="newChat()">+ 新建对话</button></div>
     <div class="model-select">
       <select id="modelSelect" onchange="switchModel()">
-        <option value="deepseek-chat">DeepSeek V3</option>
-        <option value="deepseek-reasoner">DeepSeek R1</option>
+        <option value="north-mini-code-free">North Mini Code</option>
+        <option value="mimo-v2.5-free">Mimo V2.5</option>
       </select>
     </div>
     <div class="title">会话列表</div>
@@ -167,7 +167,11 @@ async function send() {
   msgs.scrollTop = msgs.scrollHeight;
 
   try {
-    var r = await fetch('/auth/api/chat/sessions/'+curSession+'/send?content='+encodeURIComponent(text)+'&stream=true', { headers: H });
+    var r = await fetch('/auth/api/chat/sessions/'+curSession+'/send', {
+      method: 'POST',
+      headers: Object.assign({'Content-Type': 'application/json'}, H),
+      body: JSON.stringify({content: text}),
+    });
     var reader = r.body.getReader();
     var decoder = new TextDecoder();
     var buf = '';
