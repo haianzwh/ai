@@ -8,17 +8,13 @@ from fastapi import APIRouter, HTTPException, Depends, Query, Body
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from .database import execute, execute_write
+from .database import execute, execute_write, execute_one
 from .auth import get_current_user
 from .ai_client import create_opencode_session, send_prompt, poll_response, OPENCODE_URL
 
 
 class SendReq(BaseModel):
     content: str
-
-from .database import execute, execute_write
-from .auth import get_current_user
-from .ai_client import create_opencode_session, send_prompt, poll_response
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/chat", tags=["聊天"])
@@ -69,25 +65,22 @@ async def create_session(user: dict = Depends(get_current_user)):
     sid = f"chat_{uuid.uuid4().hex[:12]}"
 
     # 在 opencode 中创建对应会话
+    oc_id = ""
     try:
         oc = await create_opencode_session()
         oc_id = oc.get("id", "")
-        _oc_cache[sid] = oc_id
-        model = oc.get("model", "unknown")
     except Exception:
-        oc_id = ""
-        model = "unknown"
+        pass
 
     await execute_write(
-        "INSERT INTO chat_sessions (id, username, title, model) VALUES (%s,%s,%s,%s)",
-        (sid, user["username"], "新对话", "hy3-free"),
+        "INSERT INTO chat_sessions (id, username, title, model, oc_session_id) VALUES (%s,%s,%s,%s,%s)",
+        (sid, user["username"], "新对话", "deepseek-v4-flash-free", oc_id),
     )
     return {"success": True, "id": sid, "title": "新对话"}
 
 
 @router.delete("/sessions/{sid}")
 async def delete_session(sid: str, user: dict = Depends(get_current_user)):
-    _oc_cache.pop(sid, None)
     await execute_write("DELETE FROM chat_messages WHERE session_id=%s", (sid,))
     await execute_write("DELETE FROM chat_sessions WHERE id=%s AND username=%s", (sid, user["username"]))
     return {"success": True}
@@ -126,16 +119,17 @@ async def send_message(
         (sid, "user", content),
     )
 
-    # 获取或创建 opencode 会话
-    oc_id = _oc_cache.get(sid)
+    # 获取或创建 opencode 会话（持久化到DB，复用上下文）
+    session = await execute_one("SELECT oc_session_id FROM chat_sessions WHERE id=%s", (sid,))
+    oc_id = session["oc_session_id"] if session else ""
     if not oc_id:
         try:
             oc = await create_opencode_session()
             oc_id = oc.get("id", "")
-            _oc_cache[sid] = oc_id
+            await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
         except Exception as e:
             return StreamingResponse(
-                _error_stream(f"创建AI会话失败: {e}"),
+                _error_stream(f"创建AI会话: {e}"),
                 media_type="text/event-stream",
             )
 
