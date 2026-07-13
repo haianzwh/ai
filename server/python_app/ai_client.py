@@ -42,7 +42,7 @@ async def send_prompt(session_id: str, text: str) -> str:
 async def poll_response(session_id: str, timeout: int = 120) -> AsyncGenerator[dict, None]:
     """轮询 opencode 消息，获取 AI 回复。"""
     start = asyncio.get_event_loop().time()
-    seen: set[str] = set()  # 已处理的消息 ID
+    seen: set[str] = set()
     full_text = ""
 
     async with httpx.AsyncClient() as client:
@@ -65,11 +65,56 @@ async def poll_response(session_id: str, timeout: int = 120) -> AsyncGenerator[d
                 await asyncio.sleep(1)
                 continue
 
-            # 找没见过的消息
             for msg in messages:
                 mid = msg.get("id", "")
                 if mid in seen:
                     continue
+                mtype = msg.get("type", "")
+
+                # 用户消息直接标记已见，跳过
+                if mtype == "user":
+                    seen.add(mid)
+                    continue
+
+                # 错误消息
+                error = msg.get("error")
+                if error:
+                    seen.add(mid)
+                    yield {"content": "", "done": True, "error": str(error.get("message", error))}
+                    return
+
+                if mtype == "assistant":
+                    seen.add(mid)
+                    if msg.get("finish") == "error":
+                        continue
+
+                    content_blocks = msg.get("content", [])
+                    if not content_blocks:
+                        continue
+
+                    for block in content_blocks:
+                        btype = block.get("type", "text")
+                        block_text = block.get("text", "") if isinstance(block, dict) else str(block)
+
+                        if btype in ("reasoning", "thinking", "thought"):
+                            if block_text:
+                                yield {"thinking": block_text, "done": False}
+                            continue
+
+                        if block_text:
+                            if block_text != full_text and block_text.startswith(full_text):
+                                delta = block_text[len(full_text):]
+                            else:
+                                delta = block_text
+                                full_text = ""
+                            full_text += delta
+                            yield {"content": delta, "done": False}
+
+                    if msg.get("finish") == "stop":
+                        yield {"content": "", "done": True, "error": None}
+                        return
+
+            await asyncio.sleep(0.5)
 
                 mtype = msg.get("type", "")
 
