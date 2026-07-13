@@ -115,12 +115,7 @@ async def send_message(
     user: dict = Depends(get_current_user),
 ):
     """发送消息 → SSE 流式返回 AI 回复"""
-    # 获取或创建发送锁
-    if sid not in _send_locks:
-        _send_locks[sid] = asyncio.Lock()
-
-    async with _send_locks[sid]:
-        return await _do_send_message(sid, req, user)
+    return await _do_send_message(sid, req, user)
 
 
 async def _do_send_message(sid: str, req: SendReq, user: dict):

@@ -40,10 +40,7 @@ async def send_prompt(session_id: str, text: str) -> str:
 
 
 async def poll_response(session_id: str, timeout: int = 120) -> AsyncGenerator[dict, None]:
-    """
-    轮询 opencode 消息，获取 AI 回复。
-    追踪已处理的消息 ID，逐条 yield 新消息增量。
-    """
+    """轮询 opencode 消息，获取 AI 回复。"""
     start = asyncio.get_event_loop().time()
     seen: set[str] = set()  # 已处理的消息 ID
     full_text = ""
@@ -65,10 +62,8 @@ async def poll_response(session_id: str, timeout: int = 120) -> AsyncGenerator[d
                 )
                 messages = resp.json().get("data", [])
             except Exception:
-                await asyncio.sleep(1)
-                continue
 
-            # 找没见过的 assistant 消息
+            # 找没见过的消息
             for msg in messages:
                 mid = msg.get("id", "")
                 if mid in seen:
@@ -76,9 +71,15 @@ async def poll_response(session_id: str, timeout: int = 120) -> AsyncGenerator[d
 
                 mtype = msg.get("type", "")
 
+                # 用户消息直接标记已见
+                if mtype == "user":
+                    seen.add(mid)
+                    continue
+
                 # 检测错误
                 error = msg.get("error")
                 if error:
+                    seen.add(mid)
                     yield {"content": "", "done": True, "error": str(error.get("message", error))}
                     return
 
