@@ -18,6 +18,7 @@ async def create_opencode_session(model: str = DEFAULT_MODEL) -> dict:
         sid = session.get("id", "")
         if sid and model:
             await client.put(f"{OPENCODE_URL}/api/session/{sid}/model", json={"modelID": model})
+            await asyncio.sleep(2)  # 等会话初始化
         return session
 
 
