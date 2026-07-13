@@ -146,7 +146,7 @@ window.doLogin=async function(){
     if(data.success){
       localStorage.setItem('auth_token',data.token);
       localStorage.setItem('user_info',JSON.stringify(data.user));
-      document.cookie = 'auth_token=' + data.token + ';path=/;max-age=86400';
+      document.cookie = 'auth_token=' + data.token + ';path=/;max-age=86400;SameSite=Lax';
       if(document.getElementById('r').checked){
         localStorage.setItem('saved_username',u);
         localStorage.setItem('saved_password',p);
