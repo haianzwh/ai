@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Chat</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;background:#0f1729;color:#fff;height:100vh;display:flex;flex-direction:column}
+.h{background:rgba(99,102,241,.1);border-bottom:1px solid rgba(99,102,241,.2);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.h h1{font-size:16px;white-space:nowrap}
+.h nav{display:flex;gap:6px}
+.h nav a{color:rgba(255,255,255,.5);text-decoration:none;font-size:12px;padding:4px 10px;border:1px solid rgba(255,255,255,.2);border-radius:4px}
+.sidebar{width:260px;background:rgba(0,0,0,.2);border-right:1px solid rgba(255,255,255,.06);overflow-y:auto;display:flex;flex-direction:column}
+.sidebar .new-btn{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sidebar .new-btn button{width:100%;padding:10px;border:none;border-radius:8px;background:rgba(99,102,241,.2);color:#fff;cursor:pointer;font-size:13px}
+.session{padding:10px 16px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.6);border-left:3px solid transparent;display:flex;justify-content:space-between;align-items:center}
+.session:hover,.session.active{background:rgba(99,102,241,.1);color:#fff;border-left-color:#6366f1}
+.session .del{border:none;background:none;color:rgba(255,255,255,.2);cursor:pointer;font-size:14px;padding:2px 4px;visibility:hidden}
+.session:hover .del{visibility:visible}
+.session .del:hover{color:#ef4444}
+
+.main{flex:1;display:flex;overflow:hidden}
+.chat{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.messages{flex:1;overflow-y:auto;padding:20px}
+.msg{margin-bottom:16px;max-width:85%}
+.msg.user{margin-left:auto;text-align:right}
+.msg .msg-content{display:inline-block;padding:10px 16px;border-radius:16px;font-size:14px;line-height:1.6;text-align:left}
+.msg.user .msg-content{background:#6366f1}
+.msg.assistant .msg-content{background:rgba(255,255,255,.08)}
+.msg .thinking{font-size:12px;color:rgba(255,255,255,.4);padding:8px 12px;margin-bottom:4px;background:rgba(0,0,0,.2);border-radius:8px;display:none}
+.msg .thinking.show{display:block}
+.msg .thinking summary{cursor:pointer;font-size:11px}
+.thinking summary::before{content:'🧠 思考中... '}
+.toolbar{padding:12px 20px;border-top:1px solid rgba(255,255,255,.06);display:flex;gap:8px;align-items:center}
+.toolbar textarea{flex:1;padding:10px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:14px;resize:none;outline:none;min-height:44px;max-height:150px;font-family:inherit}
+.toolbar textarea:focus{border-color:#6366f1}
+.toolbar button{padding:10px 20px;border:none;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;cursor:pointer;font-weight:600;font-size:13px;white-space:nowrap}
+.toolbar button:disabled{opacity:.5}
+.loading{text-align:center;padding:40px;color:rgba(255,255,255,.4)}
+.empty{text-align:center;padding:80px 20px;color:rgba(255,255,255,.3);font-size:14px}
+.empty p{margin:8px 0}
+.model-select{padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
+.model-select select{width:100%;padding:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#fff;font-size:12px;outline:none}
+.title{font-size:12px;color:rgba(255,255,255,.3);padding:8px 16px;text-transform:uppercase}
+
+@media(max-width:767px){
+  .sidebar{display:none}
+  .sidebar.open{display:block;position:fixed;top:0;left:0;bottom:0;z-index:100;width:260px}
+  .h .menu-btn{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="h">
+  <button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')" style="display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer">☰</button>
+  <h1>🤖 AI Chat</h1>
+  <nav>
+    <a href="/upload.html">📤 上传</a>
+    <a href="/projects.html">📁 项目</a>
+    <a href="/ranking.html">🏆 排行</a>
+    <a href="#" onclick="logout()">退出</a>
+  </nav>
+</div>
+<div class="main">
+  <div class="sidebar" id="sidebar">
+    <div class="new-btn"><button onclick="newChat()">+ 新建对话</button></div>
+    <div class="model-select">
+      <select id="modelSelect" onchange="switchModel()">
+        <option value="deepseek-chat">DeepSeek V3</option>
+        <option value="deepseek-reasoner">DeepSeek R1</option>
+      </select>
+    </div>
+    <div class="title">会话列表</div>
+    <div id="sessionList"></div>
+  </div>
+  <div class="chat">
+    <div class="messages" id="messages"><div class="empty"><p>👋 选择一个对话或新建</p><p>模型: DeepSeek V3</p></div></div>
+    <div class="toolbar">
+      <textarea id="input" rows="1" placeholder="输入消息... (Enter 发送, Shift+Enter 换行)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"></textarea>
+      <button id="sendBtn" onclick="send()">发送</button>
+    </div>
+  </div>
+</div>
+<script>
+var T = localStorage.getItem('auth_token');
+if (!T) location.href = '/login.html';
+var H = { Authorization: 'Bearer ' + T };
+var curSession = null;
+var curModel = 'deepseek-chat';
+
+function logout() {
+  localStorage.removeItem('auth_token');
+  localStorage.removeItem('user_info');
+  document.cookie = 'auth_token=;path=/;max-age=0';
+  location.href = '/login.html';
+}
+
+async function loadSessions() {
+  var r = await fetch('/auth/api/chat/sessions', { headers: H });
+  var d = await r.json();
+  var el = document.getElementById('sessionList');
+  if (!d.sessions.length) {
+    el.innerHTML = '<div style="padding:16px;color:rgba(255,255,255,.3);font-size:12px">暂无对话</div>';
+    return;
+  }
+  el.innerHTML = d.sessions.map(function(s) {
+    return '<div class="session'+(s.id===curSession?' active':'')+'" onclick="select('+"'"+s.id+"'"+')"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(s.title)+'</span><button class="del" onclick="event.stopPropagation();del('+"'"+s.id+"'"+')">×</button></div>';
+  }).join('');
+}
+
+async function newChat() {
+  var r = await fetch('/auth/api/chat/sessions', { method: 'POST', headers: H });
+  var d = await r.json();
+  if (d.success) { curSession = d.id; loadSessions(); showEmpty(); }
+}
+
+async function select(sid) {
+  curSession = sid;
+  loadSessions();
+  var r = await fetch('/auth/api/chat/sessions/' + sid + '/messages', { headers: H });
+  var d = await r.json();
+  var el = document.getElementById('messages');
+  if (!d.messages.length) { showEmpty(); return; }
+  el.innerHTML = d.messages.map(function(m) {
+    var thinkingHtml = m.thinking ? '<details class="thinking"><summary></summary><pre>'+esc(m.thinking)+'</pre></details>' : '';
+    return '<div class="msg '+m.role+'">' + thinkingHtml + '<div class="msg-content">'+esc(m.content)+'</div></div>';
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+  document.getElementById('modelSelect').value = curModel;
+}
+
+function showEmpty() {
+  document.getElementById('messages').innerHTML = '<div class="empty"><p>开始新对话</p></div>';
+}
+
+async function del(sid) {
+  await fetch('/auth/api/chat/sessions/' + sid, { method: 'DELETE', headers: H });
+  if (curSession === sid) { curSession = null; showEmpty(); }
+  loadSessions();
+}
+
+async function switchModel() {
+  curModel = document.getElementById('modelSelect').value;
+  if (curSession) {
+    await fetch('/auth/api/chat/sessions/' + curSession + '/model?model=' + curModel, { method: 'PUT', headers: H });
+  }
+}
+
+async function send() {
+  var input = document.getElementById('input');
+  var text = input.value.trim();
+  if (!text || !curSession) return;
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+
+  var msgs = document.getElementById('messages');
+  if (msgs.querySelector('.empty')) msgs.innerHTML = '';
+  msgs.innerHTML += '<div class="msg user"><div class="msg-content">'+esc(text)+'</div></div>';
+
+  var aiDiv = document.createElement('div');
+  aiDiv.className = 'msg assistant';
+  aiDiv.innerHTML = '<div class="msg-content"></div>';
+  msgs.appendChild(aiDiv);
+  var aiContent = aiDiv.querySelector('.msg-content');
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    var r = await fetch('/auth/api/chat/sessions/'+curSession+'/send?content='+encodeURIComponent(text)+'&stream=true', { headers: H });
+    var reader = r.body.getReader();
+    var decoder = new TextDecoder();
+    var buf = '';
+    var thinkingAdded = false;
+
+    while (true) {
+      var { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      var lines = buf.split('\n');
+      buf = lines.pop() || '';
+      for (var l of lines) {
+        if (!l.startsWith('data: ')) continue;
+        try {
+          var d = JSON.parse(l.slice(6));
+          if (d.done) break;
+          if (d.thinking && !thinkingAdded) {
+            var det = document.createElement('details');
+            det.className = 'thinking show';
+            det.innerHTML = '<summary></summary><pre></pre>';
+            aiDiv.insertBefore(det, aiContent);
+            thinkingAdded = true;
+          }
+          if (d.thinking && thinkingAdded) {
+            aiDiv.querySelector('pre').textContent += d.thinking;
+          }
+          if (d.content) {
+            aiContent.textContent += d.content;
+          }
+        } catch(e) {}
+      }
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+  } catch(e) {
+    aiContent.textContent = '错误: ' + e.message;
+  }
+  document.getElementById('sendBtn').disabled = false;
+  loadSessions();
+}
+
+function esc(s) {
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// 自适应 textarea 高度
+document.getElementById('input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+});
+
+loadSessions();
+</script>
+</body>
+</html>

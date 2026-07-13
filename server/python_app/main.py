@@ -51,7 +51,11 @@ async def lifespan(app: FastAPI):
     # 加载技能插件
     from .skills import registry
     from .skills.hello import HelloSkill
+    from .skills.photo_edit import PhotoEditSkill
+    from .skills.skill_creator import SkillCreator as SkillCreatorSkill
     registry.register(HelloSkill())
+    registry.register(PhotoEditSkill())
+    registry.register(SkillCreatorSkill())
     print("[启动] 安装技能插件...")
     await registry.install(app)
 
@@ -131,11 +135,13 @@ from .routes_auth import router as auth_router
 from .routes_projects import router as projects_router
 from .routes_files import router as files_router
 from .routes_stats import router as stats_router
+from .routes_chat import router as chat_router
 
 app.include_router(auth_router)
 app.include_router(projects_router)
 app.include_router(files_router)
 app.include_router(stats_router)
+app.include_router(chat_router)
 
 
 # ---------- 运行入口 ----------
