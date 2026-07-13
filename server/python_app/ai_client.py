@@ -27,9 +27,16 @@ async def send_prompt(session_id: str, text: str) -> str:
         return resp.json().get("data", {}).get("id", "")
 
 
-async def poll_response(session_id: str, timeout: int = 120) -> AsyncGenerator[dict, None]:
+async def poll_response(session_id: str, existing_ids: set[str] = None, timeout: int = 120) -> AsyncGenerator[dict, None]:
+    """轮询 opencode 消息，获取 AI 回复。
+    
+    Args:
+        session_id: opencode 会话 ID
+        existing_ids: 发送前已有的消息 ID 集合，只返回之后的新消息
+        timeout: 超时秒数
+    """
     start = asyncio.get_event_loop().time()
-    seen: set[str] = set()
+    seen: set[str] = set(existing_ids) if existing_ids else set()
     full_text = ""
 
     async with httpx.AsyncClient() as client:

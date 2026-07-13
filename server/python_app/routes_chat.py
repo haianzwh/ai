@@ -141,23 +141,28 @@ async def _do_send_message(sid: str, req: SendReq, user: dict):
         title = content[:30] + ("..." if len(content) > 30 else "")
         await execute_write("UPDATE chat_sessions SET title=%s WHERE id=%s", (title, sid))
 
-    # 发 prompt
+    # 发 prompt 前，记录 opencode 已有的消息 ID
+    import httpx as _hx
+    async with _hx.AsyncClient() as oc_client:
+        r = await oc_client.get(f"{OPENCODE_URL}/api/session/{oc_id}/message", params={"from": 0, "to": 100})
+        existing_ids = {m["id"] for m in r.json().get("data", []) if m.get("id")}
+    
     await send_prompt(oc_id, content)
 
     # 返回流式响应
     return StreamingResponse(
-        _stream_response(sid, oc_id),
+        _stream_response(sid, oc_id, existing_ids),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
 
-async def _stream_response(sid: str, oc_id: str):
+async def _stream_response(sid: str, oc_id: str, existing_ids: set[str] = None):
     """流式返回 AI 回复（只做轮询，不创建会话/发消息）"""
     full = ""
     thinking = ""
     try:
-        async for chunk in poll_response(oc_id):
+        async for chunk in poll_response(oc_id, existing_ids=existing_ids):
             if chunk.get("done"):
                 if chunk.get("error"):
                     yield f"data: {json.dumps({'error': chunk['error'], 'done': True})}\n\n"
