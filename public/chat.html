@@ -227,11 +227,7 @@ msgs.scrollTop = msgs.scrollHeight;
       if (!l.startsWith('data: ')) continue;
       try {
         var d = JSON.parse(l.slice(6));
-        if (d.done) break;
-        if (d.status) {
-          aiContent.textContent = d.status;
-          continue;
-        }
+        if (d.content) aiContent.textContent += d.content;
         if (d.thinking) {
           if (!thinkingAdded) {
             var det = document.createElement('details');
@@ -242,9 +238,7 @@ msgs.scrollTop = msgs.scrollHeight;
           }
           aiDiv.querySelector('pre').textContent += d.thinking;
         }
-        if (d.content) {
-          aiContent.textContent += d.content;
-        }
+        if (d.done) break;
       } catch(e) {}
     }
     msgs.scrollTop = msgs.scrollHeight;

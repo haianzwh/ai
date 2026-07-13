@@ -61,12 +61,10 @@ async def poll_response(session_id: str, existing_ids: set[str] = None, timeout:
 
             # 只处理新消息
             new_messages = [m for m in messages if m.get("id") not in seen]
-            print(f"[DEBUG] poll: total={len(messages)} new={len(new_messages)} seen={len(seen)}", flush=True)
             
             for msg in new_messages:
                 mid = msg.get("id", "")
-                seen.add(mid)  # 立即标记为已见
-                print(f"[DEBUG] processing msg: id={mid[:20]} type={msg.get('type')} finish={msg.get('finish')}", flush=True)
+                seen.add(mid)
                 
                 mtype = msg.get("type", "")
                 if mtype == "user":
