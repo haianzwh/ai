@@ -3,10 +3,14 @@
   聊天路由 — 基于 opencode web 作为 AI 引擎
 =============================================================================
 """
-import json, uuid, asyncio, logging
+import json, uuid, asyncio, logging, httpx
 from fastapi import APIRouter, HTTPException, Depends, Query, Body
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+
+from .database import execute, execute_write
+from .auth import get_current_user
+from .ai_client import create_opencode_session, send_prompt, poll_response, OPENCODE_URL
 
 
 class SendReq(BaseModel):
@@ -22,6 +26,23 @@ router = APIRouter(prefix="/api/chat", tags=["聊天"])
 # 内存中缓存：chat_session_id → opencode_session_id
 # 重启丢失，聊天会话需重建
 _oc_cache: dict[str, str] = {}
+
+
+@router.get("/models")
+async def list_models(user: dict = Depends(get_current_user)):
+    """从 opencode 获取可用模型列表"""
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(f"{OPENCODE_URL}/api/model")
+            data = resp.json()
+            models = [
+                {"id": m["id"], "name": m.get("name", m["id"]), "provider": m.get("providerID", "")}
+                for m in data.get("data", [])
+                if m.get("status") == "active"
+            ]
+        return {"success": True, "models": models}
+    except Exception as e:
+        return {"success": False, "models": [], "error": str(e)}
 
 
 @router.get("/sessions")

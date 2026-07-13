@@ -58,11 +58,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
   <button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')" style="display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer">☰</button>
   <h1>🤖 AI Chat</h1>
   <div style="display:flex;align-items:center;gap:6px">
-    <select id="modelSelectMobile" onchange="switchModelMobile()" style="display:none;padding:4px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#fff;font-size:11px;outline:none">
-      <option value="deepseek-v4-flash-free">DeepSeek V4 Flash</option>
-      <option value="north-mini-code-free">North Mini Code</option>
-      <option value="mimo-v2.5-free">Mimo V2.5</option>
-    </select>
+    <select id="modelSelectMobile" onchange="switchModelMobile()" style="display:none;padding:4px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#fff;font-size:11px;outline:none"></select>
     <nav>
       <a href="/upload.html">📤</a>
       <a href="/projects.html">📁</a>
@@ -75,10 +71,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
   <div class="sidebar" id="sidebar">
     <div class="new-btn"><button onclick="newChat()">+ 新建对话</button></div>
     <div class="model-select">
-      <select id="modelSelect" onchange="switchModel()">
-        <option value="north-mini-code-free">North Mini Code</option>
-        <option value="mimo-v2.5-free">Mimo V2.5</option>
-      </select>
+      <select id="modelSelect" onchange="switchModel()"></select>
     </div>
     <div class="title">会话列表</div>
     <div id="sessionList"></div>
@@ -96,7 +89,24 @@ var T = localStorage.getItem('auth_token');
 if (!T) location.href = '/login.html';
 var H = { Authorization: 'Bearer ' + T };
 var curSession = null;
-var curModel = 'deepseek-chat';
+var curModel = 'deepseek-v4-flash-free';
+
+async function loadModels() {
+  try {
+    var r = await fetch('/auth/api/chat/models', { headers: H });
+    var d = await r.json();
+    var models = d.models || [];
+    if (!models.length) models = [{id:'deepseek-v4-flash-free',name:'DeepSeek V4 Flash'}];
+    var opts = models.map(function(m){return '<option value="'+m.id+'">'+m.name+'</option>';}).join('');
+    document.getElementById('modelSelect').innerHTML = opts;
+    document.getElementById('modelSelectMobile').innerHTML = opts;
+    document.getElementById('modelSelect').value = curModel;
+    document.getElementById('modelSelectMobile').value = curModel;
+  } catch(e) {
+    document.getElementById('modelSelect').innerHTML = '<option value="deepseek-v4-flash-free">DeepSeek V4 Flash</option>';
+    document.getElementById('modelSelectMobile').innerHTML = '<option value="deepseek-v4-flash-free">DeepSeek V4 Flash</option>';
+  }
+}
 
 function logout() {
   localStorage.removeItem('auth_token');
@@ -250,7 +260,9 @@ document.getElementById('input').addEventListener('input', function() {
   this.style.height = Math.min(this.scrollHeight, 150) + 'px';
 });
 
+loadModels();
 loadSessions();
+(async function(){ await newChat(); })();
 </script>
 </body>
 </html>
