@@ -151,46 +151,40 @@ async def send_message(
             "问题：" + content
         )
 
-    # 记录已有 opencode 消息 ID（防重复取旧回复）
-    import httpx as _hx
-    try:
-        r = _hx.get(f"{OPENCODE_URL}/api/session/{oc_id}/message", params={"from": 0, "to": 50}, timeout=5)
-        existing_ids = {m["id"] for m in r.json().get("data", []) if m.get("id")}
-    except:
-        existing_ids = set()
+    # 发送 prompt（异步）
+    c = content  # 供闭包使用
+    asyncio.create_task(_generate_stream(sid, oc_id, c))
+    return {"success": True, "message": "已发送"}
 
-    # 发送 prompt 并同步等待回复
-    await send_prompt(oc_id, content)
-    
-    full_text = ""
-    for retry in range(2):
-        try:
-            async for chunk in poll_response(oc_id, existing_ids=existing_ids, timeout=120):
-                if chunk.get("done"):
-                    break
-                if chunk.get("content"):
-                    full_text += chunk["content"]
-            break
-        except Exception as e:
-            if "TooLarge" in str(e) or "max bytes" in str(e):
-                oc = await create_opencode_session()
-                oc_id = oc.get("id", "")
-                await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
-                await send_prompt(oc_id, content)
-                async for chunk in poll_response(oc_id, timeout=120):
-                    if chunk.get("done"):
-                        break
-                    if chunk.get("content"):
-                        full_text += chunk["content"]
+
+async def _generate_stream(sid: str, oc_id: str, content: str):
+    """后台生成 AI 回复（逐步写入，实现流式效果）"""
+    try:
+        await send_prompt(oc_id, content)
+        last_text = ""
+        db_id = None
+        async for chunk in poll_response(oc_id, timeout=120):
+            delta = chunk.get("content", "")
+            if delta:
+                last_text += delta
+                if db_id is None:
+                    db_id = await execute_write(
+                        "INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)",
+                        (sid, "assistant", last_text),
+                    )
+                else:
+                    await execute_write(
+                        "UPDATE chat_messages SET content=%s WHERE id=%s",
+                        (last_text, db_id),
+                    )
+            if chunk.get("done"):
+                if db_id and last_text:
+                    await execute_write("UPDATE chat_messages SET content=%s WHERE id=%s", (last_text, db_id))
                 break
-            else:
-                return {"success": False, "error": str(e)}
-    
-    if full_text:
-        await execute_write(
-            "INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)",
-            (sid, "assistant", full_text),
-        )
-    
-    return {"success": True, "content": full_text}
+        if last_text and db_id is None:
+            await execute_write("INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)", (sid, "assistant", last_text))
+    except Exception as e:
+        if last_text and db_id is None:
+            await execute_write("INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)", (sid, "assistant", last_text))
+        print(f"[stream] ❌ {e}", flush=True)
 

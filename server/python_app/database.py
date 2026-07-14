@@ -67,11 +67,11 @@ async def execute_one(sql: str, params: tuple | list | None = None) -> dict | No
 
 async def execute_write(sql: str, params: tuple | list | None = None) -> int:
     """
-    执行写入 SQL（INSERT/UPDATE/DELETE）并返回影响行数。
+    执行写入 SQL（INSERT/UPDATE/DELETE）并返回 lastrowid（INSERT）或行数。
     """
     pool = await get_pool()
     async with pool.acquire() as conn:
         async with conn.cursor() as cur:
             result = await cur.execute(sql, params or ())
             await conn.commit()
-            return result
+            return cur.lastrowid if cur.lastrowid else result
