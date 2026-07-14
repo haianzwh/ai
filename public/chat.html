@@ -141,7 +141,7 @@ async function send(){
   // 发消息
   try{await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:sendText})})}catch(e){aiDiv.innerHTML='<div class=bubble>发送失败</div>';document.querySelector('.send-btn').disabled=false;return}
   // 轮询消息（每 500ms）
-  var lastLen=0,cnt=0
+  var lastLen=0,cnt=0;_pollStop=false
   ;(function poll(){
     if(_pollStop||cnt++>60){document.querySelector('.send-btn').disabled=false;return}
     fetch('/auth/api/chat/sessions/'+curSession+'/messages',{headers:H}).then(r=>r.json()).then(d=>{
