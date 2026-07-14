@@ -142,15 +142,30 @@ async def send_message(
 
     # 发送 prompt 并等待 AI 回复
     full_text = ""
-    try:
-        await send_prompt(oc_id, content)
-        async for chunk in poll_response(oc_id, timeout=120):
-            if chunk.get("done"):
+    for retry in range(2):
+        try:
+            await send_prompt(oc_id, content)
+            async for chunk in poll_response(oc_id, timeout=120):
+                if chunk.get("done"):
+                    break
+                if chunk.get("content"):
+                    full_text += chunk["content"]
+            break
+        except Exception as e:
+            # 请求体过大时重建会话（清除上下文）
+            if "TooLarge" in str(e) or "max bytes" in str(e):
+                oc = await create_opencode_session()
+                oc_id = oc.get("id", "")
+                await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
+                await send_prompt(oc_id, content)
+                async for chunk in poll_response(oc_id, timeout=120):
+                    if chunk.get("done"):
+                        break
+                    if chunk.get("content"):
+                        full_text += chunk["content"]
                 break
-            if chunk.get("content"):
-                full_text += chunk["content"]
-    except Exception as e:
-        return {"success": False, "error": str(e)}
+            else:
+                return {"success": False, "error": str(e)}
 
     # 保存 AI 回复
     if full_text:
