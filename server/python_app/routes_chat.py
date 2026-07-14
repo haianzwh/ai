@@ -225,7 +225,10 @@ async def send_message(
         if tm:
             before = full_text[:full_text.index("<think>")].strip()
             after = full_text[full_text.index("</think>") + 8:].strip()
-            thinking_part = (before + "\n\n" + tm.group(1).strip()).strip()
+            tc = tm.group(1).strip()
+            if before and tc.startswith(before):
+                tc = tc[len(before):].strip()
+            thinking_part = (before + "\n\n" + tc).strip()
             clean_text = after
         else:
             thinking_part = ""

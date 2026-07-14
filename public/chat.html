@@ -192,7 +192,9 @@ function formatContent(txt, thinking){
     if(tm){
       var before=txt.slice(0,txt.indexOf('<think>')).trim()
       var after=txt.slice(txt.indexOf('</think>')+8).trim()
-      thinking=(before?before+'\n\n':'')+tm[1].trim()
+      var tc=tm[1].trim()
+      if(before&&tc.startsWith(before))tc=tc.slice(before.length).trim()
+      thinking=(before?before+'\n\n':'')+tc
       txt=after
     }
   }
