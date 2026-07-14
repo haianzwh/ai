@@ -95,13 +95,8 @@ body.light-mode .btn-new:hover{background:rgba(140,180,215,.35);color:rgba(50,95
 .nav-bar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:1px}
 .nav-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.12);cursor:pointer;transition:all .2s;flex-shrink:0}
 .nav-dot:hover,.nav-dot.active{background:#818cf8;transform:scale(1.4);box-shadow:0 0 6px rgba(129,140,248,.3)}
-.nav-preview{position:fixed;right:44px;top:50%;transform:translateY(-50%);background:rgba(30,30,50,.92);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;width:260px;max-height:50vh;overflow-y:auto;font-size:12px;color:rgba(255,255,255,.6);line-height:1.5}
-.nav-preview::-webkit-scrollbar{width:2px}
-.nav-preview::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:1px}
-body.light-mode .nav-bar{background:rgba(255,255,255,.5)}
 body.light-mode .nav-dot{background:rgba(0,0,0,.12)}
 body.light-mode .nav-dot:hover,body.light-mode .nav-dot.active{background:#6366f1}
-body.light-mode .nav-preview{background:rgba(250,250,252,.95);border-color:rgba(0,0,0,.08);color:rgba(0,0,0,.5)}
 
 /* ===== 消息区 ===== */
 #msgArea{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;scroll-behavior:smooth;padding:12px 0}
@@ -219,7 +214,6 @@ body.light-mode .think-btn.on{background:rgba(99,102,241,.08);border-color:rgba(
 
 <div id=navBar class=nav-bar>
   <div class=nav-dots id=navDots></div>
-  <div class=nav-preview id=navPreview style=display:none></div>
 </div>
 
 <div class=main>
@@ -423,21 +417,15 @@ function toggleDark(){
 function updateNav(){
   var dots=document.getElementById('navDots');dots.innerHTML=''
   var msgs=document.querySelectorAll('#msgArea .msg.user')
-  if(!msgs.length){var e=document.createElement('div');e.className='nav-dot';e.style.opacity='.15';dots.appendChild(e);return}
   msgs.forEach(function(m,i){
     var d=document.createElement('div');d.className='nav-dot'
-    d.onmouseenter=function(){var p=document.getElementById('navPreview');p.style.display='block';p.textContent=(m.querySelector('.bubble').textContent||'').slice(0,200)}
+    d.title=(m.querySelector('.bubble').textContent||'').trim().slice(0,100)
     d.onclick=function(){m.scrollIntoView({behavior:'smooth',block:'center'})}
     dots.appendChild(d)
   })
   var all=dots.querySelectorAll('.nav-dot')
   if(all.length)all[all.length-1].classList.add('active')
 }
-document.getElementById('navBar').addEventListener('mouseleave',function(){
-  setTimeout(function(){
-    if(!document.getElementById('navBar').matches(':hover'))document.getElementById('navPreview').style.display='none'
-  },300)
-})
 async function uploadFiles(files){for(var i=0;i<files.length;i++){var fd=new FormData();fd.append('file',files[i]);await fetch('/auth/api/upload',{method:'POST',headers:H,body:fd})}loadMessages()}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function copyCode(btn){
