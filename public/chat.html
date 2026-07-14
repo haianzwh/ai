@@ -83,7 +83,7 @@ select option{background:#fff;color:#1a1a2e}
 /* 用户消息操作按钮 */
 .msg-actions{display:flex;gap:4px;margin-top:4px;opacity:0;transition:opacity .2s}
 .msg.user:hover .msg-actions{opacity:1}
-.msg-actions button{background:none;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.3);padding:2px 8px;border-radius:6px;cursor:pointer;font-size:10px;transition:.15s;line-height:1.4}
+.msg-actions button{background:none;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.3);padding:2px 8px;border-radius:6px;cursor:pointer;font-size:11px;transition:.15s;line-height:1.4}
 .msg-actions button:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6)}
 .edit-ta{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px;color:#e0e0e0;font-size:13px;resize:none;outline:none;min-height:60px;font-family:inherit;box-sizing:border-box}
 .edit-actions{display:flex;gap:6px;margin-top:6px}
@@ -217,7 +217,7 @@ el.innerHTML=d.messages.map(function(m,i){
   var label=m.role==='user'?esc(d.username):(d.model||'AI').split('-')[0]
   var meta=label+' · '+m.time
   var html='<div class="msg '+m.role+'">'+formatContent(m.content||'',m.thinking||'',m.role,meta)
-  if(m.role==='user')html+='<div class=msg-actions><button onclick=copyMsg(this) title=复制>📋</button><button onclick=editMsg(this) title=修改>✏️</button></div>'
+  if(m.role==='user')html+='<div class=msg-actions><button onclick=copyMsg(this)>📋 复制</button><button onclick=editMsg(this)>✏️ 修改</button></div>'
   return html+'</div>'
 }).join('');el.scrollTop=el.scrollHeight;modelName=d.model||'AI'
 var sel=document.getElementById('modelSelect');if(sel)sel.value=modelName}
@@ -229,7 +229,7 @@ async function send(){
   var sendText=chatMode==='think'?'<think>逐步思考</think>'+text:text
   var el=document.getElementById('msgArea')
   if(el.querySelector('.empty-state'))el.innerHTML=''
-  el.innerHTML+='<div class="msg user">'+formatContent(text,'','user','我 · '+now())+'<div class=msg-actions><button onclick=copyMsg(this) title=复制>📋</button><button onclick=editMsg(this) title=修改>✏️</button></div></div>'
+  el.innerHTML+='<div class="msg user">'+formatContent(text,'','user','我 · '+now())+'<div class=msg-actions><button onclick=copyMsg(this)>📋 复制</button><button onclick=editMsg(this)>✏️ 修改</button></div></div>'
   var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
   try{
     var ctrl=new AbortController();setTimeout(function(){ctrl.abort()},90000)
@@ -247,7 +247,7 @@ async function sendText(text){
   var txt=chatMode==='think'?'<think>逐步思考</think>'+text:text
   var el=document.getElementById('msgArea'),aiDiv
   if(el.querySelector('.empty-state'))el.innerHTML=''
-  el.innerHTML+='<div class="msg user">'+formatContent(text,'','user','我 · '+now())+'<div class=msg-actions><button onclick=copyMsg(this) title=复制>📋</button><button onclick=editMsg(this) title=修改>✏️</button></div></div>'
+  el.innerHTML+='<div class="msg user">'+formatContent(text,'','user','我 · '+now())+'<div class=msg-actions><button onclick=copyMsg(this)>📋 复制</button><button onclick=editMsg(this)>✏️ 修改</button></div></div>'
   aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
   document.querySelector('.send-btn').disabled=true
   try{
@@ -287,7 +287,7 @@ function formatContent(txt, thinking, role, meta){
 function copyMsg(btn){
   var txt=btn.closest('.msg').querySelector('.bubble').textContent
   navigator.clipboard.writeText(txt)
-  btn.textContent='✓';setTimeout(function(){btn.textContent='📋'},1000)
+  btn.textContent='✓ 已复制';setTimeout(function(){btn.textContent='📋 复制'},1500)
 }
 function editMsg(btn){
   var msg=btn.closest('.msg'),bubble=msg.querySelector('.bubble')
