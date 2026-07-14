@@ -18,20 +18,7 @@ class SendReq(BaseModel):
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/chat", tags=["聊天"])
-
-# 会话生成锁：每个 sid 同时只允许一个后台任务
 _gen_locks: dict[str, asyncio.Lock] = {}
-
-
-@router.get("/models")
-
-# 发送锁：每个会话同时只允许一个发送请求
-_send_locks: dict[str, asyncio.Lock] = {}
-
-# 内存中缓存：chat_session_id → opencode_session_id
-# 重启丢失，聊天会话需重建
-_oc_cache: dict[str, str] = {}
-
 
 @router.get("/models")
 async def list_models(user: dict = Depends(get_current_user)):
@@ -174,31 +161,26 @@ async def _generate_response(sid: str, oc_id: str, content: str, lock: asyncio.L
             existing_ids = {m["id"] for m in r.json().get("data", []) if m.get("id")}
         except:
             existing_ids = set()
-        await send_prompt(oc_id, content)
-        last_text = ""
-        db_id = None
-        async for chunk in poll_response(oc_id, existing_ids=existing_ids, timeout=120):
-            delta = chunk.get("content", "")
-            if delta:
-                last_text += delta
-                if db_id is None:
-                    db_id = await execute_write(
-                        "INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)",
-                        (sid, "assistant", last_text),
-                    )
-                else:
-                    await execute_write(
-                        "UPDATE chat_messages SET content=%s WHERE id=%s",
-                        (last_text, db_id),
-                    )
-            if chunk.get("done"):
-                if db_id and last_text:
-                    await execute_write("UPDATE chat_messages SET content=%s WHERE id=%s", (last_text, db_id))
-                break
-        if last_text and db_id is None:
-            await execute_write("INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)", (sid, "assistant", last_text))
-    except Exception:
-        pass
+        try:
+            await send_prompt(oc_id, content)
+            last_text = ""
+            db_id = None
+            async for chunk in poll_response(oc_id, existing_ids=existing_ids, timeout=120):
+                delta = chunk.get("content", "")
+                if delta:
+                    last_text += delta
+                    if db_id is None:
+                        db_id = await execute_write("INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)", (sid, "assistant", last_text))
+                    else:
+                        await execute_write("UPDATE chat_messages SET content=%s WHERE id=%s", (last_text, db_id))
+                if chunk.get("done"):
+                    if db_id and last_text:
+                        await execute_write("UPDATE chat_messages SET content=%s WHERE id=%s", (last_text, db_id))
+                    break
+            if last_text and db_id is None:
+                await execute_write("INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)", (sid, "assistant", last_text))
+        except Exception:
+            pass
 
 
 @router.get("/stream/{sid}")
