@@ -67,9 +67,9 @@ select option{background:#fff;color:#1a1a2e}
 .sidebar .title{padding:8px 16px 4px;font-size:11px;font-weight:600;color:rgba(255,255,255,.25);letter-spacing:.5px;flex-shrink:0}
 .session-group{padding:0 8px;margin-bottom:4px}
 .group-label{padding:6px 8px 2px;font-size:11px;color:rgba(255,255,255,.2);font-weight:500}
-.session{padding:8px 10px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.35);border-radius:8px;transition:.1s;margin:1px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.session{padding:8px 10px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.35);border-radius:8px;transition:.1s;margin:1px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:2px solid transparent}
 .session:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)}
-.session.active{background:rgba(99,102,241,.15);color:#e0e0e0}
+.session.active{background:rgba(99,102,241,.15);border-left-color:#818cf8;color:#e0e0e0}
 .session .del{float:right;background:none;border:none;color:rgba(255,255,255,.15);cursor:pointer;font-size:12px;padding:0 4px;border-radius:4px;visibility:hidden}
 .session:hover .del{visibility:visible}
 .session .del:hover{color:#ef4444}
@@ -198,7 +198,7 @@ select option{background:#fff;color:#1a1a2e}
         <textarea id=input rows=1 placeholder="给 AI 发送消息" onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
         <div class=input-bottom>
           <div class=left>
-            <select id=modelSelect onchange=switchModel(this.value) style="background:rgba(255,255,255,.06);color:var(--text,#e0e0e0);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;outline:none;max-width:140px;transition:.15s"></select>
+            <select id=modelSelect onchange=switchModel(this.value) style="background:rgba(255,255,255,.06);color:var(--text,#e0e0e0);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;outline:none;max-width:150px;transition:.15s"></select>
             <button class=dark-btn onclick=toggleDark() id=darkBtn title="深色模式">🌙</button>
           </div>
           <div class=right>
@@ -286,7 +286,7 @@ async function send(){
   el.innerHTML+='<div class="msg user">'+formatContent(text,'','user','我 · '+now())+'<div class=msg-actions><button onclick=copyMsg(this)>📋 复制</button><button onclick=editMsg(this)>✏️ 修改</button></div></div>'
   var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
   try{
-    var ctrl=new AbortController();setTimeout(function(){ctrl.abort()},90000)
+    var ctrl=new AbortController();setTimeout(function(){ctrl.abort()},30000)
     var r=await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:sendText}),signal:ctrl.signal})
     if(!r.ok){var t=await r.text().catch(function(){return''});aiDiv.innerHTML='<div class=bubble>❌ '+r.status+': '+esc(t.slice(0,60))+'</div>';return}
     var d=await r.json()
@@ -305,7 +305,7 @@ async function sendText(text){
   aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
   document.querySelector('.send-btn').disabled=true
   try{
-    var ctrl=new AbortController();setTimeout(function(){ctrl.abort()},90000)
+    var ctrl=new AbortController();setTimeout(function(){ctrl.abort()},30000)
     var r=await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:txt}),signal:ctrl.signal})
     if(!r.ok){var t=await r.text().catch(function(){return''});aiDiv.innerHTML='<div class=bubble>❌ '+r.status+': '+esc(t.slice(0,60))+'</div>';return}
     var d=await r.json()
