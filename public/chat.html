@@ -120,6 +120,8 @@ select option{background:#fff;color:#1a1a2e}
 .msg.assistant .bubble :not(pre)>code{background:rgba(99,102,241,.12);padding:2px 8px;border-radius:4px;font-size:13px;color:#818cf8}
 .msg.assistant .bubble.thinking{background:transparent;color:rgba(255,255,255,.35);font-size:13px;padding:4px 0}
 .msg.assistant .bubble.thinking::after{content:'';display:inline-block;width:6px;height:6px;background:#818cf8;border-radius:50%;margin-left:6px;animation:dotPulse 1.2s infinite}
+.interrupted{text-align:center;color:rgba(255,255,255,.25);font-size:12px;padding:8px 0;letter-spacing:1px}
+body.light-mode .interrupted{color:rgba(0,0,0,.2)}
 .msg .meta{font-size:11px;color:rgba(255,255,255,.2);margin-bottom:6px;padding:0 2px}
 .msg.user .meta{text-align:right}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -201,7 +203,7 @@ select option{background:#fff;color:#1a1a2e}
   <div class=input-bar>
     <div class=input-container>
       <div class=input-wrap>
-        <textarea id=input rows=1 placeholder="给 AI 发送消息" onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+        <textarea id=input rows=1 placeholder="给 AI 发送消息" onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();send()}else if(event.key=='ArrowUp'){event.preventDefault();if(histIdx<msgHistory.length-1){histIdx++;document.getElementById('input').value=msgHistory[msgHistory.length-1-histIdx]}}else if(event.key=='ArrowDown'){event.preventDefault();if(histIdx>0){histIdx--;document.getElementById('input').value=msgHistory[msgHistory.length-1-histIdx]}else{histIdx=-1;document.getElementById('input').value=''}}"></textarea>
         <div class=input-bottom>
           <div class=left>
             <select id=modelSelect onchange=switchModel(this.value) style="background:rgba(255,255,255,.06);color:var(--text,#e0e0e0);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:3px 8px;font-size:14px;cursor:pointer;outline:none;max-width:150px;transition:.15s"></select>
@@ -220,7 +222,7 @@ select option{background:#fff;color:#1a1a2e}
 
 <script>
 var T=localStorage.getItem('auth_token');if(!T)location.href='/login.html'
-var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat',modelName='',uName='用户',currentAbort=null
+var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat',modelName='',uName='用户',currentAbort=null,msgHistory=[],histIdx=-1
 function now(){var d=new Date();return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.toTimeString().slice(0,8)}
 
 async function loadModels(){
@@ -284,6 +286,7 @@ var sel=document.getElementById('modelSelect');if(sel)sel.value=modelName}
 
 async function send(){
   var input=document.getElementById('input'),text=input.value.trim();if(!text)return
+  msgHistory.push(text);histIdx=-1
   input.value='';if(!curSession){var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:H});var d=await r.json();curSession=d.id;loadSessions()}
   input.style.height='auto';document.querySelector('.send-btn').disabled=true
   var sendText=chatMode==='think'?'<think>逐步思考</think>'+text:text
@@ -301,13 +304,14 @@ async function send(){
     if(d.content||d.thinking){var _m=(modelName||'AI').split('-')[0]+' · '+now();aiDiv.outerHTML='<div class="msg assistant">'+formatContent(d.content||'',d.thinking||'','assistant',_m)+'</div>'}else{aiDiv.innerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
     el.scrollTop=el.scrollHeight;loadSessions()
   }catch(e){
-    if(e.name==='AbortError'&&currentAbort){aiDiv.innerHTML='<div class=bubble style=text-align:center;color:rgba(255,255,255,.35)>已中断</div>'}
+    if(e.name==='AbortError'&&currentAbort){aiDiv.outerHTML='<div class="msg assistant"><div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class=interrupted>————————已中断————————</div></div>'}
     else aiDiv.innerHTML='<div class=bubble>❌ '+(e.name==='AbortError'?'请求超时，请重试':esc(e.message))+'</div>'
   }
   finally{clearTimeout(tmr);currentAbort=null;document.querySelector('.send-btn').textContent='➤';document.querySelector('.send-btn').disabled=false}
 }
 async function sendText(text){
   if(!text)return
+  msgHistory.push(text);histIdx=-1
   if(!curSession){var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:H});var d=await r.json();curSession=d.id;loadSessions()}
   var txt=chatMode==='think'?'<think>逐步思考</think>'+text:text
   var el=document.getElementById('msgArea'),aiDiv
@@ -325,7 +329,7 @@ async function sendText(text){
     if(d.content||d.thinking){aiDiv.outerHTML='<div class="msg assistant">'+formatContent(d.content||'',d.thinking||'','assistant')+'</div>'}else{aiDiv.innerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
     el.scrollTop=el.scrollHeight;loadSessions()
   }catch(e){
-    if(e.name==='AbortError'&&currentAbort){aiDiv.innerHTML='<div class=bubble style=text-align:center;color:rgba(255,255,255,.35)>已中断</div>'}
+    if(e.name==='AbortError'&&currentAbort){aiDiv.outerHTML='<div class="msg assistant"><div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class=interrupted>————————已中断————————</div></div>'}
     else aiDiv.innerHTML='<div class=bubble>❌ '+(e.name==='AbortError'?'请求超时，请重试':esc(e.message))+'</div>'
   }
   finally{clearTimeout(tmr);currentAbort=null;document.querySelector('.send-btn').textContent='➤';document.querySelector('.send-btn').disabled=false}
