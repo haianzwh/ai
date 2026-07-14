@@ -427,7 +427,7 @@ function updateNav(){
   msgs.forEach(function(m,i){
     var d=document.createElement('div');d.className='nav-dot'
     d.dataset.idx=i
-    d.onclick=function(){msgs[+this.dataset.idx].scrollIntoView({behavior:'smooth',block:'center'})}
+    d.onclick=function(){var m=msgs[+this.dataset.idx];m.scrollIntoView({behavior:'smooth',block:'center'});var p=document.getElementById('navPreview');p.style.display='block';p.textContent=(m.querySelector('.bubble').textContent||'').slice(0,200)}
     dots.appendChild(d)
   })
   var all=dots.querySelectorAll('.nav-dot')
@@ -438,7 +438,7 @@ document.getElementById('navBar').addEventListener('mouseover',function(e){
   var dot=e.target.closest('.nav-dot');if(!dot)return
   var idx=+dot.dataset.idx
   var msgs=document.querySelectorAll('#msgArea .msg.user')
-  if(msgs[idx])showNavPreview(msgs[idx].querySelector('.bubble').textContent)
+  if(msgs[idx]){var p=document.getElementById('navPreview');p.style.display='block';p.textContent=(msgs[idx].querySelector('.bubble').textContent||'').slice(0,200)}
 })
 document.getElementById('navBar').addEventListener('mouseleave',function(){
   setTimeout(function(){
