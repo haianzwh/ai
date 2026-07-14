@@ -18,7 +18,8 @@ body.light-mode .session:hover{background:rgba(0,0,0,.06);color:#1a1a2e}
 body.light-mode .session.active{background:rgba(99,102,241,.1);color:#1a1a2e}
 body.light-mode .sidebar-footer{border-top-color:rgba(0,0,0,.06)}
 body.light-mode .sidebar-footer .uname{color:rgba(0,0,0,.5)}
-body.light-mode #sessionSearch{background:#f0f0f5;border-color:rgba(0,0,0,.15);color:#1a1a2e}
+body.light-mode #sessionSearch{background:#f0f0f5;border:1px solid rgba(0,0,0,.15);color:#1a1a2e}
+body.light-mode #sessionSearch::placeholder{color:rgba(0,0,0,.3)}
 body.light-mode #sessionSearch::placeholder{color:rgba(0,0,0,.3)}
 body.light-mode .sidebar-footer button{color:rgba(0,0,0,.4)}
 body.light-mode .sidebar-footer button:hover{background:rgba(0,0,0,.05);color:#1a1a2e}
@@ -81,6 +82,8 @@ select option{background:#fff;color:#1a1a2e}
 .sidebar-hidden .sidebar-open-btn{display:flex !important}
 .sidebar-open-btn{display:none !important;position:fixed;top:12px;left:12px;z-index:50;width:36px;height:36px;border:none;border-radius:10px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);cursor:pointer;font-size:18px;align-items:center;justify-content:center;transition:.15s}
 .sidebar-open-btn:hover{background:rgba(255,255,255,.12);color:rgba(255,255,255,.6)}
+#sessionSearch{margin:0 16px 10px;padding:9px 12px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-size:12px;outline:none;flex-shrink:0;transition:.15s}
+#sessionSearch:focus{border-color:rgba(99,102,241,.4)}
 
 /* ===== 主区域 ===== */
 .main{flex:1;display:flex;flex-direction:column;height:100vh;max-width:calc(100% - 300px)}
@@ -175,7 +178,7 @@ select option{background:#fff;color:#1a1a2e}
     <span class=logo>OpenCode</span>
     <button onclick=toggleSidebar() title=收起 style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:6px;transition:.15s">◀</button>
   </div>
-  <input id=sessionSearch placeholder="搜索对话..." style="margin:0 16px 10px;padding:9px 12px;border:1px solid rgba(255,255,255,.06);border-radius:8px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);font-size:12px;outline:none;flex-shrink:0">
+  <input id=sessionSearch placeholder="搜索对话...">
   <button class=btn-new onclick=newChat()>+ 开启新对话</button>
   <div class=title>对话历史</div>
   <div style="overflow-y:auto;flex:1" id=sessionList></div>
@@ -198,7 +201,7 @@ select option{background:#fff;color:#1a1a2e}
         <textarea id=input rows=1 placeholder="给 AI 发送消息" onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
         <div class=input-bottom>
           <div class=left>
-            <select id=modelSelect onchange=switchModel(this.value) style="background:rgba(255,255,255,.06);color:var(--text,#e0e0e0);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;outline:none;max-width:150px;transition:.15s"></select>
+            <select id=modelSelect onchange=switchModel(this.value) style="background:rgba(255,255,255,.06);color:var(--text,#e0e0e0);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:3px 8px;font-size:14px;cursor:pointer;outline:none;max-width:150px;transition:.15s"></select>
             <button class=dark-btn onclick=toggleDark() id=darkBtn title="深色模式">🌙</button>
           </div>
           <div class=right>
@@ -370,9 +373,12 @@ function toggleDark(){
 async function uploadFiles(files){for(var i=0;i<files.length;i++){var fd=new FormData();fd.append('file',files[i]);await fetch('/auth/api/upload',{method:'POST',headers:H,body:fd})}loadMessages()}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function copyCode(btn){
-  var code=btn.parentElement.querySelector('pre code')
-  if(!code)return;var t=code.textContent
-  navigator.clipboard.writeText(t).then(function(){btn.textContent='✓';setTimeout(function(){btn.textContent='📋'},1500)}).catch(function(){})
+  var ta=document.createElement('textarea')
+  ta.value=btn.parentElement.querySelector('pre code').textContent
+  ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select()
+  try{document.execCommand('copy')}catch(e){}
+  document.body.removeChild(ta)
+  btn.textContent='✓';setTimeout(function(){btn.textContent='📋'},1500)
 }
 function md(s){
   s=s.replace(/```(\w*)\n([\s\S]*?)```/g,'<div class=code-wrap><button class=copy-btn onclick=copyCode(this)>📋</button><pre><code class="lang-$1">$2</code></pre></div>')
