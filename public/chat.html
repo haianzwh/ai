@@ -92,6 +92,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
   <div class=chat-header>
     <h2 id=chatTitle>🤖 AI Chat</h2>
     <div class=actions>
+      <select id=modelSelect onchange=switchModel(this.value) style="background:rgba(255,255,255,.06);color:#e2e8f0;border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer;outline:none"></select>
       <button onclick="document.getElementById('fileInput').click()" title="上传文件">📎 文件</button>
       <button onclick=loadMessages() title="刷新">🔄 刷新</button>
     </div>
@@ -116,7 +117,27 @@ function now(){var d=new Date();return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+
 
 function setMode(m){chatMode=m;document.getElementById('btnNormal').classList.toggle('active',m==='chat');document.getElementById('btnThink').classList.toggle('active',m==='think')}
 
-async function newChat(){var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:H});var d=await r.json();if(d.success){curSession=d.id;selectSession(d.id)}}
+async function loadModels(){
+  var sel=document.getElementById('modelSelect');if(!sel)return
+  var r=await fetch('/auth/api/chat/models',{headers:H})
+  var d=await r.json()
+  if(!d.success||!d.models)return
+  sel.innerHTML=''
+  d.models.forEach(function(m){
+    var o=document.createElement('option')
+    o.value=m.id;o.textContent=m.name;sel.appendChild(o)
+  })
+  sel.value=modelName||'deepseek-v4-flash-free'
+}
+async function switchModel(mid){
+  modelName=mid
+  if(curSession)await fetch('/auth/api/chat/sessions/'+curSession+'/model',{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({model:mid})})
+}
+async function newChat(){
+  var mid=document.getElementById('modelSelect')?document.getElementById('modelSelect').value:''
+  var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({model:mid})})
+  var d=await r.json();if(d.success){curSession=d.id;selectSession(d.id)}
+}
 
 async function selectSession(sid){curSession=sid;loadSessions();loadMessages()}
 
@@ -131,7 +152,8 @@ document.getElementById('chatTitle').textContent=d.messages[0]?d.messages[0].con
 el.innerHTML=d.messages.map(function(m){
   var label=m.role==='user'?esc(d.username):(d.model||'AI').split('-')[0]
   return '<div class="msg '+m.role+'"><div class=meta>'+label+' · '+m.time+'</div>'+formatContent(m.content||'')+'</div>'
-}).join('');el.scrollTop=el.scrollHeight;modelName=d.model||'AI'}
+}).join('');el.scrollTop=el.scrollHeight;modelName=d.model||'AI'
+var sel=document.getElementById('modelSelect');if(sel)sel.value=modelName}
 
 async function send(){
   var input=document.getElementById('input'),text=input.value.trim();if(!text)return
@@ -168,5 +190,5 @@ function formatContent(txt){
 
 async function uploadFiles(files){for(var i=0;i<files.length;i++){var fd=new FormData();fd.append('file',files[i]);await fetch('/auth/api/upload',{method:'POST',headers:H,body:fd})}loadMessages()}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
-setMode('chat');loadSessions();(async function(){await newChat()})();
+setMode('chat');loadModels();loadSessions();(async function(){await newChat()})();
 </script></body></html>

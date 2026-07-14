@@ -16,6 +16,14 @@ from .ai_client import create_opencode_session, send_prompt, poll_response, OPEN
 class SendReq(BaseModel):
     content: str
 
+
+class CreateSessionReq(BaseModel):
+    model: str = ""
+
+
+class ModelReq(BaseModel):
+    model: str
+
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/chat", tags=["聊天"])
 
@@ -64,22 +72,23 @@ async def list_sessions(user: dict = Depends(get_current_user)):
 
 
 @router.post("/sessions")
-async def create_session(user: dict = Depends(get_current_user)):
+async def create_session(req: CreateSessionReq = Body(default=None), user: dict = Depends(get_current_user)):
     sid = f"chat_{uuid.uuid4().hex[:12]}"
+    model = req.model if req and req.model else DEFAULT_MODEL
 
     # 提前创建 opencode 会话（预热，后续发消息不用等）
     oc_id = ""
     try:
-        oc = await create_opencode_session()
+        oc = await create_opencode_session(model)
         oc_id = oc.get("id", "")
     except Exception:
         pass
 
     await execute_write(
         "INSERT INTO chat_sessions (id, username, title, model, oc_session_id) VALUES (%s,%s,%s,%s,%s)",
-        (sid, user["username"], "新对话", DEFAULT_MODEL, oc_id),
+        (sid, user["username"], "新对话", model, oc_id),
     )
-    return {"success": True, "id": sid, "title": "新对话"}
+    return {"success": True, "id": sid, "title": "新对话", "model": model}
 
 
 @router.delete("/sessions/{sid}")
@@ -111,6 +120,19 @@ async def get_messages(sid: str, user: dict = Depends(get_current_user)):
     }
 
 
+class ModelReq(BaseModel):
+    model: str
+
+
+@router.put("/sessions/{sid}/model")
+async def update_session_model(sid: str, req: ModelReq, user: dict = Depends(get_current_user)):
+    await execute_write(
+        "UPDATE chat_sessions SET model=%s, oc_session_id='' WHERE id=%s AND username=%s",
+        (req.model, sid, user["username"]),
+    )
+    return {"success": True}
+
+
 @router.post("/sessions/{sid}/send")
 async def send_message(
     sid: str,
@@ -127,10 +149,11 @@ async def send_message(
     )
 
     # 获取或创建 opencode 会话
-    session = await execute_one("SELECT oc_session_id FROM chat_sessions WHERE id=%s", (sid,))
+    session = await execute_one("SELECT oc_session_id, model FROM chat_sessions WHERE id=%s", (sid,))
     oc_id = session["oc_session_id"] if session else ""
+    session_model = session["model"] if session else DEFAULT_MODEL
     if not oc_id:
-        oc = await create_opencode_session()
+        oc = await create_opencode_session(session_model)
         oc_id = oc.get("id", "")
         await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
 
@@ -176,7 +199,7 @@ async def send_message(
             break
         except Exception as e:
             if "TooLarge" in str(e) or "max bytes" in str(e):
-                oc = await create_opencode_session()
+                oc = await create_opencode_session(session_model)
                 oc_id = oc.get("id", "")
                 await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
                 await send_prompt(oc_id, content)
