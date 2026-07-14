@@ -151,19 +151,28 @@ async def send_message(
             "问题：" + content
         )
 
+    # 记录已有 opencode 消息 ID（防重复取旧回复）
+    import httpx as _hx
+    try:
+        r = _hx.get(f"{OPENCODE_URL}/api/session/{oc_id}/message", params={"from": 0, "to": 50}, timeout=5)
+        existing_ids = {m["id"] for m in r.json().get("data", []) if m.get("id")}
+    except:
+        existing_ids = set()
+
     # 发送 prompt（异步）
-    c = content  # 供闭包使用
-    asyncio.create_task(_generate_stream(sid, oc_id, c))
+    c = content
+    c_ids = existing_ids
+    asyncio.create_task(_generate_stream(sid, oc_id, c, c_ids))
     return {"success": True, "message": "已发送"}
 
 
-async def _generate_stream(sid: str, oc_id: str, content: str):
-    """后台生成 AI 回复（逐步写入，实现流式效果）"""
+async def _generate_stream(sid: str, oc_id: str, content: str, existing_ids: set[str]):
+    """后台生成 AI 回复"""
     try:
         await send_prompt(oc_id, content)
         last_text = ""
         db_id = None
-        async for chunk in poll_response(oc_id, timeout=120):
+        async for chunk in poll_response(oc_id, existing_ids=existing_ids, timeout=120):
             delta = chunk.get("content", "")
             if delta:
                 last_text += delta
