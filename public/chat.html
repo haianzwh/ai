@@ -43,13 +43,13 @@ body.light-mode .footer-text{color:rgba(0,0,0,.2)}
 body.light-mode .think-wrap{border-color:rgba(0,0,0,.08);background:rgba(0,0,0,.02)}
 body.light-mode .think-wrap summary{color:rgba(0,0,0,.4)}
 body.light-mode .think-content{color:rgba(0,0,0,.5);border-top-color:rgba(0,0,0,.08)}
-body.light-mode .msg.assistant .bubble pre{background:#1a1a2e;border-color:rgba(0,0,0,.15);color:#e0e0e0}
-body.light-mode .msg.assistant .bubble code{color:#a5b4fc}
-body.light-mode .msg.assistant .bubble :not(pre)>code{background:rgba(99,102,241,.1);color:#6366f1}
-body.light-mode .msg.assistant .bubble .copy-btn{background:#1a1a2e;border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.4)}
-body.light-mode .msg.assistant .bubble .copy-btn:hover{background:#2a2a3e;color:#fff}
-body.light-mode .msg-actions button{color:rgba(0,0,0,.35);border-color:rgba(0,0,0,.1)}
-body.light-mode .msg-actions button:hover{background:rgba(0,0,0,.05);color:#1a1a2e}
+body.light-mode .msg.assistant .bubble pre{background:#f0f0f5;border-color:rgba(0,0,0,.08);color:#1a1a2e}
+body.light-mode .msg.assistant .bubble code{color:#6366f1}
+body.light-mode .msg.assistant .bubble :not(pre)>code{background:rgba(99,102,241,.08);color:#6366f1}
+body.light-mode .msg.assistant .bubble .copy-btn{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);color:rgba(0,0,0,.35)}
+body.light-mode .msg.assistant .bubble .copy-btn:hover{background:rgba(0,0,0,.1);color:#1a1a2e}
+body.light-mode .msg-actions button{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.08);color:rgba(0,0,0,.35)}
+body.light-mode .msg-actions button:hover{background:rgba(0,0,0,.06);color:#1a1a2e}
 body.light-mode .edit-ta{background:#f0f0f5;border-color:rgba(0,0,0,.12);color:#1a1a2e}
 body.light-mode .edit-cancel{background:#f0f0f5;border-color:rgba(0,0,0,.12);color:rgba(0,0,0,.5)}
 body.light-mode #msgArea::-webkit-scrollbar-thumb{background:rgba(0,0,0,.08)}
@@ -132,10 +132,10 @@ select option{background:#fff;color:#1a1a2e}
 .think-content{padding:10px 14px;font-size:13px;color:rgba(255,255,255,.5);line-height:1.8;white-space:pre-wrap;max-height:400px;overflow-y:auto}
 
 /* 用户消息操作按钮 */
-.msg-actions{display:flex;gap:4px;margin-top:4px;opacity:0;transition:opacity .2s}
+.msg-actions{display:flex;gap:6px;margin-top:6px;padding:0 4px;opacity:0;transition:opacity .2s}
 .msg.user:hover .msg-actions{opacity:1}
-.msg-actions button{background:none;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.3);padding:2px 8px;border-radius:6px;cursor:pointer;font-size:11px;transition:.15s;line-height:1.4}
-.msg-actions button:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6)}
+.msg-actions button{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.35);padding:3px 12px;border-radius:6px;cursor:pointer;font-size:11px;transition:.15s;line-height:1.5;backdrop-filter:blur(4px)}
+.msg-actions button:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6)}
 .edit-ta{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px;color:#e0e0e0;font-size:13px;resize:none;outline:none;min-height:60px;font-family:inherit;box-sizing:border-box}
 .edit-actions{display:flex;gap:6px;margin-top:6px}
 .edit-confirm{padding:4px 14px;border:none;border-radius:8px;background:#6366f1;color:#fff;cursor:pointer;font-size:12px;height:30px}
