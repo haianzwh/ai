@@ -167,6 +167,7 @@ async function send(){
   var input=document.getElementById('input');
   var text=input.value.trim();
   if(!text)return;
+  input.value='';  // 清输入框
   if(!curSession){var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:H});var d=await r.json();curSession=d.id;loadSessions()}
   input.style.height='auto';
   document.querySelector('.send-btn').disabled=true;

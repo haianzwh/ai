@@ -140,12 +140,26 @@ async def send_message(
         title = content[:30] + ("..." if len(content) > 30 else "")
         await execute_write("UPDATE chat_sessions SET title=%s WHERE id=%s", (title, sid))
 
+    # 检测思考模式：消息开头有 <think> 标签时切换推理模型
+    if content.startswith("<think>"):
+        import httpx as _hx2
+        async with _hx2.AsyncClient() as oc_client:
+            await oc_client.put(f"{OPENCODE_URL}/api/session/{oc_id}/model", json={"modelID": "north-mini-code-free"})
+
+    # 发送 prompt 前记录已有消息 ID（防重复取旧回复）
+    import httpx
+    try:
+        r = httpx.get(f"{OPENCODE_URL}/api/session/{oc_id}/message", params={"from": 0, "to": 50}, timeout=5)
+        existing_ids = {m["id"] for m in r.json().get("data", []) if m.get("id")}
+    except:
+        existing_ids = set()
+
     # 发送 prompt 并等待 AI 回复
     full_text = ""
     for retry in range(2):
         try:
             await send_prompt(oc_id, content)
-            async for chunk in poll_response(oc_id, timeout=120):
+            async for chunk in poll_response(oc_id, existing_ids=existing_ids, timeout=120):
                 if chunk.get("done"):
                     break
                 if chunk.get("content"):
@@ -158,7 +172,7 @@ async def send_message(
                 oc_id = oc.get("id", "")
                 await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
                 await send_prompt(oc_id, content)
-                async for chunk in poll_response(oc_id, timeout=120):
+                async for chunk in poll_response(oc_id, existing_ids=set(), timeout=120):
                     if chunk.get("done"):
                         break
                     if chunk.get("content"):
