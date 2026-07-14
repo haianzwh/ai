@@ -14,8 +14,8 @@ body.light-mode .btn-new{background:rgba(0,0,0,.05);color:#1a1a2e}
 body.light-mode .btn-new:hover{background:rgba(0,0,0,.1)}
 body.light-mode .group-label{color:rgba(0,0,0,.35)}
 body.light-mode .session{color:rgba(0,0,0,.5)}
-body.light-mode .session:hover{background:rgba(0,0,0,.04);color:#1a1a2e}
-body.light-mode .session.active{background:rgba(0,0,0,.06);color:#1a1a2e}
+body.light-mode .session:hover{background:rgba(0,0,0,.06);color:#1a1a2e}
+body.light-mode .session.active{background:rgba(99,102,241,.1);color:#1a1a2e}
 body.light-mode .sidebar-footer{border-top-color:rgba(0,0,0,.06)}
 body.light-mode .sidebar-footer .uname{color:rgba(0,0,0,.5)}
 body.light-mode #sessionSearch{background:#f0f0f5;border-color:rgba(0,0,0,.15);color:#1a1a2e}
@@ -30,8 +30,8 @@ body.light-mode .msg.assistant .bubble strong{color:#1a1a2e}
 body.light-mode .msg.assistant .bubble .md-li{color:rgba(0,0,0,.55)}
 body.light-mode .msg.assistant .bubble .step-text{color:#1a1a2e}
 body.light-mode .msg .meta{color:rgba(0,0,0,.3)}
-body.light-mode .input-wrap{background:#fff;border-color:rgba(0,0,0,.12)}
-body.light-mode .input-wrap:focus-within{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+body.light-mode .input-wrap{background:#fff;border-color:rgba(0,0,0,.1);backdrop-filter:none}
+body.light-mode .input-wrap:focus-within{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.08)}
 body.light-mode .input-wrap textarea{color:#1a1a2e}
 body.light-mode .input-wrap textarea::placeholder{color:rgba(0,0,0,.25)}
 body.light-mode .input-bottom .left button{color:rgba(0,0,0,.4)}
@@ -68,8 +68,8 @@ select option{background:#fff;color:#1a1a2e}
 .session-group{padding:0 8px;margin-bottom:4px}
 .group-label{padding:6px 8px 2px;font-size:11px;color:rgba(255,255,255,.2);font-weight:500}
 .session{padding:8px 10px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.35);border-radius:8px;transition:.1s;margin:1px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.session:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.6)}
-.session.active{background:rgba(255,255,255,.06);color:#e0e0e0}
+.session:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)}
+.session.active{background:rgba(99,102,241,.15);color:#e0e0e0}
 .session .del{float:right;background:none;border:none;color:rgba(255,255,255,.15);cursor:pointer;font-size:12px;padding:0 4px;border-radius:4px;visibility:hidden}
 .session:hover .del{visibility:visible}
 .session .del:hover{color:#ef4444}
@@ -141,9 +141,9 @@ select option{background:#fff;color:#1a1a2e}
 /* ===== 输入栏 ===== */
 .input-bar{padding:0 0 20px;flex-shrink:0;display:flex;flex-direction:column;align-items:center}
 .input-container{width:100%;max-width:900px;padding:0 40px}
-.input-wrap{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.08);border-radius:16px;padding:8px 12px;display:flex;flex-direction:column;transition:.2s}
-.input-wrap:focus-within{border-color:rgba(99,102,241,.5);box-shadow:0 0 0 3px rgba(99,102,241,.08)}
-.input-wrap textarea{flex:1;border:none;background:transparent;color:#e0e0e0;font-size:15px;resize:none;outline:none;font-family:inherit;min-height:22px;max-height:150px;line-height:1.6;padding:4px 0}
+.input-wrap{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:16px;padding:10px 14px;display:flex;flex-direction:column;transition:.2s;backdrop-filter:blur(10px)}
+.input-wrap:focus-within{border-color:rgba(99,102,241,.4);box-shadow:0 0 0 3px rgba(99,102,241,.06)}
+.input-wrap textarea{flex:1;border:none;background:transparent;color:#e0e0e0;font-size:14px;resize:none;outline:none;font-family:inherit;min-height:24px;max-height:150px;line-height:1.6;padding:2px 0}
 .input-wrap textarea::placeholder{color:rgba(255,255,255,.2)}
 .input-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:6px;margin-top:2px;border-top:1px solid rgba(255,255,255,.04)}
 .input-bottom .left{display:flex;gap:4px;align-items:center}
@@ -340,7 +340,7 @@ function formatContent(txt, thinking, role, meta){
 
 function copyMsg(btn){
   var txt=btn.closest('.msg').querySelector('.bubble').textContent
-  navigator.clipboard.writeText(txt)
+  try{navigator.clipboard.writeText(txt)}catch(e){}
   btn.textContent='✓ 已复制';setTimeout(function(){btn.textContent='📋 复制'},1500)
 }
 function editMsg(btn){
