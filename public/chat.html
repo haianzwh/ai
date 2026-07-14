@@ -28,6 +28,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .sidebar-footer .uname{font-size:13px;color:rgba(255,255,255,.5);flex:1}
 .sidebar-hidden .sidebar{margin-left:-300px}
 .sidebar-hidden .main{max-width:100%}
+.sidebar-hidden .sidebar-open-btn{display:flex !important}
+.sidebar-open-btn{display:none !important;position:fixed;top:12px;left:12px;z-index:50;width:36px;height:36px;border:none;border-radius:10px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);cursor:pointer;font-size:18px;align-items:center;justify-content:center;transition:.15s}
+.sidebar-open-btn:hover{background:rgba(255,255,255,.12);color:rgba(255,255,255,.6)}
 
 /* ===== 主区域 ===== */
 .main{flex:1;display:flex;flex-direction:column;height:100vh;max-width:calc(100% - 300px)}
@@ -95,10 +98,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .input-bottom .left{display:flex;gap:4px;align-items:center}
 .input-bottom .left button{background:none;border:none;color:rgba(255,255,255,.25);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:12px;transition:.15s}
 .input-bottom .left button:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.5)}
-.input-bottom .left .pill{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:4px 14px;font-size:11px}
 .input-bottom .right{display:flex;gap:6px;align-items:center}
-.input-bottom .right select{background:rgba(255,255,255,.04);color:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:4px 8px;font-size:10px;cursor:pointer;outline:none;max-width:100px}
-.input-bottom .right select option{background:#1a1a2e;color:#e0e0e0}
 .send-btn{width:36px;height:36px;border:none;border-radius:50%;background:#6366f1;color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
 .send-btn:hover{opacity:.85;transform:scale(1.05)}
 .send-btn:disabled{opacity:.2;cursor:default;transform:none}
@@ -136,6 +136,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
   </div>
 </div>
 
+<button class=sidebar-open-btn onclick=toggleSidebar()>☰</button>
+
 <div class=main>
   <div id=msgArea>
     <div class=empty-state><div class=icon>💬</div><p>开始对话</p></div>
@@ -146,11 +148,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
         <textarea id=input rows=1 placeholder="给 AI 发送消息" onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
         <div class=input-bottom>
           <div class=left>
-            <button class=pill id=btnMode onclick="cycleMode()">⚡ 快速</button>
+            <select id=modelSelect onchange=switchModel(this.value) style="background:rgba(255,255,255,.04);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;outline:none;max-width:140px"></select>
             <button onclick=loadMessages() title="刷新">🔄</button>
           </div>
           <div class=right>
-            <select id=modelSelect onchange=switchModel(this.value)></select>
             <button class=send-btn onclick=send()>➤</button>
           </div>
         </div>
@@ -165,11 +166,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 var T=localStorage.getItem('auth_token');if(!T)location.href='/login.html'
 var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat',modelName='AI',uName='用户'
 function now(){var d=new Date();return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.toTimeString().slice(0,8)}
-
-function cycleMode(){
-  chatMode=chatMode==='chat'?'think':'chat'
-  document.getElementById('btnMode').textContent=chatMode==='think'?'🧠 深度思考':'⚡ 快速'
-}
 
 async function loadModels(){
   var names={'deepseek-v4-flash-free':'DeepSeek','hy3-free':'Hy3','north-mini-code-free':'Mini Code','nemotron-3-ultra-free':'Nemotron','mimo-v2.5-free':'MiMo','big-pickle':'Big Pickle'}
