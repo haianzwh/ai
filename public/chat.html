@@ -120,8 +120,10 @@ select option{background:#fff;color:#1a1a2e}
 .msg.assistant .bubble :not(pre)>code{background:rgba(99,102,241,.12);padding:2px 8px;border-radius:4px;font-size:13px;color:#818cf8}
 .msg.assistant .bubble.thinking{background:transparent;color:rgba(255,255,255,.35);font-size:13px;padding:4px 0}
 .msg.assistant .bubble.thinking::after{content:'';display:inline-block;width:6px;height:6px;background:#818cf8;border-radius:50%;margin-left:6px;animation:dotPulse 1.2s infinite}
-.interrupted{text-align:center;color:rgba(255,255,255,.15);font-size:11px;padding:4px 0;letter-spacing:2px;width:100%;max-width:900px;margin:0 auto}
-body.light-mode .interrupted{color:rgba(0,0,0,.12)}
+.interrupted{display:flex;align-items:center;gap:12px;color:rgba(255,255,255,.12);font-size:11px;padding:6px 0;width:100%;max-width:900px;margin:0 auto}
+.interrupted span{flex:1;height:0;border-top:1px solid rgba(255,255,255,.08)}
+body.light-mode .interrupted{color:rgba(0,0,0,.1)}
+body.light-mode .interrupted span{border-top-color:rgba(0,0,0,.06)}
 .msg .meta{font-size:11px;color:rgba(255,255,255,.2);margin-bottom:6px;padding:0 2px}
 .msg.user .meta{text-align:right}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -304,7 +306,7 @@ async function send(){
     if(d.content||d.thinking){var _m=(modelName||'AI').split('-')[0]+' · '+now();aiDiv.outerHTML='<div class="msg assistant">'+formatContent(d.content||'',d.thinking||'','assistant',_m)+'</div>'}else{aiDiv.innerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
     el.scrollTop=el.scrollHeight;loadSessions()
   }catch(e){
-    if(e.name==='AbortError'&&currentAbort){aiDiv.outerHTML='<div class=interrupted>—— 已中断 ——</div>'}
+    if(e.name==='AbortError'&&currentAbort){aiDiv.outerHTML='<div class=interrupted><span></span>已中断<span></span></div>'}
     else aiDiv.innerHTML='<div class=bubble>❌ '+(e.name==='AbortError'?'请求超时，请重试':esc(e.message))+'</div>'
   }
   finally{clearTimeout(tmr);currentAbort=null;isSending=0;document.querySelector('.send-btn').textContent='➤';document.querySelector('.send-btn').disabled=false}
@@ -329,7 +331,7 @@ async function sendText(text){
     if(d.content||d.thinking){aiDiv.outerHTML='<div class="msg assistant">'+formatContent(d.content||'',d.thinking||'','assistant')+'</div>'}else{aiDiv.innerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
     el.scrollTop=el.scrollHeight;loadSessions()
   }catch(e){
-    if(e.name==='AbortError'&&currentAbort){aiDiv.outerHTML='<div class=interrupted>—— 已中断 ——</div>'}
+    if(e.name==='AbortError'&&currentAbort){aiDiv.outerHTML='<div class=interrupted><span></span>已中断<span></span></div>'}
     else aiDiv.innerHTML='<div class=bubble>❌ '+(e.name==='AbortError'?'请求超时，请重试':esc(e.message))+'</div>'
   }
   finally{clearTimeout(tmr);currentAbort=null;isSending=0;document.querySelector('.send-btn').textContent='➤';document.querySelector('.send-btn').disabled=false}
