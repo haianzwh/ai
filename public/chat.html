@@ -1,25 +1,20 @@
 <!DOCTYPE html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><title>AI Chat</title><style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;background:#0f1729;color:#fff;min-height:100vh;display:flex}
-
-/* ========== 侧边栏 ========== */
 .sidebar{width:280px;background:rgba(0,0,0,.25);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;flex-shrink:0;height:100vh}
 .sidebar .hd{padding:16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;gap:8px;flex-shrink:0}
-.sidebar .hd{padding:16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;gap:8px}
 .sidebar .hd button{flex:1;padding:10px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
 .btn-new{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
 .btn-model{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)}
 .btn-model.active{background:rgba(99,102,241,.2);color:#818cf8}
-.sidebar .title{padding:12px 16px;font-size:11px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1px}
+.sidebar .title{padding:12px 16px;font-size:11px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1px;flex-shrink:0}
 .session{padding:12px 16px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.5);display:flex;justify-content:space-between;align-items:center;border-left:3px solid transparent;transition:.1s}
 .session:hover{background:rgba(99,102,241,.06);color:#fff}
 .session.active{background:rgba(99,102,241,.1);border-left-color:#6366f1;color:#fff}
 .session .del{background:none;border:none;color:rgba(255,255,255,.2);cursor:pointer;font-size:15px;padding:2px 6px;visibility:hidden;border-radius:4px}
 .session:hover .del{visibility:visible}
 .session .del:hover{color:#ef4444;background:rgba(239,68,68,.1)}
-
-/* ========== 主聊天区 ========== */
-.main{flex:1;display:flex;flex-direction:column;max-width:calc(100% - 280px)}
+.main{flex:1;display:flex;flex-direction:column;max-width:calc(100% - 280px);height:100vh}
 .chat-header{padding:14px 24px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
 .chat-header h2{font-size:16px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px}
 .chat-header .actions{display:flex;gap:6px}
@@ -32,38 +27,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 .msg.user .bubble{background:#6366f1;border-bottom-right-radius:4px}
 .msg.assistant .bubble{background:rgba(255,255,255,.06);border-bottom-left-radius:4px}
 .msg.assistant .bubble.thinking{background:transparent;color:rgba(255,255,255,.3);font-size:12px;padding:4px 0}
-
-/* 思维链折叠 */
 .think-wrap{background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:8px;overflow:hidden}
 .think-wrap summary{padding:10px 14px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:6px}
 .think-wrap summary::before{content:'🔍'}
 .think-wrap .think-content{padding:4px 14px 14px;font-size:12px;color:rgba(255,255,255,.45);line-height:1.7;white-space:pre-wrap;max-height:300px;overflow-y:auto}
-
-/* 输入区 */
 .input-bar{padding:12px 24px 16px;border-top:1px solid rgba(255,255,255,.06);flex-shrink:0}
 .input-wrap{display:flex;gap:8px;align-items:flex-end;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:8px 8px 8px 16px}
 .input-wrap:focus-within{border-color:#6366f1}
 .input-wrap textarea{flex:1;border:none;background:transparent;color:#fff;font-size:14px;resize:none;outline:none;font-family:inherit;min-height:24px;max-height:120px;line-height:1.5}
 .input-wrap .tool-btn{background:none;border:none;color:rgba(255,255,255,.3);padding:6px;border-radius:8px;cursor:pointer;font-size:18px;flex-shrink:0}
 .input-wrap .tool-btn:hover{color:#6366f1;background:rgba(99,102,241,.1)}
-.input-wrap .send-btn{padding:8px 18px;border:none;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;cursor:pointer;font-size:14px;font-weight:600;flex-shrink:0;disabled:opacity:.5}
-.input-wrap .send-btn:hover{opacity:.9}
-
-/* 空状态 */
+.input-wrap .send-btn{padding:8px 18px;border:none;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;cursor:pointer;font-size:14px;font-weight:600;flex-shrink:0}
+.input-wrap .send-btn:disabled{opacity:.5;cursor:default}
+.input-wrap .send-btn:hover:not(:disabled){opacity:.9}
 .empty-state{text-align:center;padding:100px 40px;color:rgba(255,255,255,.2)}
 .empty-state .icon{font-size:48px;margin-bottom:16px}
 .empty-state p{font-size:14px;line-height:2}
-
-/* 响应式 */
 @media(max-width:768px){
   .sidebar{display:none}
   .main{max-width:100%}
   .sidebar.open{display:flex;position:fixed;top:0;left:0;bottom:0;z-index:100;width:280px}
 }
-</style></head>
-<body>
+</style></head><body>
 
-<!-- 侧边栏 -->
 <div class=sidebar id=sidebar>
   <div class=hd>
     <button class="btn-new" onclick=newChat()>+ 新建</button>
@@ -74,7 +60,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
   <div style="overflow-y:auto;flex:1" id=sessionList></div>
 </div>
 
-<!-- 主区 -->
 <div class=main>
   <div class=chat-header>
     <h2 id=chatTitle>AI Chat</h2>
@@ -83,7 +68,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
       <button onclick=loadMessages() title="刷新">🔄</button>
     </div>
   </div>
-  <div id=msgArea><div class=empty-state><div class=icon>💬</div><p>选择或新建一个对话<br>输入消息即可开始</p></div></div>
+  <div id=msgArea>
+    <div class=empty-state><div class=icon>💬</div><p>选择或新建一个对话<br>输入消息即可开始</p></div>
+  </div>
   <div class=input-bar>
     <div class=input-wrap>
       <textarea id=input rows=1 placeholder="输入消息..." onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
@@ -96,32 +83,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 
 <script>
 var T = localStorage.getItem('auth_token');
-if (!T) location.href='/login.html';
+if(!T)location.href='/login.html';
 var H = {Authorization:'Bearer '+T};
-var curSession = null;
-var chatMode = 'chat';  // chat | think
+var curSession=null,chatMode='chat';
 
-function setMode(m){
-  chatMode = m;
-  document.getElementById('btnNormal').classList.toggle('active',m==='chat');
-  document.getElementById('btnThink').classList.toggle('active',m==='think');
-}
+function setMode(m){chatMode=m;document.getElementById('btnNormal').classList.toggle('active',m==='chat');document.getElementById('btnThink').classList.toggle('active',m==='think')}
 
-async function newChat(){
-  var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:H});
-  var d=await r.json();
-  if(d.success){curSession=d.id;selectSession(d.id)}
-}
+async function newChat(){var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:H});var d=await r.json();if(d.success){curSession=d.id;selectSession(d.id)}}
 
-async function selectSession(sid){
-  curSession=sid;
-  loadSessions();
-  loadMessages();
-}
+async function selectSession(sid){curSession=sid;loadSessions();loadMessages()}
 
 async function loadSessions(){
-  var r=await fetch('/auth/api/chat/sessions',{headers:H});
-  var d=await r.json();
+  var r=await fetch('/auth/api/chat/sessions',{headers:H});var d=await r.json();
   document.getElementById('sessionList').innerHTML=d.sessions.map(function(s){
     var c=s.id===curSession?' active':'';
     return '<div class="session'+c+'" onclick="selectSession(\''+s.id+'\')">'+
@@ -130,101 +103,53 @@ async function loadSessions(){
   }).join('');
 }
 
-async function delSession(sid){
-  await fetch('/auth/api/chat/sessions/'+sid,{method:'DELETE',headers:H});
-  if(curSession===sid){curSession=null;document.getElementById('msgArea').innerHTML='<div class=empty-state><div class=icon>💬</div><p>选择或新建一个对话</p></div>'}
-  loadSessions();
-}
+async function delSession(sid){await fetch('/auth/api/chat/sessions/'+sid,{method:'DELETE',headers:H});if(curSession===sid){curSession=null;document.getElementById('msgArea').innerHTML='<div class=empty-state><div class=icon>💬</div><p>选择或新建一个对话</p></div>'}loadSessions()}
 
 async function loadMessages(){
-  if(!curSession)return;
-  var r=await fetch('/auth/api/chat/sessions/'+curSession+'/messages',{headers:H});
-  var d=await r.json();
+  if(!curSession)return;var r=await fetch('/auth/api/chat/sessions/'+curSession+'/messages',{headers:H});var d=await r.json();
   var el=document.getElementById('msgArea');
-  if(!d.messages.length){
-    el.innerHTML='<div class=empty-state><div class=icon>💬</div><p>开始对话</p></div>';
-    return;
-  }
-  // 更新标题
-  var s=d.messages[0];
+  if(!d.messages.length){el.innerHTML='<div class=empty-state><div class=icon>💬</div><p>开始对话</p></div>';return}
   document.getElementById('chatTitle').textContent=curSession.substr(0,16)+'…';
   el.innerHTML=d.messages.map(function(m){
-    var content='';
-    var thinking='';
-    // 尝试分离thinking内容（如果消息包含 标记）
-    var txt=m.content||'';
-    var thinkMatch=txt.match(/<think>([\s\S]*?)<\/think>/);
-    if(thinkMatch){thinking=thinkMatch[1];txt=txt.replace(/<think>[\s\S]*?<\/think>/,'').trim()}
-    if(thinking){
-      content+='<details class=think-wrap><summary>💡 思考过程</summary><div class=think-content>'+esc(thinking)+'</div></details>';
-    }
-    content+='<div class=bubble>'+esc(txt||'')+'</div>';
-    return '<div class="msg '+m.role+'">'+content+'</div>';
+    var txt=m.content||'',thinking='',html='';
+    var tm=txt.match(/<think>([\s\S]*?)<\/think>/);
+    if(tm){thinking=tm[1];txt=txt.replace(/<think>[\s\S]*?<\/think>/,'').trim()}
+    if(thinking)html+='<details class=think-wrap><summary>💡 思考过程</summary><div class=think-content>'+esc(thinking)+'</div></details>';
+    html+='<div class=bubble>'+esc(txt||'')+'</div>';
+    return '<div class="msg '+m.role+'">'+html+'</div>';
   }).join('');
   el.scrollTop=el.scrollHeight;
 }
 
 async function send(){
-  var input=document.getElementById('input');
-  var text=input.value.trim();
+  var input=document.getElementById('input'),text=input.value.trim();
   if(!text)return;
-  input.value='';  // 清输入框
+  input.value='';
   if(!curSession){var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:H});var d=await r.json();curSession=d.id;loadSessions()}
   input.style.height='auto';
   document.querySelector('.send-btn').disabled=true;
-
-  // 显示用户消息
+  var sendText=chatMode==='think'?'<think>请逐步思考再回答</think>'+text:text;
   var el=document.getElementById('msgArea');
   if(el.querySelector('.empty-state'))el.innerHTML='';
-  var userDiv=document.createElement('div');userDiv.className='msg user';userDiv.innerHTML='<div class=bubble>'+esc(text)+'</div>';
-  el.appendChild(userDiv);
-
-  // 显示AI占位
-  var aiDiv=document.createElement('div');aiDiv.className='msg assistant';
-  aiDiv.innerHTML='<div class="bubble thinking">🤔 思考中...</div>';
-  el.appendChild(aiDiv);el.scrollTop=el.scrollHeight;
-
-  // 如果是思考模式，添加thinking前缀
-  var sendText = chatMode==='think' ? '<think>请逐步思考再回答</think>'+text : text;
-
+  var userDiv=document.createElement('div');userDiv.className='msg user';userDiv.innerHTML='<div class=bubble>'+esc(text)+'</div>';el.appendChild(userDiv);
+  var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class="bubble thinking">🤔 思考中...</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight;
   try{
-    var r=await fetch('/auth/api/chat/sessions/'+curSession+'/send',{
-      method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),
-      body:JSON.stringify({content:sendText})
-    });
+    var r=await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:sendText})});
+    if(!r.ok){var t=await r.text().catch(function(){return''});aiDiv.innerHTML='<div class=bubble>❌ 错误'+r.status+': '+esc(t.slice(0,100))+'</div>';return}
     var d=await r.json();
     if(d.content){
-      var txt=d.content;
-      var thinkMatch=txt.match(/<think>([\s\S]*?)<\/think>/);
-      var thinking='',mainText=txt;
-      if(thinkMatch){thinking=thinkMatch[1];mainText=txt.replace(/<think>[\s\S]*?<\/think>/,'').trim()}
-      var html='';
-      if(thinking)html+='<details class=think-wrap><summary>💡 思考过程</summary><div class=think-content>'+esc(thinking)+'</div></details>';
+      var txt=d.content,tm=txt.match(/<think>([\s\S]*?)<\/think>/),thinking='',mainText=txt;
+      if(tm){thinking=tm[1];mainText=txt.replace(/<think>[\s\S]*?<\/think>/,'').trim()}
+      var html=thinking?'<details class=think-wrap open><summary>💡 思考过程</summary><div class=think-content>'+esc(thinking)+'</div></details>':'';
       html+='<div class=bubble>'+(mainText?esc(mainText):'')+'</div>';
       aiDiv.innerHTML=html;
-    }else{
-      aiDiv.innerHTML='<div class=bubble>'+(d.error?'错误: '+d.error:'(无回复)')+'</div>';
-    }
-    el.scrollTop=el.scrollHeight;
-    loadSessions();
-  }catch(e){
-    aiDiv.innerHTML='<div class=bubble>网络错误: '+e.message+'</div>';
-  }
+    }else{aiDiv.innerHTML='<div class=bubble>'+esc(d.error||'(无回复)')+'</div>'}
+    el.scrollTop=el.scrollHeight;loadSessions();
+  }catch(e){aiDiv.innerHTML='<div class=bubble>❌ 请求失败: '+esc(e.message)+'</div>'}
   document.querySelector('.send-btn').disabled=false;
 }
 
-async function uploadFiles(files){
-  for(var i=0;i<files.length;i++){
-    var fd=new FormData();fd.append('file',files[i]);
-    await fetch('/auth/api/upload',{method:'POST',headers:H,body:fd});
-  }
-  loadMessages();
-}
-
+async function uploadFiles(files){for(var i=0;i<files.length;i++){var fd=new FormData();fd.append('file',files[i]);await fetch('/auth/api/upload',{method:'POST',headers:H,body:fd})}loadMessages()}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
-
-// 初始化
-setMode('chat');
-loadSessions();
-(async function(){await newChat()})();
+setMode('chat');loadSessions();(async function(){await newChat()})();
 </script></body></html>
