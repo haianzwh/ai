@@ -7,45 +7,55 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 body.dark-mode{background:#0a0a14;color:#c0c0c0}
 body.dark-mode .sidebar{background:#0e0e1e}
 body.dark-mode .msg.user .bubble{background:#1e1e32}
-body.light-mode{background:#f0f2f5;color:#1a1a2e}
+body.light-mode{background:#f5f5f8;color:#1a1a2e}
 body.light-mode .sidebar{background:#fff;border-right-color:rgba(0,0,0,.06)}
 body.light-mode .sidebar .logo{color:#1a1a2e}
-body.light-mode .btn-new{background:rgba(0,0,0,.04);color:rgba(0,0,0,.5)}
-body.light-mode .btn-new:hover{background:rgba(0,0,0,.08);color:#1a1a2e}
-body.light-mode .session{color:rgba(0,0,0,.35)}
+body.light-mode .btn-new{background:rgba(0,0,0,.05);color:#1a1a2e}
+body.light-mode .btn-new:hover{background:rgba(0,0,0,.1)}
+body.light-mode .group-label{color:rgba(0,0,0,.35)}
+body.light-mode .session{color:rgba(0,0,0,.5)}
 body.light-mode .session:hover{background:rgba(0,0,0,.04);color:#1a1a2e}
 body.light-mode .session.active{background:rgba(0,0,0,.06);color:#1a1a2e}
 body.light-mode .sidebar-footer{border-top-color:rgba(0,0,0,.06)}
-body.light-mode .sidebar-footer .uname{color:rgba(0,0,0,.4)}
-body.light-mode #sessionSearch{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.08);color:rgba(0,0,0,.5)}
-body.light-mode .msg.user .bubble{background:#e8e8f0;color:#1a1a2e}
+body.light-mode .sidebar-footer .uname{color:rgba(0,0,0,.5)}
+body.light-mode #sessionSearch{background:#f0f0f5;border-color:rgba(0,0,0,.12);color:#1a1a2e}
+body.light-mode #sessionSearch::placeholder{color:rgba(0,0,0,.3)}
+body.light-mode .sidebar-footer button{color:rgba(0,0,0,.4)}
+body.light-mode .sidebar-footer button:hover{background:rgba(0,0,0,.05);color:#1a1a2e}
+body.light-mode .msg.user .bubble{background:#e4e4f0;color:#1a1a2e}
 body.light-mode .msg.assistant .bubble{color:#1a1a2e}
-body.light-mode .input-wrap{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.1)}
+body.light-mode .msg.assistant .bubble h2{color:#1a1a2e}
+body.light-mode .msg.assistant .bubble h3{color:#1a1a2e}
+body.light-mode .msg.assistant .bubble strong{color:#1a1a2e}
+body.light-mode .msg.assistant .bubble .md-li{color:rgba(0,0,0,.55)}
+body.light-mode .msg.assistant .bubble .step-text{color:#1a1a2e}
+body.light-mode .msg .meta{color:rgba(0,0,0,.3)}
+body.light-mode .input-wrap{background:#fff;border-color:rgba(0,0,0,.12)}
+body.light-mode .input-wrap:focus-within{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
 body.light-mode .input-wrap textarea{color:#1a1a2e}
-body.light-mode .input-wrap textarea::placeholder{color:rgba(0,0,0,.2)}
-body.light-mode .input-bottom .left button{color:rgba(0,0,0,.25)}
-body.light-mode .input-bottom .left button:hover{background:rgba(0,0,0,.04);color:rgba(0,0,0,.5)}
-body.light-mode #modelSelect{background:rgba(0,0,0,.04);color:rgba(0,0,0,.45);border-color:rgba(0,0,0,.08)}
-body.light-mode .footer-text{color:rgba(0,0,0,.12)}
-body.light-mode .think-wrap{border-color:rgba(0,0,0,.08)}
-body.light-mode .think-wrap summary{color:rgba(0,0,0,.35)}
-body.light-mode .think-content{color:rgba(0,0,0,.45);border-top-color:rgba(0,0,0,.08)}
-body.light-mode .msg .meta{color:rgba(0,0,0,.2)}
-body.light-mode select option{background:#fff;color:#1a1a2e}
-body.light-mode .group-label{color:rgba(0,0,0,.2)}
-body.light-mode .session .del{color:rgba(0,0,0,.15)}
-body.light-mode .session .del:hover{color:#ef4444}
-body.light-mode .sidebar-footer button{color:rgba(0,0,0,.25)}
-body.light-mode .sidebar-footer button:hover{background:rgba(0,0,0,.04);color:rgba(0,0,0,.5)}
-body.light-mode .msg-actions button{color:rgba(0,0,0,.25);border-color:rgba(0,0,0,.08)}
-body.light-mode .msg-actions button:hover{background:rgba(0,0,0,.04);color:rgba(0,0,0,.5)}
-body.light-mode .input-bottom select{background:rgba(0,0,0,.04);color:rgba(0,0,0,.45);border-color:rgba(0,0,0,.08)}
-body.light-mode .msg.assistant .bubble pre{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.08)}
+body.light-mode .input-wrap textarea::placeholder{color:rgba(0,0,0,.25)}
+body.light-mode .input-bottom .left button{color:rgba(0,0,0,.4)}
+body.light-mode .input-bottom .left button:hover{background:rgba(0,0,0,.05);color:#1a1a2e}
+body.light-mode #modelSelect{background:#f0f0f5;color:#1a1a2e;border-color:rgba(0,0,0,.12)}
+body.light-mode .input-bottom select{background:#f0f0f5;color:#1a1a2e;border-color:rgba(0,0,0,.12)}
+body.light-mode .footer-text{color:rgba(0,0,0,.2)}
+body.light-mode .think-wrap{border-color:rgba(0,0,0,.08);background:rgba(0,0,0,.02)}
+body.light-mode .think-wrap summary{color:rgba(0,0,0,.4)}
+body.light-mode .think-content{color:rgba(0,0,0,.5);border-top-color:rgba(0,0,0,.08)}
+body.light-mode .msg.assistant .bubble pre{background:#f0f0f5;border-color:rgba(0,0,0,.08)}
 body.light-mode .msg.assistant .bubble code{color:#6366f1}
 body.light-mode .msg.assistant .bubble :not(pre)>code{background:rgba(99,102,241,.08);color:#6366f1}
-body.light-mode .msg.assistant .bubble .copy-btn{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.08);color:rgba(0,0,0,.3)}
-body.light-mode .msg.assistant .bubble .copy-btn:hover{background:rgba(0,0,0,.08);color:rgba(0,0,0,.6)}
+body.light-mode .msg.assistant .bubble .copy-btn{background:#f0f0f5;border-color:rgba(0,0,0,.08);color:rgba(0,0,0,.35)}
+body.light-mode .msg.assistant .bubble .copy-btn:hover{background:#e0e0e8;color:#1a1a2e}
+body.light-mode .msg-actions button{color:rgba(0,0,0,.35);border-color:rgba(0,0,0,.1)}
+body.light-mode .msg-actions button:hover{background:rgba(0,0,0,.05);color:#1a1a2e}
+body.light-mode .edit-ta{background:#f0f0f5;border-color:rgba(0,0,0,.12);color:#1a1a2e}
+body.light-mode .edit-cancel{background:#f0f0f5;border-color:rgba(0,0,0,.12);color:rgba(0,0,0,.5)}
 body.light-mode #msgArea::-webkit-scrollbar-thumb{background:rgba(0,0,0,.08)}
+body.light-mode .dark-btn{color:rgba(0,0,0,.4)}
+body.light-mode select option{background:#fff;color:#1a1a2e}
+body.light-mode .session .del{color:rgba(0,0,0,.2)}
+body.light-mode .session .del:hover{color:#ef4444}
 select option{background:#fff;color:#1a1a2e}
 
 /* ===== 侧边栏 ===== */
