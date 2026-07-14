@@ -49,6 +49,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 .msg.assistant .bubble strong{color:#f0f0f0}
 .msg.assistant .bubble .md-li{padding-left:12px;margin:2px 0;color:rgba(255,255,255,.65)}
 .msg.assistant .bubble .md-li::before{content:'• ';color:rgba(255,255,255,.3)}
+.msg.assistant .bubble pre{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:12px 14px;margin:8px 0;overflow-x:auto;white-space:pre}
+.msg.assistant .bubble code{font-family:'JetBrains Mono','Fira Code','Consolas',monospace;font-size:12px;line-height:1.5;color:#a5b4fc}
+.msg.assistant .bubble :not(pre)>code{background:rgba(99,102,241,.12);padding:1px 6px;border-radius:4px;font-size:12px;color:#818cf8}
 .msg.assistant .bubble.thinking{background:transparent;border:none;box-shadow:none;color:rgba(255,255,255,.35);font-size:13px;padding:4px 0}
 .msg.assistant .bubble.thinking::after{content:'';display:inline-block;width:4px;height:4px;background:#818cf8;border-radius:50%;margin-left:4px;animation:dotPulse 1.2s infinite}
 @keyframes dotPulse{0%,100%{opacity:.3}50%{opacity:1}}
@@ -206,7 +209,9 @@ function formatContent(txt, thinking){
 async function uploadFiles(files){for(var i=0;i<files.length;i++){var fd=new FormData();fd.append('file',files[i]);await fetch('/auth/api/upload',{method:'POST',headers:H,body:fd})}loadMessages()}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function md(s){
-  s=s.replace(/^### (.+)$/gm,'<h4>$1</h4>')
+  s=s.replace(/```(\w*)\n([\s\S]*?)```/g,'<pre><code class="lang-$1">$2</code></pre>')
+       .replace(/`([^`]+)`/g,'<code>$1</code>')
+       .replace(/^### (.+)$/gm,'<h4>$1</h4>')
        .replace(/^## (.+)$/gm,'<h3>$1</h3>')
        .replace(/^# (.+)$/gm,'<h2>$1</h2>')
        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
