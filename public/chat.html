@@ -462,12 +462,24 @@ function renameSession(sid){
   overlay.querySelector('.rnCancel').onclick=close
   overlay.querySelector('.rnOk').onclick=function(){
     var v=inp.value.trim()
-    if(v){fetch('/auth/api/chat/sessions/'+sid,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({title:v})}).then(function(){close();loadSessions()}).catch(function(){close();loadSessions()})}
+    if(v){
+      document.querySelector('.session.active span').textContent=v
+      close()
+      fetch('/auth/api/chat/sessions/'+sid,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({title:v})}).catch(function(){})
+    }
   }
   inp.onkeydown=function(e){if(e.key==='Enter')overlay.querySelector('.rnOk').click();if(e.key==='Escape')close()}
 }
 function pinSession(sid){
-  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).then(function(){loadSessions()}).catch(function(){loadSessions()})
+  var el=document.querySelector('.session.active')
+  if(!el)return
+  var wasPinned=el.classList.contains('pinned')
+  el.classList.toggle('pinned')
+  if(!wasPinned){
+    var list=document.getElementById('sessionList')
+    list.insertBefore(el,list.firstChild)
+  }
+  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){el.classList.toggle('pinned')})
 }
 function toggleDark(){
   document.body.classList.toggle('light-mode')
