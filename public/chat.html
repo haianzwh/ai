@@ -62,10 +62,10 @@ select option{background:#fff;color:#1a1a2e}
 .sidebar{width:300px;background:#16162a;border-right:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;flex-shrink:0;height:100vh;transition:margin-left .25s}
 .sidebar .hd{padding:16px;display:flex;gap:8px;flex-shrink:0;align-items:center;justify-content:space-between}
 .sidebar .hd .logo{font-size:16px;font-weight:700;color:#e0e0e0;letter-spacing:1px}
-.btn-new{width:calc(100% - 32px);margin:0 16px 12px;padding:11px;border:none;border-radius:10px;background:rgba(180,200,220,.15);color:rgba(180,210,240,.7);cursor:pointer;font-size:13px;font-weight:500;transition:.15s;text-align:center;flex-shrink:0}
-.btn-new:hover{background:rgba(180,200,220,.25);color:rgba(180,210,240,.9)}
-body.light-mode .btn-new{background:rgba(160,190,220,.15);color:rgba(80,120,160,.7)}
-body.light-mode .btn-new:hover{background:rgba(160,190,220,.25);color:rgba(60,100,140,.9)}
+.btn-new{width:calc(100% - 32px);margin:0 16px 12px;padding:11px;border:none;border-radius:10px;background:rgba(160,195,220,.2);color:rgba(180,210,240,.8);cursor:pointer;font-size:13px;font-weight:500;transition:.15s;text-align:center;flex-shrink:0}
+.btn-new:hover{background:rgba(160,195,220,.3);color:rgba(200,225,245,.95)}
+body.light-mode .btn-new{background:rgba(140,180,215,.2);color:rgba(60,110,155,.8)}
+body.light-mode .btn-new:hover{background:rgba(140,180,215,.35);color:rgba(50,95,140,.95)}
 .sidebar .title{padding:8px 16px 4px;font-size:11px;font-weight:600;color:rgba(255,255,255,.25);letter-spacing:.5px;flex-shrink:0}
 .session-group{padding:0 8px;margin-bottom:4px}
 .group-label{padding:6px 8px 2px;font-size:11px;color:rgba(255,255,255,.2);font-weight:500}
@@ -90,11 +90,11 @@ body.light-mode .btn-new:hover{background:rgba(160,190,220,.25);color:rgba(60,10
 
 /* ===== 主区域 ===== */
 .main{flex:1;display:flex;flex-direction:column;height:100vh;max-width:calc(100% - 300px)}
-.nav-bar{position:fixed;right:8px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:10px;background:rgba(255,255,255,.03);backdrop-filter:blur(8px);transition:all .25s;max-height:60vh;overflow-y:auto}
+.nav-bar{position:fixed;right:10px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.04);backdrop-filter:blur(12px);transition:all .25s;max-height:60vh;overflow-y:auto;min-width:12px}
 .nav-bar::-webkit-scrollbar{width:2px}
 .nav-bar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:1px}
-.nav-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15);cursor:pointer;transition:all .2s;flex-shrink:0}
-.nav-dot:hover,.nav-dot.active{background:#818cf8;transform:scale(1.3)}
+.nav-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.12);cursor:pointer;transition:all .2s;flex-shrink:0;margin:1px 0}
+.nav-dot:hover,.nav-dot.active{background:#818cf8;transform:scale(1.4);box-shadow:0 0 6px rgba(129,140,248,.3)}
 .nav-preview{position:fixed;right:50px;top:50%;transform:translateY(-50%);background:rgba(30,30,50,.92);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;max-width:280px;max-height:50vh;overflow-y:auto;font-size:12px;color:rgba(255,255,255,.6);line-height:1.5}
 .nav-preview::-webkit-scrollbar{width:2px}
 .nav-preview::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:1px}
@@ -409,9 +409,10 @@ function toggleDark(){
 }
 // 右侧导航栏
 function updateNav(){
-  var dots=document.getElementById('navDots')
-  dots.innerHTML=''
-  document.querySelectorAll('#msgArea .msg.user').forEach(function(m,i){
+  var dots=document.getElementById('navDots');dots.innerHTML=''
+  var msgs=document.querySelectorAll('#msgArea .msg.user')
+  if(!msgs.length){var e=document.createElement('div');e.className='nav-dot';e.style.opacity='.2';dots.appendChild(e);return}
+  msgs.forEach(function(m,i){
     var d=document.createElement('div');d.className='nav-dot';d.title=(m.textContent||'').slice(0,20)
     d.onclick=function(){m.scrollIntoView({behavior:'smooth',block:'center'});navExpand()}
     d.onmouseenter=function(){showNavPreview(m.textContent)}
