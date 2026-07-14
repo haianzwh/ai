@@ -49,10 +49,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 
 /* ===== 思维链 ===== */
 .think-wrap{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:6px;overflow:hidden}
-.think-wrap[open] summary{background:rgba(99,102,241,.06);border-bottom:1px solid rgba(255,255,255,.06)}
-.think-wrap summary{padding:6px 12px;cursor:pointer;font-size:11px;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:6px;transition:.15s;border-radius:10px}
-.think-wrap summary:hover{background:rgba(99,102,241,.06)}
-.think-wrap summary::marker{color:#6366f1}
+.think-header{padding:6px 12px;font-size:11px;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(255,255,255,.06)}
 .think-content{padding:8px 12px;font-size:11px;color:rgba(255,255,255,.45);line-height:1.6;white-space:pre-wrap;max-height:300px;overflow-y:auto}
 
 /* ===== 输入栏 ===== */
@@ -186,7 +183,7 @@ function formatContent(txt, thinking){
   if(sm&&!thinking){thinking=sm[1];mainText=sm[2].trim()}
   if(!thinking&&chatMode==='think'&&txt.length>100){thinking=txt;mainText=''}
   var html=''
-  if(thinking)html='<details class=think-wrap><summary>🧠 思维链</summary><div class=think-content>'+esc(thinking)+'</div></details>'
+  if(thinking)html='<div class=think-wrap><div class=think-header>🧠 思考过程</div><div class=think-content>'+esc(thinking)+'</div></div>'
   html+='<div class=bubble>'+(mainText?esc(mainText):'')+'</div>'
   return html
 }
