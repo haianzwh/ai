@@ -102,7 +102,30 @@ var H = { Authorization: 'Bearer ' + T };
   }
 })();
 var curSession = null;
-var curModel = 'deepseek-v4-flash-free';
+var curModel = 'hy3-free';
+var pollTimer = null;   // 当前会话的轮询定时器，切会话时必须清理
+
+// 停止当前轮询（切会话/新建/删除前调用，避免往旧节点写数据造成重复）
+function stopPoll() {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+
+// 统一渲染：以数据库为准，避免手动 append 与数据库重渲染造成重复
+async function renderMessages(sid, thinking) {
+  var r = await fetch('/auth/api/chat/sessions/' + sid + '/messages', { headers: H });
+  var d = await r.json();
+  var el = document.getElementById('messages');
+  if (!d.messages.length) { showEmpty(); return; }
+  el.innerHTML = d.messages.map(function(m) {
+    var thinkingHtml = m.thinking ? '<details class="thinking"><summary></summary><pre>'+esc(m.thinking)+'</pre></details>' : '';
+    return '<div class="msg '+m.role+'">' + thinkingHtml + '<div class="msg-content">'+esc(m.content)+'</div></div>';
+  }).join('');
+  if (thinking && d.messages[d.messages.length-1].role !== 'assistant') {
+    el.innerHTML += '<div class="msg assistant"><div class="msg-content" style="color:rgba(255,255,255,.4);font-size:12px">⏳ 思考中...</div></div>';
+  }
+  el.scrollTop = el.scrollHeight;
+  document.getElementById('modelSelect').value = curModel;
+}
 
 async function loadModels() {
   try {
@@ -142,24 +165,17 @@ async function loadSessions() {
 }
 
 async function newChat() {
+  stopPoll();
   var r = await fetch('/auth/api/chat/sessions', { method: 'POST', headers: H });
   var d = await r.json();
   if (d.success) { curSession = d.id; loadSessions(); showEmpty(); }
 }
 
 async function select(sid) {
+  stopPoll();            // 切会话先停掉旧轮询，避免往旧节点写数据造成重复
   curSession = sid;
   loadSessions();
-  var r = await fetch('/auth/api/chat/sessions/' + sid + '/messages', { headers: H });
-  var d = await r.json();
-  var el = document.getElementById('messages');
-  if (!d.messages.length) { showEmpty(); return; }
-  el.innerHTML = d.messages.map(function(m) {
-    var thinkingHtml = m.thinking ? '<details class="thinking"><summary></summary><pre>'+esc(m.thinking)+'</pre></details>' : '';
-    return '<div class="msg '+m.role+'">' + thinkingHtml + '<div class="msg-content">'+esc(m.content)+'</div></div>';
-  }).join('');
-  el.scrollTop = el.scrollHeight;
-  document.getElementById('modelSelect').value = curModel;
+  await renderMessages(sid);
 }
 
 function showEmpty() {
@@ -167,6 +183,7 @@ function showEmpty() {
 }
 
 async function del(sid) {
+  stopPoll();
   await fetch('/auth/api/chat/sessions/' + sid, { method: 'DELETE', headers: H });
   if (curSession === sid) { curSession = null; showEmpty(); }
   loadSessions();
@@ -200,45 +217,36 @@ async function send() {
   input.style.height = 'auto';
   document.getElementById('sendBtn').disabled = true;
 
-  var msgs = document.getElementById('messages');
-  if (msgs.querySelector('.empty')) msgs.innerHTML = '';
-  msgs.innerHTML += '<div class="msg user"><div class="msg-content">'+esc(text)+'</div></div>';
-
-var aiDiv = document.createElement('div');
-aiDiv.className = 'msg assistant';
-aiDiv.innerHTML = '<div class="msg-content" style="color:rgba(255,255,255,.3);font-size:12px">⏳ 等待中...</div>';
-msgs.appendChild(aiDiv);
-var aiContent = aiDiv.querySelector('.msg-content');
-aiContent.textContent = '';  // 清掉等待文案
-msgs.scrollTop = msgs.scrollHeight;
-
+  // 先发后渲染：统一以数据库为准，不再手动 append（避免重复）
+  stopPoll();
   try {
     await fetch('/auth/api/chat/sessions/'+curSession+'/send', {
       method: 'POST',
       headers: Object.assign({'Content-Type': 'application/json'}, H),
       body: JSON.stringify({content: text}),
     });
-    aiContent.textContent = '⏳ 思考中...';
-    // 轮询消息
+    // 立即渲染：此时数据库已有 user 消息；assistant 未到时显示"思考中"占位
+    await renderMessages(curSession, true);
+    // 轮询直到出现 assistant 回复
     var pollCount = 0;
-    var pollTimer = setInterval(async function() {
+    pollTimer = setInterval(async function() {
       pollCount++;
       var r = await fetch('/auth/api/chat/sessions/'+curSession+'/messages', { headers: H });
       var d = await r.json();
       var msgs = d.messages || [];
       var last = msgs[msgs.length-1];
       if (last && last.role === 'assistant') {
-        aiContent.textContent = last.content;
-        clearInterval(pollTimer);
-        msgs.scrollTop = msgs.scrollHeight;
+        stopPoll();
+        await renderMessages(curSession);
         loadSessions();
       } else if (pollCount > 120) {
-        aiContent.textContent = '⏰ 超时';
-        clearInterval(pollTimer);
+        stopPoll();
+        await renderMessages(curSession);
       }
     }, 1000);
   } catch(e) {
-    aiContent.textContent = '错误: ' + e.message;
+    stopPoll();
+    await renderMessages(curSession);
   }
   document.getElementById('sendBtn').disabled = false;
 }

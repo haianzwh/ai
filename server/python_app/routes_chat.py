@@ -77,7 +77,7 @@ async def create_session(user: dict = Depends(get_current_user)):
 
     await execute_write(
         "INSERT INTO chat_sessions (id, username, title, model, oc_session_id) VALUES (%s,%s,%s,%s,%s)",
-        (sid, user["username"], "新对话", "deepseek-v4-flash-free", oc_id),
+        (sid, user["username"], "新对话", "hy3-free", oc_id),
     )
     return {"success": True, "id": sid, "title": "新对话"}
 
@@ -108,6 +108,10 @@ async def get_messages(sid: str, user: dict = Depends(get_current_user)):
     }
 
 
+# 会话锁：每个会话同时只允许一个生成任务
+_session_locks: dict[str, asyncio.Lock] = {}
+
+
 @router.post("/sessions/{sid}/send")
 async def send_message(
     sid: str,
@@ -132,27 +136,32 @@ async def send_message(
         title = content[:30] + ("..." if len(content) > 30 else "")
         await execute_write("UPDATE chat_sessions SET title=%s WHERE id=%s", (title, sid))
 
-    # 发 prompt（异步，不阻塞）
-    asyncio.create_task(_generate_async(sid, oc_id, content))
+    # 获取会话锁
+    if sid not in _session_locks:
+        _session_locks[sid] = asyncio.Lock()
+
+    # 异步生成（带锁）
+    asyncio.create_task(_generate_async(sid, oc_id, content, _session_locks[sid]))
 
     return {"success": True, "message": "已发送"}
 
 
-async def _generate_async(sid: str, oc_id: str, content: str):
-    """异步生成 AI 回复（后台运行）"""
-    try:
-        await send_prompt(oc_id, content)
-        full_text = ""
-        async for chunk in poll_response(oc_id, timeout=120):
-            if chunk.get("done"):
-                break
-            if chunk.get("content"):
-                full_text += chunk["content"]
-        if full_text:
-            await execute_write(
-                "INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)",
-                (sid, "assistant", full_text),
-            )
-    except Exception as e:
-        print(f"[generate_async] Error: {e}", flush=True)
+async def _generate_async(sid: str, oc_id: str, content: str, lock: asyncio.Lock):
+    """异步生成 AI 回复（后台运行，带锁防重复）"""
+    async with lock:
+        try:
+            await send_prompt(oc_id, content)
+            full_text = ""
+            async for chunk in poll_response(oc_id, timeout=120):
+                if chunk.get("done"):
+                    break
+                if chunk.get("content"):
+                    full_text += chunk["content"]
+            if full_text:
+                await execute_write(
+                    "INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)",
+                    (sid, "assistant", full_text),
+                )
+        except Exception as e:
+            print(f"[generate_async] Error: {e}", flush=True)
 
