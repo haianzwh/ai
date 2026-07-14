@@ -90,13 +90,12 @@ body.light-mode .btn-new:hover{background:rgba(140,180,215,.35);color:rgba(50,95
 
 /* ===== 主区域 ===== */
 .main{flex:1;display:flex;flex-direction:column;height:100vh;max-width:calc(100% - 300px)}
-.nav-bar{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;padding:60px 18px;border-radius:24px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.03);backdrop-filter:blur(8px);transition:all .25s;max-height:460px;min-width:20px}
+.nav-bar{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;padding:30px 14px;border-radius:18px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.03);backdrop-filter:blur(8px);transition:all .25s;max-height:70vh;min-width:16px;overflow-y:auto}
 .nav-bar:hover{background:rgba(255,255,255,.04)}
-.nav-dots{flex:1 1 0;min-height:0;display:flex;flex-direction:column;justify-content:space-evenly;align-items:center;width:100%;overflow-y:auto}
-.nav-dots::-webkit-scrollbar{width:3px}
-.nav-dots::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
-.nav-dots::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:1px}
-.nav-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.12);cursor:pointer;transition:all .2s;flex-shrink:0}
+.nav-bar::-webkit-scrollbar{width:2px}
+.nav-bar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:1px}
+.nav-dots{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.18);cursor:pointer;transition:all .2s;flex-shrink:0}
 .nav-dot:hover,.nav-dot.active{background:#818cf8;transform:scale(1.4);box-shadow:0 0 6px rgba(129,140,248,.3)}
 .nav-panel{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:99;background:rgba(25,25,45,.94);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:8px;min-width:220px;max-width:300px;max-height:60vh;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .2s}
 .nav-bar:hover+.nav-panel,.nav-panel:hover{opacity:1;pointer-events:auto}
