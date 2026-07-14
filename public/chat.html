@@ -54,7 +54,8 @@ body.light-mode .edit-ta{background:#f0f0f5;border-color:rgba(0,0,0,.12);color:#
 body.light-mode .edit-cancel{background:#f0f0f5;border-color:rgba(0,0,0,.12);color:rgba(0,0,0,.5)}
 body.light-mode #msgArea::-webkit-scrollbar-thumb{background:rgba(0,0,0,.08)}
 body.light-mode .dark-btn{color:rgba(0,0,0,.4)}
-body.light-mode select option{background:#fff;color:#1a1a2e}
+body.light-mode .sidebar-collapse{color:rgba(0,0,0,.3)}
+body.light-mode .sidebar-collapse:hover{background:rgba(0,0,0,.04)}
 body.light-mode .session .del{color:rgba(0,0,0,.2)}
 body.light-mode .session .del:hover{color:#ef4444}
 select option{background:#fff;color:#1a1a2e}
@@ -84,6 +85,8 @@ select option{background:#fff;color:#1a1a2e}
 .sidebar-open-btn:hover{background:rgba(255,255,255,.12);color:rgba(255,255,255,.6)}
 #sessionSearch{margin:0 16px 10px;padding:9px 12px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-size:12px;outline:none;flex-shrink:0;transition:.15s}
 #sessionSearch:focus{border-color:rgba(99,102,241,.4)}
+.sidebar-collapse{background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:18px;padding:4px 6px;border-radius:6px;transition:.15s}
+.sidebar-collapse:hover{background:rgba(255,255,255,.06)}
 
 /* ===== 主区域 ===== */
 .main{flex:1;display:flex;flex-direction:column;height:100vh;max-width:calc(100% - 300px)}
@@ -176,7 +179,7 @@ select option{background:#fff;color:#1a1a2e}
 <div class=sidebar id=sidebar>
   <div class=hd>
     <span class=logo>OpenCode</span>
-    <button onclick=toggleSidebar() title=收起 style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:18px;padding:4px 6px;border-radius:6px;transition:.15s">‹</button>
+    <button class=sidebar-collapse onclick=toggleSidebar() title=收起>‹</button>
   </div>
   <input id=sessionSearch placeholder="搜索对话...">
   <button class=btn-new onclick=newChat()>+ 开启新对话</button>
