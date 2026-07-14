@@ -125,12 +125,24 @@ async def get_messages(sid: str, user: dict = Depends(get_current_user)):
 class ModelReq(BaseModel):
     model: str
 
+class TitleReq(BaseModel):
+    title: str
+
 
 @router.put("/sessions/{sid}/model")
 async def update_session_model(sid: str, req: ModelReq, user: dict = Depends(get_current_user)):
     await execute_write(
         "UPDATE chat_sessions SET model=%s, oc_session_id='' WHERE id=%s AND username=%s",
         (req.model, sid, user["username"]),
+    )
+    return {"success": True}
+
+
+@router.put("/sessions/{sid}")
+async def update_session(sid: str, req: TitleReq, user: dict = Depends(get_current_user)):
+    await execute_write(
+        "UPDATE chat_sessions SET title=%s WHERE id=%s AND username=%s",
+        (req.title, sid, user["username"]),
     )
     return {"success": True}
 
