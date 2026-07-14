@@ -87,6 +87,9 @@ body.light-mode .more:hover{color:rgba(0,0,0,.5)}
 body.light-mode .session .menu{background:rgba(248,249,252,.95);border-color:rgba(0,0,0,.08)}
 body.light-mode .session .menu-item{color:rgba(0,0,0,.45)}
 body.light-mode .session .menu-item:hover{background:rgba(0,0,0,.04);color:rgba(0,0,0,.7)}
+body.light-mode #rnOverlay>div{background:rgba(250,251,253,.96)!important;border-color:rgba(0,0,0,.08)!important}
+body.light-mode #rnOverlay>div div:first-child{color:#1a1a2e!important}
+body.light-mode #renameInput{background:rgba(0,0,0,.03)!important;border-color:rgba(0,0,0,.1)!important;color:#1a1a2e!important}
 .sidebar-footer{padding:12px 16px;border-top:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:10px;flex-shrink:0;margin-top:auto}
 .sidebar-footer .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:600}
 .sidebar-footer .uname{font-size:13px;color:rgba(255,255,255,.5);flex:1}
@@ -447,8 +450,17 @@ function showMenu(btn,sid){
 }
 document.addEventListener('click',function(){document.querySelectorAll('.session .menu').forEach(function(m){m.style.display='none'})})
 function renameSession(sid){
-  var t=prompt('重命名对话:',document.querySelector('.session.active span').textContent)
-  if(t&&t.trim())fetch('/auth/api/chat/sessions/'+sid,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({title:t.trim()})}).then(function(){loadSessions()}).catch(function(){loadSessions()})
+  var old=document.querySelector('.session.active span').textContent
+  var overlay=document.createElement('div');overlay.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center'
+  var box=document.createElement('div');box.style.cssText='background:rgba(25,25,45,.95);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:24px;min-width:320px'
+  box.innerHTML='<div style="margin-bottom:14px;font-size:14px;font-weight:600;color:#e0e0e0">重命名对话</div><input id=renameInput value="'+esc(old)+'" style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.05);color:#e0e0e0;font-size:13px;outline:none;box-sizing:border-box"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button onclick="this.closest(\'#rnOverlay\').remove()" style="padding:8px 18px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:transparent;color:rgba(255,255,255,.4);cursor:pointer;font-size:12px">取消</button><button id=rnConfirm style="padding:8px 18px;border:none;border-radius:8px;background:#6366f1;color:#fff;cursor:pointer;font-size:12px">确认</button></div>'
+  overlay.id='rnOverlay';overlay.appendChild(box);document.body.appendChild(overlay)
+  var inp=document.getElementById('renameInput');inp.focus();inp.select()
+  document.getElementById('rnConfirm').onclick=function(){
+    var v=inp.value.trim()
+    if(v){fetch('/auth/api/chat/sessions/'+sid,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({title:v})}).then(function(){overlay.remove();loadSessions()}).catch(function(){overlay.remove();loadSessions()})}
+  }
+  inp.onkeydown=function(e){if(e.key==='Enter')document.getElementById('rnConfirm').click();if(e.key==='Escape')overlay.remove()}
 }
 function pinSession(sid){
   fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).then(function(){loadSessions()}).catch(function(){loadSessions()})
