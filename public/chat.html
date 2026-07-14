@@ -32,6 +32,20 @@ body.light-mode .think-wrap summary{color:rgba(0,0,0,.35)}
 body.light-mode .think-content{color:rgba(0,0,0,.45);border-top-color:rgba(0,0,0,.08)}
 body.light-mode .msg .meta{color:rgba(0,0,0,.2)}
 body.light-mode select option{background:#fff;color:#1a1a2e}
+body.light-mode .group-label{color:rgba(0,0,0,.2)}
+body.light-mode .session .del{color:rgba(0,0,0,.15)}
+body.light-mode .session .del:hover{color:#ef4444}
+body.light-mode .sidebar-footer button{color:rgba(0,0,0,.25)}
+body.light-mode .sidebar-footer button:hover{background:rgba(0,0,0,.04);color:rgba(0,0,0,.5)}
+body.light-mode .msg-actions button{color:rgba(0,0,0,.25);border-color:rgba(0,0,0,.08)}
+body.light-mode .msg-actions button:hover{background:rgba(0,0,0,.04);color:rgba(0,0,0,.5)}
+body.light-mode .input-bottom select{background:rgba(0,0,0,.04);color:rgba(0,0,0,.45);border-color:rgba(0,0,0,.08)}
+body.light-mode .msg.assistant .bubble pre{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.08)}
+body.light-mode .msg.assistant .bubble code{color:#6366f1}
+body.light-mode .msg.assistant .bubble :not(pre)>code{background:rgba(99,102,241,.08);color:#6366f1}
+body.light-mode .msg.assistant .bubble .copy-btn{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.08);color:rgba(0,0,0,.3)}
+body.light-mode .msg.assistant .bubble .copy-btn:hover{background:rgba(0,0,0,.08);color:rgba(0,0,0,.6)}
+body.light-mode #msgArea::-webkit-scrollbar-thumb{background:rgba(0,0,0,.08)}
 select option{background:#fff;color:#1a1a2e}
 
 /* ===== 侧边栏 ===== */
@@ -195,12 +209,11 @@ var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat',modelName='AI'
 function now(){var d=new Date();return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.toTimeString().slice(0,8)}
 
 async function loadModels(){
-  var names={'deepseek-v4-flash-free':'DeepSeek','hy3-free':'Hy3','north-mini-code-free':'Mini Code','nemotron-3-ultra-free':'Nemotron','mimo-v2.5-free':'MiMo','big-pickle':'Big Pickle'}
   var sel=document.getElementById('modelSelect');if(!sel)return
   var r=await fetch('/auth/api/chat/models',{headers:H});var d=await r.json()
   if(!d.success||!d.models)return
   sel.innerHTML=''
-  d.models.forEach(function(m){var o=document.createElement('option');o.value=m.id;o.textContent=names[m.id]||m.name;sel.appendChild(o)})
+  d.models.forEach(function(m){var o=document.createElement('option');o.value=m.id;o.textContent=m.name;sel.appendChild(o)})
   sel.value=modelName||'deepseek-v4-flash-free'
 }
 async function switchModel(mid){
@@ -227,6 +240,9 @@ async function loadSessions(){
   })
   function renderGroup(label,items){return items.length?'<div class=session-group><div class=group-label>'+label+'</div>'+items.map(function(s){var c=s.id===curSession?' active':'';return'<div class="session'+c+'" onclick="selectSession(\''+s.id+'\')"><span>'+esc(s.title||'新对话')+'</span><button class=del onclick="event.stopPropagation();delSession(\''+s.id+'\')">×</button></div>'}).join('')+'</div>':''}
   document.getElementById('sessionList').innerHTML=renderGroup('今天',today)+renderGroup('昨天',yesterday)+renderGroup('7天内',week)+renderGroup('30天内',older)
+  // 重新应用搜索过滤
+  var q=document.getElementById('sessionSearch').value.toLowerCase()
+  if(q)document.querySelectorAll('#sessionList .session').forEach(function(s){if(!s.textContent.toLowerCase().includes(q))s.style.display='none'})
 }
 async function delSession(sid){
   await fetch('/auth/api/chat/sessions/'+sid,{method:'DELETE',headers:H})
@@ -302,8 +318,8 @@ function formatContent(txt, thinking, role, meta){
   if(sm&&!thinking){thinking=sm[1];mainText=sm[2].trim()}
   if(!thinking&&chatMode==='think'&&txt.length>100&&role!='user'){thinking=txt;mainText=''}
   var html=meta?'<div class=meta>'+meta+'</div>':''
-  if(thinking)html='<details class=think-wrap><summary>🤔 思考过程</summary><div class=think-content>'+esc(thinking)+'</div></details>'
-  if(role=='user')html='<div class=bubble>'+(mainText?esc(mainText):'')+'</div>'
+  if(thinking)html+='<details class=think-wrap><summary>🤔 思考过程</summary><div class=think-content>'+esc(thinking)+'</div></details>'
+  if(role=='user')html+='<div class=bubble>'+(mainText?esc(mainText):'')+'</div>'
   else html+='<div class=bubble>'+(mainText?md(esc(mainText)):'')+'</div>'
   return html
 }
