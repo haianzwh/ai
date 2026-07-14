@@ -91,12 +91,24 @@ body.light-mode .btn-new:hover{background:rgba(140,180,215,.35);color:rgba(50,95
 /* ===== 主区域 ===== */
 .main{flex:1;display:flex;flex-direction:column;height:100vh;max-width:calc(100% - 300px)}
 .nav-bar{position:fixed;right:12px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 8px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.04);backdrop-filter:blur(12px);transition:all .25s;max-height:50vh;overflow-y:auto;min-width:16px}
+.nav-bar:hover{background:rgba(255,255,255,.08)}
 .nav-bar::-webkit-scrollbar{width:2px}
 .nav-bar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:1px}
 .nav-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.12);cursor:pointer;transition:all .2s;flex-shrink:0}
 .nav-dot:hover,.nav-dot.active{background:#818cf8;transform:scale(1.4);box-shadow:0 0 6px rgba(129,140,248,.3)}
+.nav-panel{position:fixed;right:46px;top:50%;transform:translateY(-50%);z-index:99;background:rgba(25,25,45,.94);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:8px;min-width:220px;max-width:300px;max-height:60vh;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .25s}
+.nav-bar:hover+.nav-panel,.nav-panel:hover{opacity:1;pointer-events:auto}
+.nav-panel::-webkit-scrollbar{width:3px}
+.nav-panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
+.nav-pi{padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.5);line-height:1.4;transition:.1s;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.nav-pi:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)}
+body.light-mode .nav-bar{background:rgba(255,255,255,.5)}
+body.light-mode .nav-bar:hover{background:rgba(255,255,255,.6)}
 body.light-mode .nav-dot{background:rgba(0,0,0,.12)}
 body.light-mode .nav-dot:hover,body.light-mode .nav-dot.active{background:#6366f1}
+body.light-mode .nav-panel{background:rgba(248,249,252,.95);border-color:rgba(0,0,0,.08)}
+body.light-mode .nav-pi{color:rgba(0,0,0,.45)}
+body.light-mode .nav-pi:hover{background:rgba(0,0,0,.04);color:rgba(0,0,0,.7)}
 
 /* ===== 消息区 ===== */
 #msgArea{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;scroll-behavior:smooth;padding:12px 0}
@@ -215,6 +227,7 @@ body.light-mode .think-btn.on{background:rgba(99,102,241,.08);border-color:rgba(
 <div id=navBar class=nav-bar>
   <div class=nav-dots id=navDots></div>
 </div>
+<div class=nav-panel id=navPanel></div>
 
 <div class=main>
   <div id=msgArea>
@@ -416,12 +429,16 @@ function toggleDark(){
 // 右侧导航栏
 function updateNav(){
   var dots=document.getElementById('navDots');dots.innerHTML=''
+  var panel=document.getElementById('navPanel');panel.innerHTML=''
   var msgs=document.querySelectorAll('#msgArea .msg.user')
   msgs.forEach(function(m,i){
     var d=document.createElement('div');d.className='nav-dot'
-    d.title=(m.querySelector('.bubble').textContent||'').trim().slice(0,100)
     d.onclick=function(){m.scrollIntoView({behavior:'smooth',block:'center'})}
     dots.appendChild(d)
+    var pi=document.createElement('div');pi.className='nav-pi'
+    pi.textContent=(m.querySelector('.bubble').textContent||'').trim().slice(0,100)
+    pi.onclick=function(){m.scrollIntoView({behavior:'smooth',block:'center'});panel.style.opacity='0'}
+    panel.appendChild(pi)
   })
   var all=dots.querySelectorAll('.nav-dot')
   if(all.length)all[all.length-1].classList.add('active')
