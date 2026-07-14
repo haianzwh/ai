@@ -90,6 +90,18 @@ body.light-mode .btn-new:hover{background:rgba(160,190,220,.25);color:rgba(60,10
 
 /* ===== 主区域 ===== */
 .main{flex:1;display:flex;flex-direction:column;height:100vh;max-width:calc(100% - 300px)}
+.nav-bar{position:fixed;right:8px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:10px;background:rgba(255,255,255,.03);backdrop-filter:blur(8px);transition:all .25s;max-height:60vh;overflow-y:auto}
+.nav-bar::-webkit-scrollbar{width:2px}
+.nav-bar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:1px}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15);cursor:pointer;transition:all .2s;flex-shrink:0}
+.nav-dot:hover,.nav-dot.active{background:#818cf8;transform:scale(1.3)}
+.nav-preview{position:fixed;right:50px;top:50%;transform:translateY(-50%);background:rgba(30,30,50,.92);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;max-width:280px;max-height:50vh;overflow-y:auto;font-size:12px;color:rgba(255,255,255,.6);line-height:1.5}
+.nav-preview::-webkit-scrollbar{width:2px}
+.nav-preview::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:1px}
+body.light-mode .nav-bar{background:rgba(255,255,255,.5)}
+body.light-mode .nav-dot{background:rgba(0,0,0,.12)}
+body.light-mode .nav-dot:hover,body.light-mode .nav-dot.active{background:#6366f1}
+body.light-mode .nav-preview{background:rgba(250,250,252,.95);border-color:rgba(0,0,0,.08);color:rgba(0,0,0,.5)}
 
 /* ===== 消息区 ===== */
 #msgArea{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;scroll-behavior:smooth;padding:12px 0}
@@ -199,6 +211,11 @@ body.light-mode .interrupted span{border-top-color:rgba(0,0,0,.06)}
 
 <button class=sidebar-open-btn onclick=toggleSidebar()>☰</button>
 
+<div id=navBar class=nav-bar onmouseenter=navExpand() onmouseleave=navCollapse()>
+  <div class=nav-dots id=navDots></div>
+  <div class=nav-preview id=navPreview style=display:none></div>
+</div>
+
 <div class=main>
   <div id=msgArea>
     <div class=empty-state><div class=icon>💬</div><p>开始对话</p></div>
@@ -284,7 +301,7 @@ el.innerHTML=d.messages.map(function(m,i){
   var html='<div class="msg '+m.role+'">'+formatContent(m.content||'',m.thinking||'',m.role,meta)
   if(m.role==='user')html+='<div class=msg-actions><button onclick=copyMsg(this)>📋 复制</button><button onclick=editMsg(this)>✏️ 修改</button></div>'
   return html+'</div>'
-}).join('');el.scrollTop=el.scrollHeight;modelName=d.model||'AI'
+}).join('');el.scrollTop=el.scrollHeight;modelName=d.model||'AI';updateNav()
 var sel=document.getElementById('modelSelect');if(sel)sel.value=modelName}
 
 async function send(){
@@ -296,7 +313,7 @@ async function send(){
   var el=document.getElementById('msgArea')
   if(el.querySelector('.empty-state'))el.innerHTML=''
   el.innerHTML+='<div class="msg user">'+formatContent(text,'','user','我 · '+now())+'<div class=msg-actions><button onclick=copyMsg(this)>📋 复制</button><button onclick=editMsg(this)>✏️ 修改</button></div></div>'
-  var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
+  var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight;updateNav()
   try{
     var ctrl=new AbortController();var tmr=setTimeout(function(){currentAbort=null;ctrl.abort()},25000)
     currentAbort=ctrl;document.querySelector('.send-btn').textContent='⏹';document.querySelector('.send-btn').disabled=false
@@ -389,6 +406,34 @@ function toggleDark(){
   var isLight=document.body.classList.contains('light-mode')
   btn.textContent=isLight?'☀️':'🌙'
   localStorage.setItem('theme',isLight?'light':'dark')
+}
+// 右侧导航栏
+function updateNav(){
+  var dots=document.getElementById('navDots')
+  dots.innerHTML=''
+  document.querySelectorAll('#msgArea .msg.user').forEach(function(m,i){
+    var d=document.createElement('div');d.className='nav-dot';d.title=(m.textContent||'').slice(0,20)
+    d.onclick=function(){m.scrollIntoView({behavior:'smooth',block:'center'});navExpand()}
+    d.onmouseenter=function(){showNavPreview(m.textContent)}
+    d.onmouseleave=function(){hideNavPreview()}
+    dots.appendChild(d)
+  })
+  // 高亮最近的消息
+  var all=dots.querySelectorAll('.nav-dot')
+  if(all.length)all[all.length-1].classList.add('active')
+}
+function navExpand(){
+  document.getElementById('navPreview').style.display='block'
+}
+function navCollapse(){
+  document.getElementById('navPreview').style.display='none'
+}
+function showNavPreview(txt){
+  var p=document.getElementById('navPreview');p.style.display='block'
+  p.textContent=(txt||'').slice(0,200)
+}
+function hideNavPreview(){
+  if(!document.getElementById('navBar').matches(':hover'))document.getElementById('navPreview').style.display='none'
 }
 async function uploadFiles(files){for(var i=0;i<files.length;i++){var fd=new FormData();fd.append('file',files[i]);await fetch('/auth/api/upload',{method:'POST',headers:H,body:fd})}loadMessages()}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
