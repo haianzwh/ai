@@ -149,13 +149,6 @@ async function send(){
     }catch(e){}
   }
 }
-      // 有内容后再轮询20次确保完整，或超时80次(24秒)
-      if((hasContent&&cnt>20)||cnt>80){document.querySelector('.send-btn').disabled=false;loadSessions();return}
-      setTimeout(poll,300)
-    }).catch(function(){setTimeout(poll,500)})
-  })()
-}
-
 function formatContent(txt){
   var thinking='',mainText=txt,tm=txt.match(/<think>([\s\S]*?)<\/think>/)
   if(tm){thinking=tm[1];mainText=txt.replace(/<think>[\s\S]*?<\/think>/,'').trim()}
