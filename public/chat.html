@@ -71,6 +71,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .msg.assistant .bubble .step-num{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
 .msg.assistant .bubble .step-text{color:var(--text);font-size:14px;line-height:1.6;padding-top:3px}
 .msg.assistant .bubble pre{background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;padding:14px 16px;margin:10px 0;overflow-x:auto;white-space:pre;font-size:13px}
+.msg.assistant .bubble .code-wrap{position:relative;margin:10px 0}
+.msg.assistant .bubble .code-wrap pre{margin:0}
+.msg.assistant .bubble .copy-btn{position:absolute;top:8px;right:8px;background:var(--code-bg);border:1px solid var(--code-border);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:13px;opacity:0;transition:opacity .2s;z-index:1;color:var(--text2);line-height:1}
+.msg.assistant .bubble .code-wrap:hover .copy-btn{opacity:1}
+.msg.assistant .bubble .copy-btn:hover{background:var(--hl-bg);color:var(--hl-color)}
 .msg.assistant .bubble code{font-family:'JetBrains Mono','SF Mono','Fira Code',monospace;font-size:13px;line-height:1.5;color:var(--code-color)}
 .msg.assistant .bubble :not(pre)>code{background:var(--hl-bg);padding:2px 8px;border-radius:4px;font-size:13px;color:var(--hl-color)}
 .msg.assistant .bubble.thinking{background:transparent;border:none;color:var(--text3);font-size:13px;padding:4px 0}
@@ -231,6 +236,14 @@ function formatContent(txt, thinking){
 
 async function uploadFiles(files){for(var i=0;i<files.length;i++){var fd=new FormData();fd.append('file',files[i]);await fetch('/auth/api/upload',{method:'POST',headers:H,body:fd})}loadMessages()}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function copyCode(btn){
+  var code=btn.parentElement.querySelector('pre code')
+  if(!code)return
+  var t=code.textContent
+  navigator.clipboard.writeText(t).then(function(){
+    btn.textContent='✓';setTimeout(function(){btn.textContent='📋'},1500)
+  }).catch(function(){alert('复制失败')})
+}
 function toggleDark(){
   var b=document.body;b.classList.toggle('dark-mode')
   var isDark=b.classList.contains('dark-mode')
@@ -243,7 +256,7 @@ function toggleDark(){
   if(t==='dark'){document.body.classList.add('dark-mode');document.getElementById('darkBtn').textContent='🌙'}
 })()
 function md(s){
-  s=s.replace(/```(\w*)\n([\s\S]*?)```/g,'<pre><code class="lang-$1">$2</code></pre>')
+  s=s.replace(/```(\w*)\n([\s\S]*?)```/g,'<div class=code-wrap><button class=copy-btn onclick=copyCode(this)>📋</button><pre><code class="lang-$1">$2</code></pre></div>')
        .replace(/`([^`]+)`/g,'<code>$1</code>')
        .replace(/^(\d+)\.\s(.+)$/gm,'<div class=md-step><span class=step-num>$1</span><span class=step-text>$2</span></div>')
        .replace(/^### (.+)$/gm,'<h4>$1</h4>')
