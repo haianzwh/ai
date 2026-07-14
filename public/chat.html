@@ -79,7 +79,7 @@ select option{background:#fff;color:#1a1a2e}
 #msgArea{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;scroll-behavior:smooth;padding:24px 0}
 #msgArea::-webkit-scrollbar{width:4px}
 #msgArea::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
-.msg{width:100%;max-width:800px;margin-bottom:24px;padding:0 40px}
+.msg{width:100%;max-width:900px;margin-bottom:24px;padding:0 40px}
 .msg.user{display:flex;flex-direction:column;align-items:flex-end}
 .msg.assistant{display:flex;flex-direction:column;align-items:flex-start}
 .msg .bubble{width:fit-content;max-width:80%;padding:12px 18px;border-radius:18px;font-size:14px;line-height:1.7;word-break:break-word}
@@ -131,7 +131,7 @@ select option{background:#fff;color:#1a1a2e}
 
 /* ===== 输入栏 ===== */
 .input-bar{padding:0 0 20px;flex-shrink:0;display:flex;flex-direction:column;align-items:center}
-.input-container{width:100%;max-width:800px;padding:0 40px}
+.input-container{width:100%;max-width:900px;padding:0 40px}
 .input-wrap{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.08);border-radius:16px;padding:8px 12px;display:flex;flex-direction:column;transition:.2s}
 .input-wrap:focus-within{border-color:rgba(99,102,241,.5);box-shadow:0 0 0 3px rgba(99,102,241,.08)}
 .input-wrap textarea{flex:1;border:none;background:transparent;color:#e0e0e0;font-size:15px;resize:none;outline:none;font-family:inherit;min-height:22px;max-height:150px;line-height:1.6;padding:4px 0}
@@ -205,7 +205,7 @@ select option{background:#fff;color:#1a1a2e}
 
 <script>
 var T=localStorage.getItem('auth_token');if(!T)location.href='/login.html'
-var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat',modelName='AI',uName='用户'
+var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat',modelName='',uName='用户'
 function now(){var d=new Date();return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.toTimeString().slice(0,8)}
 
 async function loadModels(){
@@ -240,10 +240,15 @@ async function loadSessions(){
   })
   function renderGroup(label,items){return items.length?'<div class=session-group><div class=group-label>'+label+'</div>'+items.map(function(s){var c=s.id===curSession?' active':'';return'<div class="session'+c+'" onclick="selectSession(\''+s.id+'\')"><span>'+esc(s.title||'新对话')+'</span><button class=del onclick="event.stopPropagation();delSession(\''+s.id+'\')">×</button></div>'}).join('')+'</div>':''}
   document.getElementById('sessionList').innerHTML=renderGroup('今天',today)+renderGroup('昨天',yesterday)+renderGroup('7天内',week)+renderGroup('30天内',older)
-  // 重新应用搜索过滤
-  var q=document.getElementById('sessionSearch').value.toLowerCase()
-  if(q)document.querySelectorAll('#sessionList .session').forEach(function(s){if(!s.textContent.toLowerCase().includes(q))s.style.display='none'})
+  applySearch()
 }
+function applySearch(){
+  var q=document.getElementById('sessionSearch').value.toLowerCase()
+  document.querySelectorAll('#sessionList .session').forEach(function(s){
+    s.style.display=q&&!s.textContent.toLowerCase().includes(q)?'none':''
+  })
+}
+document.getElementById('sessionSearch').addEventListener('input',applySearch)
 async function delSession(sid){
   await fetch('/auth/api/chat/sessions/'+sid,{method:'DELETE',headers:H})
   if(curSession===sid){curSession=null;document.getElementById('msgArea').innerHTML='<div class=empty-state><div class=icon>💬</div><p>开始对话</p></div>'}
