@@ -90,10 +90,10 @@ body.light-mode .btn-new:hover{background:rgba(140,180,215,.35);color:rgba(50,95
 
 /* ===== 主区域 ===== */
 .main{flex:1;display:flex;flex-direction:column;height:100vh;max-width:calc(100% - 300px)}
-.nav-bar{position:fixed;right:12px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.04);backdrop-filter:blur(12px);transition:all .25s;max-height:50vh;overflow-y:auto;min-width:14px}
+.nav-bar{position:fixed;right:12px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 8px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.04);backdrop-filter:blur(12px);transition:all .25s;max-height:50vh;overflow-y:auto;min-width:16px}
 .nav-bar::-webkit-scrollbar{width:2px}
 .nav-bar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:1px}
-.nav-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.12);cursor:pointer;transition:all .2s;flex-shrink:0;margin:2px 0}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.12);cursor:pointer;transition:all .2s;flex-shrink:0}
 .nav-dot:hover,.nav-dot.active{background:#818cf8;transform:scale(1.4);box-shadow:0 0 6px rgba(129,140,248,.3)}
 .nav-preview{position:fixed;right:44px;top:50%;transform:translateY(-50%);background:rgba(30,30,50,.92);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;width:260px;max-height:50vh;overflow-y:auto;font-size:12px;color:rgba(255,255,255,.6);line-height:1.5}
 .nav-preview::-webkit-scrollbar{width:2px}
@@ -217,7 +217,7 @@ body.light-mode .think-btn.on{background:rgba(99,102,241,.08);border-color:rgba(
 
 <button class=sidebar-open-btn onclick=toggleSidebar()>☰</button>
 
-<div id=navBar class=nav-bar onmouseenter=navExpand() onmouseleave=navCollapse()>
+<div id=navBar class=nav-bar>
   <div class=nav-dots id=navDots></div>
   <div class=nav-preview id=navPreview style=display:none></div>
 </div>
@@ -425,29 +425,24 @@ function updateNav(){
   var msgs=document.querySelectorAll('#msgArea .msg.user')
   if(!msgs.length){var e=document.createElement('div');e.className='nav-dot';e.style.opacity='.2';dots.appendChild(e);return}
   msgs.forEach(function(m,i){
-    var d=document.createElement('div');d.className='nav-dot';d.title=(m.textContent||'').slice(0,20)
-    d.onclick=function(){m.scrollIntoView({behavior:'smooth',block:'center'});navExpand()}
+    var d=document.createElement('div');d.className='nav-dot'
+    d.onclick=function(){m.scrollIntoView({behavior:'smooth',block:'center'});showNavPreview(m.textContent)}
     d.onmouseenter=function(){showNavPreview(m.textContent)}
-    d.onmouseleave=function(){hideNavPreview()}
     dots.appendChild(d)
   })
-  // 高亮最近的消息
   var all=dots.querySelectorAll('.nav-dot')
   if(all.length)all[all.length-1].classList.add('active')
-}
-function navExpand(){
-  document.getElementById('navPreview').style.display='block'
-}
-function navCollapse(){
-  document.getElementById('navPreview').style.display='none'
 }
 function showNavPreview(txt){
   var p=document.getElementById('navPreview');p.style.display='block'
   p.textContent=(txt||'').slice(0,200)
 }
-function hideNavPreview(){
-  if(!document.getElementById('navBar').matches(':hover'))document.getElementById('navPreview').style.display='none'
-}
+// 离开 navBar 后延迟隐藏预览
+document.getElementById('navBar').addEventListener('mouseleave',function(){
+  setTimeout(function(){
+    if(!document.getElementById('navBar').matches(':hover'))document.getElementById('navPreview').style.display='none'
+  },300)
+})
 async function uploadFiles(files){for(var i=0;i<files.length;i++){var fd=new FormData();fd.append('file',files[i]);await fetch('/auth/api/upload',{method:'POST',headers:H,body:fd})}loadMessages()}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function copyCode(btn){
