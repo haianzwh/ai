@@ -90,12 +90,12 @@ body.light-mode .btn-new:hover{background:rgba(140,180,215,.35);color:rgba(50,95
 
 /* ===== 主区域 ===== */
 .main{flex:1;display:flex;flex-direction:column;height:100vh;max-width:calc(100% - 300px)}
-.nav-bar{position:fixed;right:10px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.04);backdrop-filter:blur(12px);transition:all .25s;max-height:60vh;overflow-y:auto;min-width:12px}
+.nav-bar{position:fixed;right:12px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.04);backdrop-filter:blur(12px);transition:all .25s;max-height:50vh;overflow-y:auto;min-width:14px}
 .nav-bar::-webkit-scrollbar{width:2px}
 .nav-bar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:1px}
-.nav-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.12);cursor:pointer;transition:all .2s;flex-shrink:0;margin:1px 0}
+.nav-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.12);cursor:pointer;transition:all .2s;flex-shrink:0;margin:2px 0}
 .nav-dot:hover,.nav-dot.active{background:#818cf8;transform:scale(1.4);box-shadow:0 0 6px rgba(129,140,248,.3)}
-.nav-preview{position:fixed;right:50px;top:50%;transform:translateY(-50%);background:rgba(30,30,50,.92);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;max-width:280px;max-height:50vh;overflow-y:auto;font-size:12px;color:rgba(255,255,255,.6);line-height:1.5}
+.nav-preview{position:fixed;right:44px;top:50%;transform:translateY(-50%);background:rgba(30,30,50,.92);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;width:260px;max-height:50vh;overflow-y:auto;font-size:12px;color:rgba(255,255,255,.6);line-height:1.5}
 .nav-preview::-webkit-scrollbar{width:2px}
 .nav-preview::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:1px}
 body.light-mode .nav-bar{background:rgba(255,255,255,.5)}
