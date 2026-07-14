@@ -11,14 +11,23 @@ OPENCODE_URL = "http://localhost:4096"
 DEFAULT_MODEL = "deepseek-v4-flash-free"
 
 
-async def create_opencode_session(model: str = DEFAULT_MODEL) -> dict:
-    """在 opencode 中创建指定模型的会话"""
+async def create_opencode_session() -> dict:
+    """在 opencode 中创建会话（模型需后续通过 set_session_model 设置）"""
     async with httpx.AsyncClient() as client:
         resp = await client.post(
             f"{OPENCODE_URL}/api/session",
-            json={"modelID": model},
+            json={},
         )
         return resp.json().get("data", {})
+
+
+async def set_session_model(session_id: str, model: str = DEFAULT_MODEL):
+    """设置 opencode 会话使用的模型"""
+    async with httpx.AsyncClient() as client:
+        await client.post(
+            f"{OPENCODE_URL}/api/session/{session_id}/model",
+            json={"model": {"id": model, "providerID": "opencode"}},
+        )
 
 
 async def send_prompt(session_id: str, text: str) -> str:

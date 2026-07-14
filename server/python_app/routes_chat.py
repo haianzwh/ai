@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from .database import execute, execute_write, execute_one
 from .auth import get_current_user
-from .ai_client import create_opencode_session, send_prompt, poll_response, OPENCODE_URL, DEFAULT_MODEL
+from .ai_client import create_opencode_session, set_session_model, send_prompt, poll_response, OPENCODE_URL, DEFAULT_MODEL
 
 
 class SendReq(BaseModel):
@@ -76,11 +76,13 @@ async def create_session(req: CreateSessionReq = Body(default=None), user: dict 
     sid = f"chat_{uuid.uuid4().hex[:12]}"
     model = req.model if req and req.model else DEFAULT_MODEL
 
-    # 提前创建 opencode 会话（预热，后续发消息不用等）
+    # 提前创建 opencode 会话并设置模型
     oc_id = ""
     try:
-        oc = await create_opencode_session(model)
+        oc = await create_opencode_session()
         oc_id = oc.get("id", "")
+        if oc_id:
+            await set_session_model(oc_id, model)
     except Exception:
         pass
 
@@ -153,8 +155,10 @@ async def send_message(
     oc_id = session["oc_session_id"] if session else ""
     session_model = session["model"] if session else DEFAULT_MODEL
     if not oc_id:
-        oc = await create_opencode_session(session_model)
+        oc = await create_opencode_session()
         oc_id = oc.get("id", "")
+        if oc_id:
+            await set_session_model(oc_id, session_model)
         await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
 
     # 首次发消息更新标题
@@ -199,7 +203,10 @@ async def send_message(
             break
         except Exception as e:
             if "TooLarge" in str(e) or "max bytes" in str(e):
-                oc = await create_opencode_session(session_model)
+                oc = await create_opencode_session()
+                oc_id = oc.get("id", "")
+                if oc_id:
+                    await set_session_model(oc_id, session_model)
                 oc_id = oc.get("id", "")
                 await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
                 await send_prompt(oc_id, content)
