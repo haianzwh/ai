@@ -217,36 +217,26 @@ async function send() {
   input.style.height = 'auto';
   document.getElementById('sendBtn').disabled = true;
 
-  // 先发后渲染：统一以数据库为准，不再手动 append（避免重复）
-  stopPoll();
+  // 同步等待 AI 回复
   try {
-    await fetch('/auth/api/chat/sessions/'+curSession+'/send', {
+    aiContent.textContent = '⏳ 思考中...';
+    var r = await fetch('/auth/api/chat/sessions/'+curSession+'/send', {
       method: 'POST',
       headers: Object.assign({'Content-Type': 'application/json'}, H),
       body: JSON.stringify({content: text}),
     });
-    // 立即渲染：此时数据库已有 user 消息；assistant 未到时显示"思考中"占位
-    await renderMessages(curSession, true);
-    // 轮询直到出现 assistant 回复
-    var pollCount = 0;
-    pollTimer = setInterval(async function() {
-      pollCount++;
-      var r = await fetch('/auth/api/chat/sessions/'+curSession+'/messages', { headers: H });
-      var d = await r.json();
-      var msgs = d.messages || [];
-      var last = msgs[msgs.length-1];
-      if (last && last.role === 'assistant') {
-        stopPoll();
-        await renderMessages(curSession);
-        loadSessions();
-      } else if (pollCount > 120) {
-        stopPoll();
-        await renderMessages(curSession);
-      }
-    }, 1000);
+    var d = await r.json();
+    if (d.content) {
+      aiContent.textContent = d.content;
+    } else if (d.error) {
+      aiContent.textContent = '错误: ' + d.error;
+    } else {
+      aiContent.textContent = '(无回复)';
+    }
+    msgs.scrollTop = msgs.scrollHeight;
+    loadSessions();
   } catch(e) {
-    stopPoll();
-    await renderMessages(curSession);
+    aiContent.textContent = '错误: ' + e.message;
   }
   document.getElementById('sendBtn').disabled = false;
 }
