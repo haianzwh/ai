@@ -108,7 +108,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 
 <script>
 var T=localStorage.getItem('auth_token');if(!T)location.href='/login.html'
-var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat'
+var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat',_pollStop=false
 
 function setMode(m){chatMode=m;document.getElementById('btnNormal').classList.toggle('active',m==='chat');document.getElementById('btnThink').classList.toggle('active',m==='think')}
 
@@ -129,6 +129,7 @@ el.innerHTML=d.messages.map(function(m){
 }).join('');el.scrollTop=el.scrollHeight}
 
 async function send(){
+  _pollStop=true
   var input=document.getElementById('input'),text=input.value.trim();if(!text)return
   input.value='';if(!curSession){var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:H});var d=await r.json();curSession=d.id;loadSessions()}
   input.style.height='auto';document.querySelector('.send-btn').disabled=true
@@ -142,14 +143,14 @@ async function send(){
   // 轮询消息（每 500ms）
   var lastLen=0,cnt=0
   ;(function poll(){
-    if(cnt++>60)return
+    if(_pollStop||cnt++>60){document.querySelector('.send-btn').disabled=false;return}
     fetch('/auth/api/chat/sessions/'+curSession+'/messages',{headers:H}).then(r=>r.json()).then(d=>{
       var msgs=d.messages||[],last=msgs[msgs.length-1]
-      if(last&&last.role==='assistant'&&last.content.length>lastLen){
+      if(last&&last.role==='assistant'){
         lastLen=last.content.length
         aiDiv.innerHTML=formatContent(last.content);el.scrollTop=el.scrollHeight
+        document.querySelector('.send-btn').disabled=false;loadSessions();return
       }
-      if(lastLen>0){document.querySelector('.send-btn').disabled=false;loadSessions();return}
       setTimeout(poll,500)
     }).catch(function(){setTimeout(poll,1000)})
   })()
