@@ -353,11 +353,11 @@ function editMsg(btn){
 }
 function confirmEdit(btn){
   var msg=btn.closest('.msg'),text=msg.querySelector('textarea').value.trim()
-  if(text){msg.querySelector('.msg-actions').remove();sendText(text);cancelEdit(btn)}else cancelEdit(btn)
+  if(text){msg.remove();sendText(text)}else cancelEdit(btn)
 }
 function cancelEdit(btn){
-  var msg=btn.closest('.msg')
-  msg.querySelector('.bubble').innerHTML=esc(msg._orig||'')
+  var msg=btn.closest('.msg'),bubble=msg.querySelector('.bubble')
+  bubble.innerHTML=esc(msg._orig||'')
 }
 function toggleSidebar(){document.body.classList.toggle('sidebar-hidden')}
 function toggleDark(){
