@@ -128,10 +128,9 @@ el.innerHTML=d.messages.map(function(m){
   var txt=m.content||'',thinking='',html=''
   var tm=txt.match(/<think>([\s\S]*?)<\/think>/)
   if(tm){thinking=tm[1];txt=txt.replace(/<think>[\s\S]*?<\/think>/,'').trim()}
-  // 也支持 = 分隔符格式（思考提示的结果）
   var sm=txt.match(/([\s\S]*?)\n[=\-]{3,}\n([\s\S]*)/)
   if(sm&&!thinking){thinking=sm[1];txt=sm[2].trim()}
-  if(thinking)html+='<details class=think-wrap><summary>🧠 思考过程</summary><div class=think-content>'+esc(thinking)+'</div></details>'
+  if(thinking)html+='<details class=think-wrap><summary>🧠 思维链</summary><div class=think-content>'+esc(thinking)+'</div></details>'
   html+='<div class=bubble>'+(txt?esc(txt):'')+'</div>'
   return'<div class="msg '+m.role+'">'+html+'</div>'
 }).join('');el.scrollTop=el.scrollHeight}
@@ -155,9 +154,13 @@ async function send(){
       if(tm){thinking=tm[1];mainText=txt.replace(/<think>[\s\S]*?<\/think>/,'').trim()}
       var sm=mainText.match(/([\s\S]*?)\n[=\-]{3,}\n([\s\S]*)/)
       if(sm&&!thinking){thinking=sm[1];mainText=sm[2].trim()}
+      // 思考模式下，如果没有明确的思考块但有步骤推理，也折叠
+      if(!thinking&&chatMode==='think'&&txt.length>100){
+        thinking=txt;mainText=''
+      }
       var html=''
       if(thinking)html='<details class=think-wrap open><summary>🧠 思维链</summary><div class=think-content>'+esc(thinking)+'</div></details>'
-      html+='<div class=bubble>'+(mainText?esc(mainText):'')+'</div>'
+      html+='<div class=bubble>'+(mainText?esc(mainText):'(见上方推理)')+'</div>'
       aiDiv.innerHTML=html
     }else{aiDiv.innerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
     el.scrollTop=el.scrollHeight;loadSessions()

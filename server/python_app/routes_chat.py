@@ -140,15 +140,16 @@ async def send_message(
         title = content[:30] + ("..." if len(content) > 30 else "")
         await execute_write("UPDATE chat_sessions SET title=%s WHERE id=%s", (title, sid))
 
-    # 检测思考模式：消息开头有 <think> 标签时切换模式
+    # 检测思考模式：消息开头有 <think> 标签时切换模型
     is_think = content.startswith("<think>")
     if is_think:
-        import httpx as _hx2
-        async with _hx2.AsyncClient() as oc_client:
-            await oc_client.put(f"{OPENCODE_URL}/api/session/{oc_id}/model", json={"modelID": "north-mini-code-free"})
-        # 移除 <think> 前缀，替换为思考提示
         content = content.replace("<think>","").replace("</think>","")
-        content = "请先展示你的推理过程（思考过程），然后用 =分隔符 输出最终答案。\n\n" + content
+        content = (
+            "\n\n请按以下格式输出：\n"
+            "<think>\n你的推理过程\n</think>\n"
+            "你的最终答案\n\n"
+            "问题：" + content
+        )
 
     # 发送 prompt 前记录已有消息 ID（防重复取旧回复）
     import httpx
