@@ -151,6 +151,3 @@ async def _do_send_message(sid: str, req: SendReq, user: dict):
             (sid, "assistant", full_text))
 
     return JSONResponse(content={"success": True, "content": full_text})
-                (sid, "assistant", full, thinking),
-            )
-        yield f"data: {json.dumps({'error': str(e), 'done': True})}\n\n"
