@@ -111,7 +111,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 
 <script>
 var T=localStorage.getItem('auth_token');if(!T)location.href='/login.html'
-var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat'
+var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat',modelName='AI'
 function now(){var d=new Date();return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.toTimeString().slice(0,8)}
 
 function setMode(m){chatMode=m;document.getElementById('btnNormal').classList.toggle('active',m==='chat');document.getElementById('btnThink').classList.toggle('active',m==='think')}
@@ -129,9 +129,9 @@ async function loadMessages(){if(!curSession)return;var r=await fetch('/auth/api
 var el=document.getElementById('msgArea');if(!d.messages.length){el.innerHTML='<div class=empty-state><div class=icon>💬</div><p>开始对话</p></div>';return}
 document.getElementById('chatTitle').textContent=d.messages[0]?d.messages[0].content.slice(0,20)+'…':'对话'
 el.innerHTML=d.messages.map(function(m){
-  var label=m.role==='user'?esc(d.username):'AI'
+  var label=m.role==='user'?esc(d.username):(d.model||'AI').split('-')[0]
   return '<div class="msg '+m.role+'"><div class=meta>'+label+' · '+m.time+'</div>'+formatContent(m.content||'')+'</div>'
-}).join('');el.scrollTop=el.scrollHeight}
+}).join('');el.scrollTop=el.scrollHeight;modelName=d.model||'AI'}
 
 async function send(){
   var input=document.getElementById('input'),text=input.value.trim();if(!text)return
@@ -142,7 +142,7 @@ async function send(){
   var u=document.getElementById('userInfo')
   if(el.querySelector('.empty-state'))el.innerHTML=''
   el.innerHTML+='<div class="msg user"><div class=meta>'+(u?esc(u.textContent):'我')+' · '+now()+'</div><div class=bubble>'+esc(text)+'</div></div>'
-  var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>AI · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
+  var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
   // 等待后端回复
   try{
     var r=await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:sendText})})

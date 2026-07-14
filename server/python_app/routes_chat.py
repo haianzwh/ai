@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from .database import execute, execute_write, execute_one
 from .auth import get_current_user
-from .ai_client import create_opencode_session, send_prompt, poll_response, OPENCODE_URL
+from .ai_client import create_opencode_session, send_prompt, poll_response, OPENCODE_URL, DEFAULT_MODEL
 
 
 class SendReq(BaseModel):
@@ -77,7 +77,7 @@ async def create_session(user: dict = Depends(get_current_user)):
 
     await execute_write(
         "INSERT INTO chat_sessions (id, username, title, model, oc_session_id) VALUES (%s,%s,%s,%s,%s)",
-        (sid, user["username"], "新对话", "hy3-free", oc_id),
+        (sid, user["username"], "新对话", DEFAULT_MODEL, oc_id),
     )
     return {"success": True, "id": sid, "title": "新对话"}
 
@@ -95,9 +95,11 @@ async def get_messages(sid: str, user: dict = Depends(get_current_user)):
         "SELECT id, role, content, thinking, tokens_input, tokens_output, created_at FROM chat_messages WHERE session_id=%s ORDER BY id ASC LIMIT 100",
         (sid,),
     )
+    session = await execute_one("SELECT model FROM chat_sessions WHERE id=%s", (sid,))
     return {
         "success": True,
         "username": user["username"],
+        "model": session["model"] if session else DEFAULT_MODEL,
         "messages": [
             {
                 "id": r["id"], "role": r["role"],

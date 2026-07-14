@@ -67,7 +67,6 @@ async def poll_response(session_id: str, existing_ids: set[str] = None, timeout:
             
             for msg in new_messages:
                 mid = msg.get("id", "")
-                seen.add(mid)
                 mtype = msg.get("type", "")
 
                 if mtype == "user":
@@ -88,14 +87,16 @@ async def poll_response(session_id: str, existing_ids: set[str] = None, timeout:
                                 full_text = text
                                 yield {"content": delta, "done": False}
 
-                    # 有内容但未完成 → 继续轮询
+                    # 无内容 → 跳过，后续轮询继续等
                     if not has_content:
-                        seen.discard(mid)
                         continue
 
-                    # 完成
-                    if msg.get("finish") in ("stop", None, ""):
+                    # 完成 → 加入 seen 避免重复
+                    if msg.get("finish") == "stop":
+                        seen.add(mid)
                         yield {"content": "", "done": True}
                         return
+                    # 未完成 → 不加 seen，下次轮询继续读取增量
+                    seen.discard(mid)
 
             await asyncio.sleep(0.5)

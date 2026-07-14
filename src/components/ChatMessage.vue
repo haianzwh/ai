@@ -24,10 +24,12 @@ const renderedContent = computed(() => {
 })
 
 const formattedTime = computed(() => {
-  return props.message.timestamp.toLocaleTimeString('zh-CN', {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  const d = props.message.timestamp
+  const date = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`
+  const time = [d.getHours(), d.getMinutes(), d.getSeconds()]
+    .map((n) => String(n).padStart(2, '0'))
+    .join(':')
+  return `${date} ${time}`
 })
 </script>
 
@@ -50,6 +52,7 @@ const formattedTime = computed(() => {
     <div class="message-body">
       <div class="message-header">
         <span class="message-role">{{ isUser ? '你' : 'AI 助手' }}</span>
+        <span class="header-separator">·</span>
         <span class="message-time">{{ formattedTime }}</span>
       </div>
 
@@ -138,8 +141,13 @@ const formattedTime = computed(() => {
 .message-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 6px;
+}
+
+.header-separator {
+  font-size: 12px;
+  color: #ccc;
 }
 
 .message-role {
