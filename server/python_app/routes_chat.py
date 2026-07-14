@@ -5,7 +5,7 @@
 """
 import json, uuid, asyncio, logging, httpx
 from fastapi import APIRouter, HTTPException, Depends, Query, Body
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 
 from .database import execute, execute_write, execute_one
@@ -159,13 +159,13 @@ async def send_message(
     except:
         existing_ids = set()
 
-    # 异步生成（后台边生成边写入 DB）
-    asyncio.create_task(_stream_generate(sid, oc_id, content, existing_ids))
-    return {"success": True, "message": "正在生成"}
+    # 异步生成
+    asyncio.create_task(_generate_response(sid, oc_id, content, existing_ids))
+    return {"success": True, "message": "已发送"}
 
 
-async def _stream_generate(sid: str, oc_id: str, content: str, existing_ids: set[str]):
-    """后台生成，逐字写入 DB（前端轮询实现流式效果）"""
+async def _generate_response(sid: str, oc_id: str, content: str, existing_ids: set[str]):
+    """后台生成 AI 回复（逐步写入实现流式）"""
     try:
         await send_prompt(oc_id, content)
         last_text = ""
@@ -190,8 +190,32 @@ async def _stream_generate(sid: str, oc_id: str, content: str, existing_ids: set
                 break
         if last_text and db_id is None:
             await execute_write("INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)", (sid, "assistant", last_text))
-    except Exception as e:
-        if last_text and db_id is None:
-            await execute_write("INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)", (sid, "assistant", last_text))
-        print(f"[stream] ❌ {e}", flush=True)
+    except Exception:
+        pass
+
+
+@router.get("/stream/{sid}")
+async def stream_response(sid: str, user: dict = Depends(get_current_user)):
+    """SSE 流式返回 AI 回复（EventSource 使用）"""
+    async def event_stream():
+        last_len = 0
+        yield f"data: {json.dumps({'status': 'connecting'})}\n\n"
+        for _ in range(120):  # 最多等 60 秒
+            rows = await execute(
+                "SELECT content FROM chat_messages WHERE session_id=%s AND role='assistant' ORDER BY id DESC LIMIT 1",
+                (sid,),
+            )
+            if rows:
+                txt = rows[0]["content"] or ""
+                if len(txt) > last_len:
+                    last_len = len(txt)
+                    yield f"data: {json.dumps({'content': txt})}\n\n"
+                if last_len > 0:
+                    yield f"data: {json.dumps({'done': True})}\n\n"
+                    return
+            await asyncio.sleep(0.5)
+        yield f"data: {json.dumps({'error': '超时', 'done': True})}\n\n"
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no", "Connection": "keep-alive"})
 

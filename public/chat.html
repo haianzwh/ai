@@ -137,18 +137,18 @@ async function send(){
   if(el.querySelector('.empty-state'))el.innerHTML=''
   el.innerHTML+='<div class="msg user"><div class=bubble>'+esc(text)+'</div></div>'
   var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class="bubble thinking">⏳</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
-  // 发消息（后端异步生成），然后轮询显示增量
+  // 发消息
   try{await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:sendText})})}catch(e){aiDiv.innerHTML='<div class=bubble>发送失败</div>';document.querySelector('.send-btn').disabled=false;return}
-  var lastLen=0,cnt=0,hasContent=false
-  ;(function poll(){
-    if(cnt>240)return;cnt++
-    fetch('/auth/api/chat/sessions/'+curSession+'/messages',{headers:H}).then(r=>r.json()).then(d=>{
-      var msgs=d.messages||[],last=msgs[msgs.length-1]
-      if(last&&last.role==='assistant'){
-        var txt=last.content||''
-        if(txt.length>=lastLen){lastLen=txt.length;aiDiv.innerHTML=formatContent(txt);el.scrollTop=el.scrollHeight}
-        hasContent=true
-      }
+  // EventSource SSE 流式接收
+  var es=new EventSource('/auth/api/chat/stream/'+curSession)
+  es.onmessage=function(e){
+    try{var d=JSON.parse(e.data)
+    if(d.status)return
+    if(d.content){aiDiv.innerHTML=formatContent(d.content);el.scrollTop=el.scrollHeight}
+    if(d.done||d.error){es.close();document.querySelector('.send-btn').disabled=false;loadSessions()}
+    }catch(e){}
+  }
+}
       // 有内容后再轮询20次确保完整，或超时80次(24秒)
       if((hasContent&&cnt>20)||cnt>80){document.querySelector('.send-btn').disabled=false;loadSessions();return}
       setTimeout(poll,300)
