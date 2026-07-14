@@ -12,9 +12,12 @@ DEFAULT_MODEL = "deepseek-v4-flash-free"
 
 
 async def create_opencode_session(model: str = DEFAULT_MODEL) -> dict:
-    """在 opencode 中创建新会话"""
+    """在 opencode 中创建指定模型的会话"""
     async with httpx.AsyncClient() as client:
-        resp = await client.post(f"{OPENCODE_URL}/api/session", json={})
+        resp = await client.post(
+            f"{OPENCODE_URL}/api/session",
+            json={"modelID": model},
+        )
         return resp.json().get("data", {})
 
 
