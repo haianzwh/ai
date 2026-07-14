@@ -13,9 +13,6 @@ select option{background:#fff;color:#1a1a2e}
 .sidebar{width:300px;background:#16162a;border-right:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;flex-shrink:0;height:100vh;transition:margin-left .25s}
 .sidebar .hd{padding:16px;display:flex;gap:8px;flex-shrink:0;align-items:center;justify-content:space-between}
 .sidebar .hd .logo{font-size:16px;font-weight:700;color:#e0e0e0;letter-spacing:1px}
-.sidebar .hd .aux{display:flex;gap:6px}
-.sidebar .hd .aux button{background:none;border:none;color:rgba(255,255,255,.3);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;transition:.15s;display:flex;align-items:center;justify-content:center}
-.sidebar .hd .aux button:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6)}
 .btn-new{width:calc(100% - 32px);margin:0 16px 12px;padding:11px;border:none;border-radius:10px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);cursor:pointer;font-size:13px;font-weight:500;transition:.15s;text-align:center;flex-shrink:0}
 .btn-new:hover{background:rgba(255,255,255,.1);color:#fff}
 .sidebar .title{padding:8px 16px 4px;font-size:11px;font-weight:600;color:rgba(255,255,255,.25);letter-spacing:.5px;flex-shrink:0}
@@ -129,18 +126,16 @@ select option{background:#fff;color:#1a1a2e}
 <div class=sidebar id=sidebar>
   <div class=hd>
     <span class=logo>OpenCode</span>
-    <div class=aux>
-      <button onclick="document.getElementById('sessionSearch').focus()" title=搜索>🔍</button>
-      <button onclick=toggleSidebar() title=收起>✕</button>
-    </div>
+    <button onclick=toggleSidebar() title=收起 style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:6px;transition:.15s">◀</button>
   </div>
+  <input id=sessionSearch placeholder="搜索对话..." style="margin:0 16px 10px;padding:9px 12px;border:1px solid rgba(255,255,255,.06);border-radius:8px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);font-size:12px;outline:none;flex-shrink:0">
   <button class=btn-new onclick=newChat()>+ 开启新对话</button>
-  <input id=sessionSearch placeholder="搜索对话..." style="margin:0 16px 8px;padding:8px 12px;border:1px solid rgba(255,255,255,.06);border-radius:8px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);font-size:12px;outline:none;flex-shrink:0;display:none">
   <div class=title>对话历史</div>
   <div style="overflow-y:auto;flex:1" id=sessionList></div>
   <div class=sidebar-footer>
     <div class=avatar>U</div>
     <span class=uname id=userName>用户</span>
+    <button onclick="document.getElementById('sessionSearch').focus()" title=搜索 style="background:none;border:none;color:rgba(255,255,255,.25);cursor:pointer;font-size:16px;padding:4px;border-radius:6px;transition:.15s;margin-left:auto">🔍</button>
   </div>
 </div>
 
