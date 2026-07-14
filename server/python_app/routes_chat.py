@@ -138,15 +138,6 @@ async def update_session_model(sid: str, req: ModelReq, user: dict = Depends(get
     return {"success": True}
 
 
-@router.put("/sessions/{sid}")
-async def update_session(sid: str, req: TitleReq, user: dict = Depends(get_current_user)):
-    await execute_write(
-        "UPDATE chat_sessions SET title=%s WHERE id=%s AND username=%s",
-        (req.title, sid, user["username"]),
-    )
-    return {"success": True}
-
-
 @router.put("/sessions/{sid}/pin")
 async def pin_session(sid: str, user: dict = Depends(get_current_user)):
     row = await execute_one("SELECT pinned FROM chat_sessions WHERE id=%s AND username=%s", (sid, user["username"]))
@@ -157,6 +148,15 @@ async def pin_session(sid: str, user: dict = Depends(get_current_user)):
             (new_val, sid, user["username"]),
         )
     return {"success": True, "pinned": new_val if row else 0}
+
+
+@router.put("/sessions/{sid}")
+async def update_session(sid: str, req: TitleReq, user: dict = Depends(get_current_user)):
+    await execute_write(
+        "UPDATE chat_sessions SET title=%s WHERE id=%s AND username=%s",
+        (req.title, sid, user["username"]),
+    )
+    return {"success": True}
 
 
 @router.post("/sessions/{sid}/send")
