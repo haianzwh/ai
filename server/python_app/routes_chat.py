@@ -229,9 +229,13 @@ async def _do_send(sid: str, req: SendReq, user: dict):
                 return {"success": False, "error": str(e)}
     
     if full_text:
+        import re as _re
+        tm = _re.search(r"<think>(.*?)</think>", full_text, _re.DOTALL)
+        thinking_part = tm.group(1).strip() if tm else ""
+        clean_text = _re.sub(r"<think>.*?</think>", "", full_text, flags=_re.DOTALL).strip()
         await execute_write(
-            "INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)",
-            (sid, "assistant", full_text),
+            "INSERT INTO chat_messages (session_id, role, content, thinking) VALUES (%s,%s,%s,%s)",
+            (sid, "assistant", clean_text, thinking_part),
         )
     
     return {"success": True, "content": full_text}

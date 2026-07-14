@@ -151,7 +151,7 @@ var el=document.getElementById('msgArea');if(!d.messages.length){el.innerHTML='<
 document.getElementById('chatTitle').textContent=d.messages[0]?d.messages[0].content.slice(0,20)+'…':'对话'
 el.innerHTML=d.messages.map(function(m){
   var label=m.role==='user'?esc(d.username):(d.model||'AI').split('-')[0]
-  return '<div class="msg '+m.role+'"><div class=meta>'+label+' · '+m.time+'</div>'+formatContent(m.content||'')+'</div>'
+  return '<div class="msg '+m.role+'"><div class=meta>'+label+' · '+m.time+'</div>'+formatContent(m.content||'',m.thinking||'')+'</div>'
 }).join('');el.scrollTop=el.scrollHeight;modelName=d.model||'AI'
 var sel=document.getElementById('modelSelect');if(sel)sel.value=modelName}
 
@@ -176,9 +176,12 @@ async function send(){
   document.querySelector('.send-btn').disabled=false
 }
 
-function formatContent(txt){
-  var thinking='',mainText=txt,tm=txt.match(/<think>([\s\S]*?)<\/think>/)
-  if(tm){thinking=tm[1];mainText=txt.replace(/<think>[\s\S]*?<\/think>/,'').trim()}
+function formatContent(txt, thinking){
+  if(!thinking){
+    var tm=txt.match(/<think>([\s\S]*?)<\/think>/)
+    if(tm){thinking=tm[1];txt=txt.replace(/<think>[\s\S]*?<\/think>/,'').trim()}
+  }
+  var mainText=txt
   var sm=mainText.match(/([\s\S]*?)\n[=\-]{3,}\n([\s\S]*)/)
   if(sm&&!thinking){thinking=sm[1];mainText=sm[2].trim()}
   if(!thinking&&chatMode==='think'&&txt.length>100){thinking=txt;mainText=''}
