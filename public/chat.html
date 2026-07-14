@@ -213,20 +213,34 @@ aiContent.textContent = '';  // 清掉等待文案
 msgs.scrollTop = msgs.scrollHeight;
 
   try {
-    var r = await fetch('/auth/api/chat/sessions/'+curSession+'/send', {
+    await fetch('/auth/api/chat/sessions/'+curSession+'/send', {
       method: 'POST',
       headers: Object.assign({'Content-Type': 'application/json'}, H),
       body: JSON.stringify({content: text}),
     });
-    var d = await r.json();
-    if (d.content) aiContent.textContent = d.content;
-    msgs.scrollTop = msgs.scrollHeight;
-    document.getElementById('sendBtn').disabled = false;
-    loadSessions();
+    aiContent.textContent = '⏳ 思考中...';
+    // 轮询消息
+    var pollCount = 0;
+    var pollTimer = setInterval(async function() {
+      pollCount++;
+      var r = await fetch('/auth/api/chat/sessions/'+curSession+'/messages', { headers: H });
+      var d = await r.json();
+      var msgs = d.messages || [];
+      var last = msgs[msgs.length-1];
+      if (last && last.role === 'assistant') {
+        aiContent.textContent = last.content;
+        clearInterval(pollTimer);
+        msgs.scrollTop = msgs.scrollHeight;
+        loadSessions();
+      } else if (pollCount > 120) {
+        aiContent.textContent = '⏰ 超时';
+        clearInterval(pollTimer);
+      }
+    }, 1000);
   } catch(e) {
     aiContent.textContent = '错误: ' + e.message;
-    document.getElementById('sendBtn').disabled = false;
   }
+  document.getElementById('sendBtn').disabled = false;
 }
 
 function esc(s) {
