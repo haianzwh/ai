@@ -5,7 +5,7 @@
 """
 import json, uuid, asyncio, logging, httpx
 from fastapi import APIRouter, HTTPException, Depends, Query, Body
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from .database import execute, execute_write, execute_one
@@ -135,107 +135,22 @@ async def _do_send_message(sid: str, req: SendReq, user: dict):
         oc_id = oc.get("id", "")
         await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
 
-    # 首次发消息更新标题
-    count_rows = await execute("SELECT COUNT(*) as c FROM chat_messages WHERE session_id=%s AND role='user'", (sid,))
-    if count_rows and count_rows[0]["c"] == 1:
-        title = content[:30] + ("..." if len(content) > 30 else "")
-        await execute_write("UPDATE chat_sessions SET title=%s WHERE id=%s", (title, sid))
-
-    # 发 prompt 前，记录 opencode 已有的消息 ID
-    import httpx as _hx
-    async with _hx.AsyncClient() as oc_client:
-        r = await oc_client.get(f"{OPENCODE_URL}/api/session/{oc_id}/message", params={"from": 0, "to": 100})
-        existing_ids = {m["id"] for m in r.json().get("data", []) if m.get("id")}
-    
+    # 发 prompt 
     await send_prompt(oc_id, content)
 
-    # 返回流式响应
-    return StreamingResponse(
-        _stream_response(sid, oc_id, existing_ids),
-        media_type="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
-    )
+    # 等 AI 回复
+    full_text = ""
+    async for chunk in poll_response(oc_id, timeout=60):
+        if chunk.get("done"):
+            break
+        if chunk.get("content"):
+            full_text += chunk["content"]
 
+    if full_text:
+        await execute_write("INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)",
+            (sid, "assistant", full_text))
 
-async def _stream_response(sid: str, oc_id: str, existing_ids: set[str] = None):
-    """流式返回 AI 回复（只做轮询，不创建会话/发消息）"""
-    full = ""
-    thinking = ""
-    try:
-        async for chunk in poll_response(oc_id, existing_ids=existing_ids):
-            if chunk.get("done"):
-                if chunk.get("error"):
-                    yield f"data: {json.dumps({'error': chunk['error'], 'done': True})}\n\n"
-                else:
-                    if full:
-                        await execute_write(
-                            "INSERT INTO chat_messages (session_id, role, content, thinking) VALUES (%s,%s,%s,%s)",
-                            (sid, "assistant", full, thinking),
-                        )
-                    yield f"data: {json.dumps({'done': True})}\n\n"
-                return
-
-            if chunk.get("thinking"):
-                delta = chunk["thinking"]
-                thinking += delta
-                yield f"data: {json.dumps({'thinking': delta})}\n\n"
-
-            delta = chunk.get("content", "")
-            if delta:
-                full += delta
-                yield f"data: {json.dumps({'content': delta})}\n\n"
-    except Exception as e:
-        if full:
-            await execute_write(
-                "INSERT INTO chat_messages (session_id, role, content, thinking) VALUES (%s,%s,%s,%s)",
-                (sid, "assistant", full, thinking),
-            )
-        yield f"data: {json.dumps({'error': str(e), 'done': True})}\n\n"
-    full = ""
-    thinking = ""
-    try:
-        # 1. 获取或创建 opencode 会话
-        yield f"data: {json.dumps({'status': 'connecting'})}\n\n"
-        session = await execute_one("SELECT oc_session_id FROM chat_sessions WHERE id=%s", (sid,))
-        oc_id = session["oc_session_id"] if session else ""
-
-        if not oc_id:
-            oc = await create_opencode_session()
-            oc_id = oc.get("id", "")
-            await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
-
-        # 2. 发送消息
-        yield f"data: {json.dumps({'status': 'sending'})}\n\n"
-        await asyncio.sleep(1)  # 给 opencode 会话准备时间
-        await send_prompt(oc_id, content)
-
-        # 3. 轮询 AI 回复
-        yield f"data: {json.dumps({'status': 'thinking'})}\n\n"
-        async for chunk in poll_response(oc_id):
-            if chunk.get("done"):
-                if chunk.get("error"):
-                    yield f"data: {json.dumps({'error': chunk['error'], 'done': True})}\n\n"
-                else:
-                    await execute_write(
-                        "INSERT INTO chat_messages (session_id, role, content, thinking) VALUES (%s,%s,%s,%s)",
-                        (sid, "assistant", full, thinking),
-                    )
-                    yield f"data: {json.dumps({'done': True})}\n\n"
-                return
-
-            if chunk.get("thinking"):
-                delta = chunk["thinking"]
-                thinking += delta
-                yield f"data: {json.dumps({'thinking': delta})}\n\n"
-
-            delta = chunk.get("content", "")
-            if delta:
-                full += delta
-                yield f"data: {json.dumps({'content': delta})}\n\n"
-    except Exception as e:
-        if full:
-            await execute_write(
-                "INSERT INTO chat_messages (session_id, role, content, thinking) VALUES (%s,%s,%s,%s)",
+    return JSONResponse(content={"success": True, "content": full_text})
                 (sid, "assistant", full, thinking),
             )
         yield f"data: {json.dumps({'error': str(e), 'done': True})}\n\n"
