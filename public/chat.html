@@ -204,13 +204,13 @@ async function send(){
   var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
   // 等待后端回复
   try{
-    var ctrl=new AbortController();setTimeout(function(){ctrl.abort()},35000)
+    var ctrl=new AbortController();setTimeout(function(){ctrl.abort()},90000)
     var r=await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:sendText}),signal:ctrl.signal})
     if(!r.ok){var t=await r.text().catch(function(){return''});aiDiv.innerHTML='<div class=bubble>❌ '+r.status+': '+esc(t.slice(0,60))+'</div>';return}
     var d=await r.json()
     if(d.content||d.thinking){var b=aiDiv.querySelector('.bubble');b.outerHTML=formatContent(d.content||'',d.thinking||'')}else{var b=aiDiv.querySelector('.bubble');b.outerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
     el.scrollTop=el.scrollHeight;loadSessions()
-  }catch(e){aiDiv.innerHTML='<div class=bubble>❌ '+esc(e.message)+'</div>'}
+  }catch(e){aiDiv.innerHTML='<div class=bubble>❌ '+(e.name==='AbortError'?'请求超时，请重试':esc(e.message))+'</div>'}
   finally{document.querySelector('.send-btn').disabled=false}
 }
 
