@@ -42,7 +42,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .btn-model.active{background:var(--hl-bg)!important;color:var(--hl-color)!important}
 .btn-model:hover{background:var(--hl-bg)}
 .sidebar .title{padding:14px 16px 8px;font-size:12px;font-weight:600;color:var(--text2);flex-shrink:0}
-.session{padding:10px 16px;cursor:pointer;font-size:13px;color:var(--text3);display:flex;justify-content:space-between;align-items:center;border-left:3px solid transparent;transition:.1s;margin:1px 6px;border-radius:8px}
+.session{padding:10px 14px;cursor:pointer;font-size:13px;color:var(--text3);display:flex;justify-content:space-between;align-items:center;border-left:3px solid transparent;transition:.1s;margin:2px 8px;border-radius:10px}
 .session:hover{background:var(--hl-bg);color:var(--text)}
 .session.active{background:var(--hl-bg);border-left-color:var(--primary);color:var(--text)}
 .session .del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;visibility:hidden}
@@ -62,9 +62,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .msg.user .meta{text-align:right}
 .msg.user{display:flex;flex-direction:column;align-items:flex-end}
 .msg.assistant{display:flex;flex-direction:column;align-items:flex-start}
-.msg .bubble{width:fit-content;max-width:100%;padding:12px 18px;border-radius:18px;font-size:14px;line-height:1.7;text-align:left;word-break:break-word}
-.msg.user .bubble{background:var(--primary);color:#fff;border-bottom-right-radius:4px}
-.msg.assistant .bubble{background:var(--bg2);border:1px solid var(--border);border-bottom-left-radius:4px;color:var(--text);line-height:1.8;white-space:pre-wrap}
+.msg .bubble{width:fit-content;max-width:100%;padding:12px 20px;border-radius:20px;font-size:14px;line-height:1.7;text-align:left;word-break:break-word}
+.msg.user .bubble{background:var(--primary);color:#fff;border-bottom-right-radius:6px}
+.msg.assistant .bubble{background:var(--bg2);border:1px solid var(--border);border-bottom-left-radius:6px;color:var(--text);line-height:1.8;white-space:pre-wrap}
 .msg.assistant .bubble h2{font-size:17px;font-weight:700;margin:16px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--primary);color:var(--text)}
 .msg.assistant .bubble h3{font-size:15px;font-weight:600;margin:12px 0 6px;color:var(--text)}
 .msg.assistant .bubble h4{font-size:14px;font-weight:600;margin:8px 0 4px;color:var(--text2)}
@@ -86,29 +86,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .msg.assistant .bubble.thinking::after{content:'';display:inline-block;width:6px;height:6px;background:var(--primary);border-radius:50%;margin-left:6px;animation:dotPulse 1.2s infinite}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes dotPulse{0%,100%{opacity:.3}50%{opacity:1}}
-.think-wrap{background:var(--think-bg);border:1px solid var(--think-border);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.think-wrap{background:var(--think-bg);border:1px solid var(--think-border);border-radius:12px;margin-bottom:10px;overflow:hidden}
 .think-wrap summary{list-style:none;cursor:pointer;padding:10px 14px;font-size:12px;font-weight:500;color:var(--think-color);display:flex;align-items:center;gap:8px;transition:.15s;user-select:none}
 .think-wrap summary::-webkit-details-marker{display:none}
 .think-wrap summary::after{content:'展开 ▾';font-size:11px;margin-left:auto;opacity:.5;transition:transform .2s}
 .think-wrap[open] summary::after{content:'收起 ▴'}
 .think-wrap[open] .think-content{border-top:1px solid var(--think-border)}
 .think-content{padding:12px 14px;font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-wrap;max-height:400px;overflow-y:auto}
-.input-bar{padding:8px 0 12px;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg2);display:flex;flex-direction:column;align-items:center}
+.input-bar{padding:4px 0 10px;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg2);display:flex;flex-direction:column;align-items:center}
 .input-container{width:100%;max-width:880px;padding:0 24px}
-.input-wrap{display:flex;gap:10px;align-items:flex-end;background:var(--input-bg);border:1.5px solid var(--input-border);border-radius:12px;padding:4px 4px 4px 16px;transition:.2s}
+.input-wrap{display:flex;gap:8px;align-items:center;background:var(--input-bg);border:1.5px solid var(--input-border);border-radius:14px;padding:4px 4px 4px 18px;transition:.2s}
 .input-wrap:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
-.input-wrap textarea{flex:1;border:none;background:transparent;color:var(--text);font-size:14px;resize:none;outline:none;font-family:inherit;min-height:24px;max-height:120px;line-height:1.5;padding:8px 0}
+.input-wrap textarea{flex:1;border:none;background:transparent;color:var(--text);font-size:14px;resize:none;outline:none;font-family:inherit;min-height:22px;max-height:100px;line-height:1.5;padding:7px 0}
 .input-wrap textarea::placeholder{color:var(--text3)}
-.input-wrap .tool-btn{background:none;border:none;color:var(--text3);width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:18px;flex-shrink:0;transition:.15s;display:flex;align-items:center;justify-content:center}
-.input-wrap .tool-btn:hover{color:var(--hl-color);background:var(--hl-bg)}
-.input-wrap .send-btn{padding:8px 20px;border:none;border-radius:10px;background:var(--primary);color:#fff;cursor:pointer;font-size:13px;font-weight:500;flex-shrink:0;transition:.15s;height:36px}
+.input-wrap select{background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer;outline:none;max-width:110px;flex-shrink:0}
+.input-wrap select option{background:var(--bg2);color:var(--text)}
+.input-wrap .send-btn{padding:7px 18px;border:none;border-radius:10px;background:var(--primary);color:#fff;cursor:pointer;font-size:13px;font-weight:500;flex-shrink:0;transition:.15s;height:34px}
 .input-wrap .send-btn:hover{opacity:.9}
 .input-wrap .send-btn:disabled{opacity:.3;cursor:default}
-.input-tools{display:flex;gap:8px;align-items:center;padding:8px 4px 0}
-.input-tools select{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;outline:none}
-.input-tools select option{background:var(--bg2);color:var(--text)}
-.input-tools button{background:none;border:1px solid var(--border);color:var(--text2);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;transition:.15s}
-.input-tools button:hover{background:var(--hl-bg);color:var(--hl-color);border-color:var(--primary)}
+.input-tools{display:flex;gap:6px;align-items:center;padding:6px 4px 0}
+.input-tools button{background:none;border:1px solid var(--border);color:var(--text3);padding:3px 10px;border-radius:8px;cursor:pointer;font-size:11px;transition:.15s}
+.input-tools button:hover{background:var(--hl-bg);color:var(--hl-color)}
 .empty-state{text-align:center;padding:120px 40px;color:var(--empty)}
 .empty-state .icon{font-size:56px;margin-bottom:16px}
 .empty-state p{font-size:14px;line-height:2;color:var(--empty)}
@@ -161,12 +159,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
     <div class=input-container>
       <div class=input-wrap>
         <textarea id=input rows=1 placeholder="输入消息..." onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
-        <button class=tool-btn onclick="document.getElementById('fileInput').click()" title=上传>📎</button>
+        <select id=modelSelect onchange=switchModel(this.value)></select>
         <button class=send-btn onclick=send()>发送</button>
       </div>
       <div class=input-tools>
-        <select id=modelSelect onchange=switchModel(this.value)></select>
-        <button onclick="document.getElementById('fileInput').click()" title="上传文件">📎 文件</button>
         <button onclick=loadMessages() title="刷新">🔄 刷新</button>
       </div>
     </div>
