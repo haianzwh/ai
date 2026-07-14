@@ -43,6 +43,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 .msg.assistant .bubble{margin-right:auto;max-width:75%}
 .msg.user .bubble{background:linear-gradient(135deg,#6366f1,#7c3aed);color:#fff;border-bottom-right-radius:4px;box-shadow:0 2px 12px rgba(99,102,241,.25)}
 .msg.assistant .bubble{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.06);border-bottom-left-radius:4px;color:#e2e8f0;box-shadow:0 1px 6px rgba(0,0,0,.1);white-space:pre-wrap}
+.msg.assistant .bubble h2{font-size:16px;font-weight:700;color:#f0f0f0;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,.08)}
+.msg.assistant .bubble h3{font-size:15px;font-weight:600;color:#e2e8f0;margin:0 0 6px}
+.msg.assistant .bubble h4{font-size:14px;font-weight:600;color:rgba(255,255,255,.7);margin:0 0 4px}
+.msg.assistant .bubble strong{color:#f0f0f0}
+.msg.assistant .bubble .md-li{padding-left:12px;margin:2px 0;color:rgba(255,255,255,.65)}
+.msg.assistant .bubble .md-li::before{content:'• ';color:rgba(255,255,255,.3)}
 .msg.assistant .bubble.thinking{background:transparent;border:none;box-shadow:none;color:rgba(255,255,255,.35);font-size:13px;padding:4px 0}
 .msg.assistant .bubble.thinking::after{content:'';display:inline-block;width:4px;height:4px;background:#818cf8;border-radius:50%;margin-left:4px;animation:dotPulse 1.2s infinite}
 @keyframes dotPulse{0%,100%{opacity:.3}50%{opacity:1}}
@@ -193,11 +199,19 @@ function formatContent(txt, thinking){
   if(!thinking&&chatMode==='think'&&txt.length>100){thinking=txt;mainText=''}
   var html=''
   if(thinking)html='<div class=think-wrap><div class=think-header>🧠 思考过程</div><div class=think-content>'+esc(thinking)+'</div></div>'
-  html+='<div class=bubble>'+(mainText?esc(mainText):'')+'</div>'
+  html+='<div class=bubble>'+(mainText?md(esc(mainText)):'')+'</div>'
   return html
 }
 
 async function uploadFiles(files){for(var i=0;i<files.length;i++){var fd=new FormData();fd.append('file',files[i]);await fetch('/auth/api/upload',{method:'POST',headers:H,body:fd})}loadMessages()}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function md(s){
+  s=s.replace(/^### (.+)$/gm,'<h4>$1</h4>')
+       .replace(/^## (.+)$/gm,'<h3>$1</h3>')
+       .replace(/^# (.+)$/gm,'<h2>$1</h2>')
+       .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+       .replace(/^- (.+)$/gm,'<div class=md-li>$1</div>')
+  return s
+}
 setMode('chat');loadModels();loadSessions();(async function(){await newChat()})();
 </script></body></html>
