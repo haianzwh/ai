@@ -12,8 +12,7 @@ DEFAULT_MODEL = "deepseek-v4-flash-free"
 
 
 async def create_opencode_session() -> dict:
-    """在 opencode 中创建会话（模型需后续通过 set_session_model 设置）"""
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=10) as client:
         resp = await client.post(
             f"{OPENCODE_URL}/api/session",
             json={},
@@ -23,7 +22,7 @@ async def create_opencode_session() -> dict:
 
 async def set_session_model(session_id: str, model: str = DEFAULT_MODEL):
     """设置 opencode 会话使用的模型"""
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=10) as client:
         await client.post(
             f"{OPENCODE_URL}/api/session/{session_id}/model",
             json={"model": {"id": model, "providerID": "opencode"}},
@@ -31,10 +30,9 @@ async def set_session_model(session_id: str, model: str = DEFAULT_MODEL):
 
 
 async def send_prompt(session_id: str, text: str, model_name: str = "") -> str:
-    """发送 prompt，可选注入模型身份提示"""
     if model_name:
         text = f"[System note: You are powered by the model named \"{model_name}\".]\n\n{text}"
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=30) as client:
         resp = await client.post(
             f"{OPENCODE_URL}/api/session/{session_id}/prompt",
             json={"prompt": {"text": text}},
@@ -42,7 +40,7 @@ async def send_prompt(session_id: str, text: str, model_name: str = "") -> str:
         return resp.json().get("data", {}).get("id", "")
 
 
-async def poll_response(session_id: str, existing_ids: set[str] = None, timeout: int = 60) -> AsyncGenerator[dict, None]:
+async def poll_response(session_id: str, existing_ids: set[str] = None, timeout: int = 30) -> AsyncGenerator[dict, None]:
     """轮询 opencode 消息，获取 AI 回复。
     
     Args:
@@ -54,7 +52,7 @@ async def poll_response(session_id: str, existing_ids: set[str] = None, timeout:
     seen: set[str] = set(existing_ids) if existing_ids else set()
     full_text = ""
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=30) as client:
         while True:
             elapsed = asyncio.get_event_loop().time() - start
             if elapsed > timeout:
