@@ -137,21 +137,15 @@ async function send(){
   if(el.querySelector('.empty-state'))el.innerHTML=''
   el.innerHTML+='<div class="msg user"><div class=bubble>'+esc(text)+'</div></div>'
   var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
-  // 发送消息到后端
-  try{await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:sendText})})}catch(e){aiDiv.innerHTML='<div class=bubble>发送失败</div>';document.querySelector('.send-btn').disabled=false;return}
-  // 轮询回复
-  var lastText='',pollCount=0,polling=true
-  async function pollMsg(){
-    if(!polling)return;pollCount++
-    try{var r=await fetch('/auth/api/chat/sessions/'+curSession+'/messages',{headers:H}),d=await r.json(),msgs=d.messages||[],last=msgs[msgs.length-1]
-    if(last&&last.role==='assistant'){
-      var txt=last.content||''
-      if(txt!==lastText){lastText=txt;aiDiv.innerHTML=formatContent(txt)}}
-    // 消息出现后5轮停止；超时2分钟
-    if((lastText&&pollCount>8)||pollCount>240){polling=false;document.querySelector('.send-btn').disabled=false;loadSessions();return}
-    }catch(e){}
-    setTimeout(pollMsg,500)
-  };setTimeout(pollMsg,300)
+  // 等待后端回复
+  try{
+    var r=await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:sendText})})
+    if(!r.ok){var t=await r.text().catch(function(){return''});aiDiv.innerHTML='<div class=bubble>❌ '+r.status+': '+esc(t.slice(0,60))+'</div>';return}
+    var d=await r.json()
+    if(d.content){aiDiv.innerHTML=formatContent(d.content)}else{aiDiv.innerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
+    el.scrollTop=el.scrollHeight;loadSessions()
+  }catch(e){aiDiv.innerHTML='<div class=bubble>❌ '+esc(e.message)+'</div>'}
+  document.querySelector('.send-btn').disabled=false
 }
 
 function formatContent(txt){
