@@ -5,7 +5,7 @@
 """
 import json, uuid, asyncio, logging, httpx
 from fastapi import APIRouter, HTTPException, Depends, Query, Body
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from .database import execute, execute_write, execute_one
@@ -18,7 +18,14 @@ class SendReq(BaseModel):
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/chat", tags=["聊天"])
-_gen_locks: dict[str, asyncio.Lock] = {}
+
+# 发送锁：每个会话同时只允许一个发送请求
+_send_locks: dict[str, asyncio.Lock] = {}
+
+# 内存中缓存：chat_session_id → opencode_session_id
+# 重启丢失，聊天会话需重建
+_oc_cache: dict[str, str] = {}
+
 
 @router.get("/models")
 async def list_models(user: dict = Depends(get_current_user)):
@@ -144,67 +151,46 @@ async def send_message(
             "问题：" + content
         )
 
-    # 异步生成（加锁防重复）
-    if sid not in _gen_locks:
-        _gen_locks[sid] = asyncio.Lock()
-    asyncio.create_task(_generate_response(sid, oc_id, content, _gen_locks[sid]))
-    return {"success": True, "message": "已发送"}
+    # 记录已有 opencode 消息 ID（防重复取旧回复）
+    import httpx as _hx
+    try:
+        r = _hx.get(f"{OPENCODE_URL}/api/session/{oc_id}/message", params={"from": 0, "to": 50}, timeout=5)
+        existing_ids = {m["id"] for m in r.json().get("data", []) if m.get("id")}
+    except:
+        existing_ids = set()
 
-
-async def _generate_response(sid: str, oc_id: str, content: str, lock: asyncio.Lock):
-    """后台生成 AI 回复（逐步写入实现流式，带锁）"""
-    async with lock:
-        # 在锁内获取 existing_ids（确保包含之前任务的所有消息）
-        import httpx as _hx
+    # 发送 prompt 并同步等待回复
+    await send_prompt(oc_id, content)
+    
+    full_text = ""
+    for retry in range(2):
         try:
-            r = _hx.get(f"{OPENCODE_URL}/api/session/{oc_id}/message", params={"from": 0, "to": 50}, timeout=5)
-            existing_ids = {m["id"] for m in r.json().get("data", []) if m.get("id")}
-        except:
-            existing_ids = set()
-        try:
-            await send_prompt(oc_id, content)
-            last_text = ""
-            db_id = None
             async for chunk in poll_response(oc_id, existing_ids=existing_ids, timeout=120):
-                delta = chunk.get("content", "")
-                if delta:
-                    last_text += delta
-                    if db_id is None:
-                        db_id = await execute_write("INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)", (sid, "assistant", last_text))
-                    else:
-                        await execute_write("UPDATE chat_messages SET content=%s WHERE id=%s", (last_text, db_id))
                 if chunk.get("done"):
-                    if db_id and last_text:
-                        await execute_write("UPDATE chat_messages SET content=%s WHERE id=%s", (last_text, db_id))
                     break
-            if last_text and db_id is None:
-                await execute_write("INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)", (sid, "assistant", last_text))
-        except Exception:
-            pass
-
-
-@router.get("/stream/{sid}")
-async def stream_response(sid: str, user: dict = Depends(get_current_user)):
-    """SSE 流式返回 AI 回复（EventSource 使用）"""
-    async def event_stream():
-        last_len = 0
-        yield f"data: {json.dumps({'status': 'connecting'})}\n\n"
-        for _ in range(120):  # 最多等 60 秒
-            rows = await execute(
-                "SELECT content FROM chat_messages WHERE session_id=%s AND role='assistant' ORDER BY id DESC LIMIT 1",
-                (sid,),
-            )
-            if rows:
-                txt = rows[0]["content"] or ""
-                if len(txt) > last_len:
-                    last_len = len(txt)
-                    yield f"data: {json.dumps({'content': txt})}\n\n"
-                if last_len > 0:
-                    yield f"data: {json.dumps({'done': True})}\n\n"
-                    return
-            await asyncio.sleep(0.5)
-        yield f"data: {json.dumps({'error': '超时', 'done': True})}\n\n"
-
-    return StreamingResponse(event_stream(), media_type="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no", "Connection": "keep-alive"})
+                if chunk.get("content"):
+                    full_text += chunk["content"]
+            break
+        except Exception as e:
+            if "TooLarge" in str(e) or "max bytes" in str(e):
+                oc = await create_opencode_session()
+                oc_id = oc.get("id", "")
+                await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
+                await send_prompt(oc_id, content)
+                async for chunk in poll_response(oc_id, timeout=120):
+                    if chunk.get("done"):
+                        break
+                    if chunk.get("content"):
+                        full_text += chunk["content"]
+                break
+            else:
+                return {"success": False, "error": str(e)}
+    
+    if full_text:
+        await execute_write(
+            "INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)",
+            (sid, "assistant", full_text),
+        )
+    
+    return {"success": True, "content": full_text}
 
