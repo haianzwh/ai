@@ -147,6 +147,15 @@ async def update_session(sid: str, req: TitleReq, user: dict = Depends(get_curre
     return {"success": True}
 
 
+@router.put("/sessions/{sid}/pin")
+async def pin_session(sid: str, user: dict = Depends(get_current_user)):
+    await execute_write(
+        "UPDATE chat_sessions SET updated_at=NOW() WHERE id=%s AND username=%s",
+        (sid, user["username"]),
+    )
+    return {"success": True}
+
+
 @router.post("/sessions/{sid}/send")
 async def send_message(
     sid: str,

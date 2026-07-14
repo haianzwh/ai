@@ -73,11 +73,11 @@ body.light-mode .btn-new:hover{background:rgba(140,180,215,.35);color:rgba(50,95
 .session:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)}
 .session.active{background:rgba(99,102,241,.15);border-left-color:#818cf8;color:#e0e0e0}
 .session .del{display:none}
-.session .more{float:right;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;visibility:hidden;letter-spacing:1px;line-height:1}
+.session .more{float:right;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:18px;padding:2px 6px;border-radius:4px;visibility:hidden;letter-spacing:2px;line-height:1;font-weight:700}
 .session:hover .more{visibility:visible}
 .session .more:hover{color:rgba(255,255,255,.5)}
-.session .menu{position:fixed;min-width:120px;background:rgba(30,30,50,.94);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:4px;z-index:200;display:none}
-.session .menu-item{padding:8px 14px;border-radius:6px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.5);transition:.1s;display:flex;align-items:center;gap:8px}
+.session .menu{position:fixed;min-width:140px;background:rgba(30,30,50,.94);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:4px;z-index:200;display:none}
+.session .menu-item{padding:8px 14px;border-radius:6px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.5);transition:.1s;display:flex;align-items:center;gap:10px}
 .session .menu-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)}
 .session .menu-item.danger{color:#ef4444}
 .session .menu-item.danger:hover{background:rgba(239,68,68,.1);color:#ef4444}
@@ -438,7 +438,7 @@ function showMenu(btn,sid){
   var existing=btn.parentElement.querySelector('.menu')
   if(existing){existing.style.display=existing.style.display==='none'?'':'none';return}
   var m=document.createElement('div');m.className='menu'
-  m.innerHTML='<div class=menu-item onclick="event.stopPropagation();renameSession(\''+sid+'\')">✏️ 编辑名称</div><div class="menu-item danger" onclick="event.stopPropagation();delSession(\''+sid+'\')">🗑 删除</div>'
+  m.innerHTML='<div class=menu-item onclick="event.stopPropagation();pinSession(\''+sid+'\')">📌 置顶</div><div class=menu-item onclick="event.stopPropagation();renameSession(\''+sid+'\')">✏️ 编辑名称</div><div class="menu-item danger" onclick="event.stopPropagation();delSession(\''+sid+'\')">🗑 删除</div>'
   btn.parentElement.appendChild(m)
   var r=btn.getBoundingClientRect();m.style.display='block'
   m.style.top=(r.bottom+4)+'px';m.style.left=Math.max(8,Math.min(r.right-m.offsetWidth,document.body.clientWidth-m.offsetWidth-8))+'px'
@@ -447,6 +447,9 @@ document.addEventListener('click',function(){document.querySelectorAll('.session
 function renameSession(sid){
   var t=prompt('重命名对话:',document.querySelector('.session.active span').textContent)
   if(t&&t.trim())fetch('/auth/api/chat/sessions/'+sid,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({title:t.trim()})}).then(function(){loadSessions()})
+}
+function pinSession(sid){
+  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).then(function(){loadSessions()}).catch(function(){})
 }
 function toggleDark(){
   document.body.classList.toggle('light-mode')
