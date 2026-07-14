@@ -426,20 +426,13 @@ function updateNav(){
   if(!msgs.length){var e=document.createElement('div');e.className='nav-dot';e.style.opacity='.15';dots.appendChild(e);return}
   msgs.forEach(function(m,i){
     var d=document.createElement('div');d.className='nav-dot'
-    d.dataset.idx=i
-    d.onclick=function(){var m=msgs[+this.dataset.idx];m.scrollIntoView({behavior:'smooth',block:'center'});var p=document.getElementById('navPreview');p.style.display='block';p.textContent=(m.querySelector('.bubble').textContent||'').slice(0,200)}
+    d.onmouseenter=function(){var p=document.getElementById('navPreview');p.style.display='block';p.textContent=(m.querySelector('.bubble').textContent||'').slice(0,200)}
+    d.onclick=function(){m.scrollIntoView({behavior:'smooth',block:'center'})}
     dots.appendChild(d)
   })
   var all=dots.querySelectorAll('.nav-dot')
   if(all.length)all[all.length-1].classList.add('active')
 }
-// 导航栏事件委托：hover 圆点显示对应消息预览
-document.getElementById('navBar').addEventListener('mouseover',function(e){
-  var dot=e.target.closest('.nav-dot');if(!dot)return
-  var idx=+dot.dataset.idx
-  var msgs=document.querySelectorAll('#msgArea .msg.user')
-  if(msgs[idx]){var p=document.getElementById('navPreview');p.style.display='block';p.textContent=(msgs[idx].querySelector('.bubble').textContent||'').slice(0,200)}
-})
 document.getElementById('navBar').addEventListener('mouseleave',function(){
   setTimeout(function(){
     if(!document.getElementById('navBar').matches(':hover'))document.getElementById('navPreview').style.display='none'
