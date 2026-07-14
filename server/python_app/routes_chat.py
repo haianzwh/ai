@@ -97,11 +97,12 @@ async def get_messages(sid: str, user: dict = Depends(get_current_user)):
     )
     return {
         "success": True,
+        "username": user["username"],
         "messages": [
             {
                 "id": r["id"], "role": r["role"],
                 "content": r["content"], "thinking": r.get("thinking"),
-                "time": r["created_at"].strftime("%H:%M"),
+                "time": r["created_at"].strftime("%Y/%-m/%-d %H:%M:%S"),
             }
             for r in rows
         ],

@@ -35,6 +35,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 #msgArea::-webkit-scrollbar{width:4px}
 #msgArea::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
 .msg{max-width:80%;margin-bottom:8px;animation:fadeIn .3s}
+.msg .meta{font-size:11px;color:rgba(255,255,255,.25);margin-bottom:4px}
+.msg.user .meta{text-align:right}
 .msg.user{margin-left:auto}
 .msg .bubble{width:fit-content;padding:8px 14px;border-radius:16px;font-size:13px;line-height:1.5;text-align:left;word-break:break-word}
 .msg.user .bubble{margin-left:auto}
@@ -110,6 +112,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 <script>
 var T=localStorage.getItem('auth_token');if(!T)location.href='/login.html'
 var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat'
+function now(){var d=new Date();return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.toTimeString().slice(0,8)}
 
 function setMode(m){chatMode=m;document.getElementById('btnNormal').classList.toggle('active',m==='chat');document.getElementById('btnThink').classList.toggle('active',m==='think')}
 
@@ -126,7 +129,8 @@ async function loadMessages(){if(!curSession)return;var r=await fetch('/auth/api
 var el=document.getElementById('msgArea');if(!d.messages.length){el.innerHTML='<div class=empty-state><div class=icon>💬</div><p>开始对话</p></div>';return}
 document.getElementById('chatTitle').textContent=d.messages[0]?d.messages[0].content.slice(0,20)+'…':'对话'
 el.innerHTML=d.messages.map(function(m){
-  return '<div class="msg '+m.role+'">'+formatContent(m.content||'')+'</div>'
+  var label=m.role==='user'?esc(d.username):'AI'
+  return '<div class="msg '+m.role+'"><div class=meta>'+label+' · '+m.time+'</div>'+formatContent(m.content||'')+'</div>'
 }).join('');el.scrollTop=el.scrollHeight}
 
 async function send(){
@@ -135,15 +139,16 @@ async function send(){
   input.style.height='auto';document.querySelector('.send-btn').disabled=true
   var sendText=chatMode==='think'?'<think>逐步思考</think>'+text:text
   var el=document.getElementById('msgArea')
+  var u=document.getElementById('userInfo')
   if(el.querySelector('.empty-state'))el.innerHTML=''
-  el.innerHTML+='<div class="msg user"><div class=bubble>'+esc(text)+'</div></div>'
-  var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
+  el.innerHTML+='<div class="msg user"><div class=meta>'+(u?esc(u.textContent):'我')+' · '+now()+'</div><div class=bubble>'+esc(text)+'</div></div>'
+  var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>AI · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
   // 等待后端回复
   try{
     var r=await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:sendText})})
     if(!r.ok){var t=await r.text().catch(function(){return''});aiDiv.innerHTML='<div class=bubble>❌ '+r.status+': '+esc(t.slice(0,60))+'</div>';return}
     var d=await r.json()
-    if(d.content){aiDiv.innerHTML=formatContent(d.content)}else{aiDiv.innerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
+    if(d.content){var b=aiDiv.querySelector('.bubble');b.outerHTML=formatContent(d.content)}else{var b=aiDiv.querySelector('.bubble');b.outerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
     el.scrollTop=el.scrollHeight;loadSessions()
   }catch(e){aiDiv.innerHTML='<div class=bubble>❌ '+esc(e.message)+'</div>'}
   document.querySelector('.send-btn').disabled=false
