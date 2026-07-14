@@ -89,10 +89,10 @@ select option{background:#fff;color:#1a1a2e}
 .main{flex:1;display:flex;flex-direction:column;height:100vh;max-width:calc(100% - 300px)}
 
 /* ===== 消息区 ===== */
-#msgArea{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;scroll-behavior:smooth;padding:24px 0}
+#msgArea{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;scroll-behavior:smooth;padding:16px 0}
 #msgArea::-webkit-scrollbar{width:4px}
 #msgArea::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
-.msg{width:100%;max-width:900px;margin-bottom:24px;padding:0 40px}
+.msg{width:100%;max-width:900px;margin-bottom:20px;padding:0 40px}
 .msg.user{display:flex;flex-direction:column;align-items:flex-end}
 .msg.assistant{display:flex;flex-direction:column;align-items:flex-start}
 .msg .bubble{width:fit-content;max-width:80%;padding:12px 18px;border-radius:18px;font-size:14px;line-height:1.7;word-break:break-word}
@@ -144,11 +144,11 @@ select option{background:#fff;color:#1a1a2e}
 /* ===== 输入栏 ===== */
 .input-bar{padding:0 0 20px;flex-shrink:0;display:flex;flex-direction:column;align-items:center}
 .input-container{width:100%;max-width:900px;padding:0 40px}
-.input-wrap{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;transition:.2s}
+.input-wrap{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:8px 12px;display:flex;align-items:center;gap:8px;transition:.2s}
 .input-wrap:focus-within{border-color:rgba(99,102,241,.35);box-shadow:0 0 0 1px rgba(99,102,241,.08)}
-.input-wrap textarea{flex:1;border:none;background:transparent;color:#e0e0e0;font-size:14px;resize:none;outline:none;font-family:inherit;min-height:24px;max-height:160px;line-height:1.6;padding:0}
+.input-wrap textarea{flex:1;border:none;background:transparent;color:#e0e0e0;font-size:14px;resize:none;outline:none;font-family:inherit;min-height:24px;max-height:160px;line-height:1.6;padding:4px 0}
 .input-wrap textarea::placeholder{color:rgba(255,255,255,.2)}
-.input-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:8px}
+.input-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:6px}
 .input-bottom .left{display:flex;gap:6px;align-items:center}
 .input-bottom .left button{background:none;border:none;color:rgba(255,255,255,.3);padding:4px 8px;border-radius:6px;cursor:pointer;font-size:13px;transition:.15s;line-height:1}
 .input-bottom .left button:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.5)}
@@ -176,7 +176,7 @@ select option{background:#fff;color:#1a1a2e}
 <div class=sidebar id=sidebar>
   <div class=hd>
     <span class=logo>OpenCode</span>
-    <button onclick=toggleSidebar() title=收起 style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:6px;transition:.15s">◀</button>
+    <button onclick=toggleSidebar() title=收起 style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:18px;padding:4px 6px;border-radius:6px;transition:.15s">‹</button>
   </div>
   <input id=sessionSearch placeholder="搜索对话...">
   <button class=btn-new onclick=newChat()>+ 开启新对话</button>
@@ -199,15 +199,16 @@ select option{background:#fff;color:#1a1a2e}
     <div class=input-container>
       <div class=input-wrap>
         <textarea id=input rows=1 placeholder="给 AI 发送消息" onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
-        <div class=input-bottom>
-          <div class=left>
-            <select id=modelSelect onchange=switchModel(this.value) style="background:rgba(255,255,255,.06);color:var(--text,#e0e0e0);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:3px 8px;font-size:14px;cursor:pointer;outline:none;max-width:150px;transition:.15s"></select>
-            <button class=dark-btn onclick=toggleDark() id=darkBtn title="深色模式">🌙</button>
-          </div>
-          <div class=right>
-            <button class=send-btn onclick=send()>➤</button>
-          </div>
+        <select id=modelSelect onchange=switchModel(this.value) style="background:rgba(255,255,255,.06);color:var(--text,#e0e0e0);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 10px;font-size:14px;cursor:pointer;outline:none;max-width:150px;flex-shrink:0;transition:.15s"></select>
+      </div>
+      <div class=input-bottom>
+        <div class=left>
+          <button class=dark-btn onclick=toggleDark() id=darkBtn title="深色模式">🌙</button>
         </div>
+        <div class=right>
+          <button class=send-btn onclick=send()>➤</button>
+        </div>
+      </div>
       </div>
       <div class=footer-text>内容由 AI 生成，请仔细甄别</div>
     </div>
