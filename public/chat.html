@@ -170,7 +170,7 @@ async function send(){
     if(d.content){var b=aiDiv.querySelector('.bubble');b.outerHTML=formatContent(d.content)}else{var b=aiDiv.querySelector('.bubble');b.outerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
     el.scrollTop=el.scrollHeight;loadSessions()
   }catch(e){aiDiv.innerHTML='<div class=bubble>❌ '+esc(e.message)+'</div>'}
-  document.querySelector('.send-btn').disabled=false
+  finally{document.querySelector('.send-btn').disabled=false}
 }
 
 function formatContent(txt, thinking){

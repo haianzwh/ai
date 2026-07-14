@@ -141,16 +141,7 @@ async def send_message(
     req: SendReq,
     user: dict = Depends(get_current_user),
 ):
-    """发送消息，同步等待 AI 回复"""
-    # 会话级锁：同一会话同时只允许一个发送请求
-    if sid not in _send_locks:
-        _send_locks[sid] = asyncio.Lock()
-    async with _send_locks[sid]:
-        return await _do_send(sid, req, user)
-
-
-async def _do_send(sid: str, req: SendReq, user: dict):
-    """实际发送逻辑（被 send_message 的锁保护）"""
+    """发送消息，同步等待 AI 回复（最大等待 60 秒）"""
     content = req.content
     
     # 保存用户消息

@@ -42,7 +42,7 @@ async def send_prompt(session_id: str, text: str, model_name: str = "") -> str:
         return resp.json().get("data", {}).get("id", "")
 
 
-async def poll_response(session_id: str, existing_ids: set[str] = None, timeout: int = 120) -> AsyncGenerator[dict, None]:
+async def poll_response(session_id: str, existing_ids: set[str] = None, timeout: int = 60) -> AsyncGenerator[dict, None]:
     """轮询 opencode 消息，获取 AI 回复。
     
     Args:
