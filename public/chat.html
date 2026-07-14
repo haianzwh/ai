@@ -166,10 +166,10 @@ async function loadMessages(){
 async function send(){
   var input=document.getElementById('input');
   var text=input.value.trim();
-  if(!text||!curSession)return;
+  if(!text)return;
   if(!curSession){var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:H});var d=await r.json();curSession=d.id;loadSessions()}
-  input.value='';input.style.height='auto';
-  document.getElementById('sendBtn').disabled=true;
+  input.style.height='auto';
+  document.querySelector('.send-btn').disabled=true;
 
   // 显示用户消息
   var el=document.getElementById('msgArea');
@@ -208,7 +208,7 @@ async function send(){
   }catch(e){
     aiDiv.innerHTML='<div class=bubble>网络错误: '+e.message+'</div>';
   }
-  document.getElementById('sendBtn').disabled=false;
+  document.querySelector('.send-btn').disabled=false;
 }
 
 async function uploadFiles(files){
