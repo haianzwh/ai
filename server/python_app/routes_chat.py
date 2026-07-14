@@ -19,6 +19,12 @@ class SendReq(BaseModel):
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/chat", tags=["聊天"])
 
+# 会话生成锁：每个 sid 同时只允许一个后台任务
+_gen_locks: dict[str, asyncio.Lock] = {}
+
+
+@router.get("/models")
+
 # 发送锁：每个会话同时只允许一个发送请求
 _send_locks: dict[str, asyncio.Lock] = {}
 
@@ -151,22 +157,23 @@ async def send_message(
             "问题：" + content
         )
 
-    # 记录已有 opencode 消息 ID（防重复取旧回复）
-    import httpx as _hx
-    try:
-        r = _hx.get(f"{OPENCODE_URL}/api/session/{oc_id}/message", params={"from": 0, "to": 50}, timeout=5)
-        existing_ids = {m["id"] for m in r.json().get("data", []) if m.get("id")}
-    except:
-        existing_ids = set()
-
-    # 异步生成
-    asyncio.create_task(_generate_response(sid, oc_id, content, existing_ids))
+    # 异步生成（加锁防重复）
+    if sid not in _gen_locks:
+        _gen_locks[sid] = asyncio.Lock()
+    asyncio.create_task(_generate_response(sid, oc_id, content, _gen_locks[sid]))
     return {"success": True, "message": "已发送"}
 
 
-async def _generate_response(sid: str, oc_id: str, content: str, existing_ids: set[str]):
-    """后台生成 AI 回复（逐步写入实现流式）"""
-    try:
+async def _generate_response(sid: str, oc_id: str, content: str, lock: asyncio.Lock):
+    """后台生成 AI 回复（逐步写入实现流式，带锁）"""
+    async with lock:
+        # 在锁内获取 existing_ids（确保包含之前任务的所有消息）
+        import httpx as _hx
+        try:
+            r = _hx.get(f"{OPENCODE_URL}/api/session/{oc_id}/message", params={"from": 0, "to": 50}, timeout=5)
+            existing_ids = {m["id"] for m in r.json().get("data", []) if m.get("id")}
+        except:
+            existing_ids = set()
         await send_prompt(oc_id, content)
         last_text = ""
         db_id = None
