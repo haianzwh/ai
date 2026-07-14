@@ -222,7 +222,7 @@ body.light-mode .interrupted{color:rgba(0,0,0,.2)}
 
 <script>
 var T=localStorage.getItem('auth_token');if(!T)location.href='/login.html'
-var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat',modelName='',uName='用户',currentAbort=null,msgHistory=[],histIdx=-1
+var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat',modelName='',uName='用户',currentAbort=null,msgHistory=[],histIdx=-1,isSending=0
 function now(){var d=new Date();return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.toTimeString().slice(0,8)}
 
 async function loadModels(){
@@ -285,8 +285,8 @@ el.innerHTML=d.messages.map(function(m,i){
 var sel=document.getElementById('modelSelect');if(sel)sel.value=modelName}
 
 async function send(){
-  var input=document.getElementById('input'),text=input.value.trim();if(!text)return
-  msgHistory.push(text);histIdx=-1
+  var input=document.getElementById('input'),text=input.value.trim();if(!text||isSending)return
+  msgHistory.push(text);histIdx=-1;isSending++
   input.value='';if(!curSession){var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:H});var d=await r.json();curSession=d.id;loadSessions()}
   input.style.height='auto';document.querySelector('.send-btn').disabled=true
   var sendText=chatMode==='think'?'<think>逐步思考</think>'+text:text
@@ -307,11 +307,11 @@ async function send(){
     if(e.name==='AbortError'&&currentAbort){aiDiv.outerHTML='<div class="msg assistant"><div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class=interrupted>————————已中断————————</div></div>'}
     else aiDiv.innerHTML='<div class=bubble>❌ '+(e.name==='AbortError'?'请求超时，请重试':esc(e.message))+'</div>'
   }
-  finally{clearTimeout(tmr);currentAbort=null;document.querySelector('.send-btn').textContent='➤';document.querySelector('.send-btn').disabled=false}
+  finally{clearTimeout(tmr);currentAbort=null;isSending=0;document.querySelector('.send-btn').textContent='➤';document.querySelector('.send-btn').disabled=false}
 }
 async function sendText(text){
-  if(!text)return
-  msgHistory.push(text);histIdx=-1
+  if(!text||isSending)return
+  msgHistory.push(text);histIdx=-1;isSending++
   if(!curSession){var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:H});var d=await r.json();curSession=d.id;loadSessions()}
   var txt=chatMode==='think'?'<think>逐步思考</think>'+text:text
   var el=document.getElementById('msgArea'),aiDiv
@@ -332,7 +332,7 @@ async function sendText(text){
     if(e.name==='AbortError'&&currentAbort){aiDiv.outerHTML='<div class="msg assistant"><div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class=interrupted>————————已中断————————</div></div>'}
     else aiDiv.innerHTML='<div class=bubble>❌ '+(e.name==='AbortError'?'请求超时，请重试':esc(e.message))+'</div>'
   }
-  finally{clearTimeout(tmr);currentAbort=null;document.querySelector('.send-btn').textContent='➤';document.querySelector('.send-btn').disabled=false}
+  finally{clearTimeout(tmr);currentAbort=null;isSending=0;document.querySelector('.send-btn').textContent='➤';document.querySelector('.send-btn').disabled=false}
 }
 
 function formatContent(txt, thinking, role, meta){
