@@ -164,6 +164,7 @@ body.light-mode .interrupted span{border-top-color:rgba(0,0,0,.06)}
 .send-btn{width:34px;height:34px;border:none;border-radius:50%;background:#6366f1;color:#fff;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
 .send-btn:hover{opacity:.85}
 .send-btn:disabled{opacity:.15;cursor:default}
+.send-btn.inactive{opacity:.25;cursor:default}
 .input-tools{display:flex;gap:6px;align-items:center;padding:6px 4px 0}
 .input-tools button{background:none;border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.25);padding:3px 10px;border-radius:8px;cursor:pointer;font-size:11px;transition:.15s}
 .input-tools button:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.5)}
@@ -411,6 +412,12 @@ function md(s){
   return s
 }
 loadModels();loadSessions();(async function(){await newChat()})();
+// 输入检测: 空内容时发送按钮置灰
+var _input=document.getElementById('input')
+_input.addEventListener('input',function(){
+  document.querySelector('.send-btn').classList.toggle('inactive',!this.value.trim())
+})
+_input.dispatchEvent(new Event('input'))
 // 初始化主题
 if(localStorage.getItem('theme')==='light'){document.body.classList.add('light-mode');document.getElementById('darkBtn').textContent='☀️'}
 </script></body></html>
