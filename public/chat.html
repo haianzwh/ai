@@ -71,6 +71,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 .msg.assistant .bubble strong{color:var(--text)}
 .msg.assistant .bubble .md-li{padding-left:12px;margin:2px 0;color:var(--text2)}
 .msg.assistant .bubble .md-li::before{content:'• ';color:var(--text3)}
+.msg.assistant .bubble .md-step{display:flex;align-items:flex-start;gap:10px;margin:6px 0;padding:8px 12px;background:var(--hl-bg);border-radius:8px;border:1px solid var(--border)}
+.msg.assistant .bubble .step-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.msg.assistant .bubble .step-text{color:var(--text);font-size:13px;line-height:1.6;padding-top:2px}
 .msg.assistant .bubble pre{background:var(--code-bg);border:1px solid var(--code-border);border-radius:8px;padding:12px 14px;margin:8px 0;overflow-x:auto;white-space:pre}
 .msg.assistant .bubble code{font-family:'JetBrains Mono','Fira Code','Consolas',monospace;font-size:12px;line-height:1.5;color:var(--code-color)}
 .msg.assistant .bubble :not(pre)>code{background:var(--hl-bg);padding:1px 6px;border-radius:4px;font-size:12px;color:var(--hl-color)}
@@ -250,6 +253,7 @@ function toggleDark(){
 function md(s){
   s=s.replace(/```(\w*)\n([\s\S]*?)```/g,'<pre><code class="lang-$1">$2</code></pre>')
        .replace(/`([^`]+)`/g,'<code>$1</code>')
+       .replace(/^(\d+)\.\s(.+)$/gm,'<div class=md-step><span class=step-num>$1</span><span class=step-text>$2</span></div>')
        .replace(/^### (.+)$/gm,'<h4>$1</h4>')
        .replace(/^## (.+)$/gm,'<h3>$1</h3>')
        .replace(/^# (.+)$/gm,'<h2>$1</h2>')
