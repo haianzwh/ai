@@ -30,7 +30,10 @@ async def set_session_model(session_id: str, model: str = DEFAULT_MODEL):
         )
 
 
-async def send_prompt(session_id: str, text: str) -> str:
+async def send_prompt(session_id: str, text: str, model_name: str = "") -> str:
+    """发送 prompt，可选注入模型身份提示"""
+    if model_name:
+        text = f"[System note: You are powered by the model named \"{model_name}\".]\n\n{text}"
     async with httpx.AsyncClient() as client:
         resp = await client.post(
             f"{OPENCODE_URL}/api/session/{session_id}/prompt",

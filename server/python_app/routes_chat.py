@@ -190,7 +190,7 @@ async def send_message(
         existing_ids = set()
 
     # 发送 prompt 并同步等待回复
-    await send_prompt(oc_id, content)
+    await send_prompt(oc_id, content, session_model)
     
     full_text = ""
     for retry in range(2):
@@ -209,7 +209,7 @@ async def send_message(
                     await set_session_model(oc_id, session_model)
                 oc_id = oc.get("id", "")
                 await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
-                await send_prompt(oc_id, content)
+                await send_prompt(oc_id, content, session_model)
                 async for chunk in poll_response(oc_id, timeout=120):
                     if chunk.get("done"):
                         break
