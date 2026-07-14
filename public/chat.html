@@ -34,10 +34,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;backg
 #msgArea{flex:1;overflow-y:auto;padding:24px;scroll-behavior:smooth}
 #msgArea::-webkit-scrollbar{width:4px}
 #msgArea::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
-.msg{max-width:80%;margin-bottom:24px;animation:fadeIn .3s}
+.msg{max-width:70%;margin-bottom:18px;animation:fadeIn .3s}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .msg.user{margin-left:auto}
-.msg .bubble{padding:12px 18px;border-radius:16px;font-size:14px;line-height:1.7;text-align:left;word-break:break-word}
+.msg .bubble{padding:10px 16px;border-radius:18px;font-size:14px;line-height:1.6;text-align:left;word-break:break-word}
 .msg.user .bubble{background:linear-gradient(135deg,#6366f1,#7c3aed);color:#fff;border-bottom-right-radius:4px;box-shadow:0 2px 8px rgba(99,102,241,.2)}
 .msg.assistant .bubble{background:rgba(255,255,255,.06);border-bottom-left-radius:4px;color:#e2e8f0}
 .msg.assistant .bubble.thinking{background:transparent;color:rgba(255,255,255,.3);font-size:13px;padding:4px 0}
@@ -159,7 +159,7 @@ async function send(){
         thinking=txt;mainText=''
       }
       var html=''
-      if(thinking)html='<details class=think-wrap open><summary>🧠 思维链</summary><div class=think-content>'+esc(thinking)+'</div></details>'
+      if(thinking)html='<details class=think-wrap><summary>🧠 思维链</summary><div class=think-content>'+esc(thinking)+'</div></details>'
       html+='<div class=bubble>'+(mainText?esc(mainText):'(见上方推理)')+'</div>'
       aiDiv.innerHTML=html
     }else{aiDiv.innerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
