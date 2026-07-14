@@ -139,15 +139,20 @@ async function send(){
   var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class="bubble thinking">⏳</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
   // 发消息
   try{await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:sendText})})}catch(e){aiDiv.innerHTML='<div class=bubble>发送失败</div>';document.querySelector('.send-btn').disabled=false;return}
-  // EventSource SSE 流式接收
-  var es=new EventSource('/auth/api/chat/stream/'+curSession)
-  es.onmessage=function(e){
-    try{var d=JSON.parse(e.data)
-    if(d.status)return
-    if(d.content){aiDiv.innerHTML=formatContent(d.content);el.scrollTop=el.scrollHeight}
-    if(d.done||d.error){es.close();document.querySelector('.send-btn').disabled=false;loadSessions()}
-    }catch(e){}
-  }
+  // 轮询消息（每 500ms）
+  var lastLen=0,cnt=0
+  ;(function poll(){
+    if(cnt++>60)return
+    fetch('/auth/api/chat/sessions/'+curSession+'/messages',{headers:H}).then(r=>r.json()).then(d=>{
+      var msgs=d.messages||[],last=msgs[msgs.length-1]
+      if(last&&last.role==='assistant'&&last.content.length>lastLen){
+        lastLen=last.content.length
+        aiDiv.innerHTML=formatContent(last.content);el.scrollTop=el.scrollHeight
+      }
+      if(lastLen>0){document.querySelector('.send-btn').disabled=false;loadSessions();return}
+      setTimeout(poll,500)
+    }).catch(function(){setTimeout(poll,1000)})
+  })()
 }
 function formatContent(txt){
   var thinking='',mainText=txt,tm=txt.match(/<think>([\s\S]*?)<\/think>/)
