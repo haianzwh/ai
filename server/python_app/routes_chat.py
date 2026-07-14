@@ -222,12 +222,18 @@ async def send_message(
     if full_text:
         import re as _re
         tm = _re.search(r"<think>(.*?)</think>", full_text, _re.DOTALL)
-        thinking_part = tm.group(1).strip() if tm else ""
-        clean_text = _re.sub(r"<think>.*?</think>", "", full_text, flags=_re.DOTALL).strip()
+        if tm:
+            before = full_text[:full_text.index("<think>")].strip()
+            after = full_text[full_text.index("</think>") + 8:].strip()
+            thinking_part = (before + "\n\n" + tm.group(1).strip()).strip()
+            clean_text = after
+        else:
+            thinking_part = ""
+            clean_text = full_text.strip()
         await execute_write(
             "INSERT INTO chat_messages (session_id, role, content, thinking) VALUES (%s,%s,%s,%s)",
             (sid, "assistant", clean_text, thinking_part),
         )
     
-    return {"success": True, "content": full_text}
+    return {"success": True, "content": clean_text, "thinking": thinking_part}
 

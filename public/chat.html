@@ -168,16 +168,22 @@ async function send(){
     var r=await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:sendText})})
     if(!r.ok){var t=await r.text().catch(function(){return''});aiDiv.innerHTML='<div class=bubble>❌ '+r.status+': '+esc(t.slice(0,60))+'</div>';return}
     var d=await r.json()
-    if(d.content){var b=aiDiv.querySelector('.bubble');b.outerHTML=formatContent(d.content)}else{var b=aiDiv.querySelector('.bubble');b.outerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
+    if(d.content||d.thinking){var b=aiDiv.querySelector('.bubble');b.outerHTML=formatContent(d.content||'',d.thinking||'')}else{var b=aiDiv.querySelector('.bubble');b.outerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
     el.scrollTop=el.scrollHeight;loadSessions()
   }catch(e){aiDiv.innerHTML='<div class=bubble>❌ '+esc(e.message)+'</div>'}
   finally{document.querySelector('.send-btn').disabled=false}
 }
 
 function formatContent(txt, thinking){
+  // 旧消息：从 content 里提取 think 标签
   if(!thinking){
     var tm=txt.match(/<think>([\s\S]*?)<\/think>/)
-    if(tm){thinking=tm[1];txt=txt.replace(/<think>[\s\S]*?<\/think>/,'').trim()}
+    if(tm){
+      var before=txt.slice(0,txt.indexOf('<think>')).trim()
+      var after=txt.slice(txt.indexOf('</think>')+8).trim()
+      thinking=(before?before+'\n\n':'')+tm[1].trim()
+      txt=after
+    }
   }
   var mainText=txt
   var sm=mainText.match(/([\s\S]*?)\n[=\-]{3,}\n([\s\S]*)/)
