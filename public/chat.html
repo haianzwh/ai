@@ -172,6 +172,12 @@ body.light-mode .interrupted span{border-top-color:rgba(0,0,0,.06)}
 .input-bottom .left button{background:none;border:none;color:rgba(255,255,255,.3);padding:4px 8px;border-radius:6px;cursor:pointer;font-size:13px;transition:.15s;line-height:1}
 .input-bottom .left button:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.5)}
 .input-bottom .left .dark-btn{font-size:16px;padding:4px 6px}
+.input-bottom .left .think-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.35);padding:3px 10px;border-radius:6px;cursor:pointer;font-size:11px;transition:.15s;white-space:nowrap}
+.input-bottom .left .think-btn:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.55)}
+.input-bottom .left .think-btn.on{background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.2);color:#818cf8}
+body.light-mode .think-btn{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.08);color:rgba(0,0,0,.35)}
+body.light-mode .think-btn:hover{background:rgba(0,0,0,.06);color:rgba(0,0,0,.55)}
+body.light-mode .think-btn.on{background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.15);color:#6366f1}
 .input-bottom .right{display:flex;gap:6px;align-items:center}
 .send-btn{width:34px;height:34px;border:none;border-radius:50%;background:#6366f1;color:#fff;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
 .send-btn:hover{opacity:.85}
@@ -227,6 +233,7 @@ body.light-mode .interrupted span{border-top-color:rgba(0,0,0,.06)}
         <div class=input-bottom>
           <div class=left>
             <select id=modelSelect onchange=switchModel(this.value) style="background:rgba(255,255,255,.06);color:var(--text,#e0e0e0);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:3px 8px;font-size:14px;cursor:pointer;outline:none;max-width:150px;transition:.15s"></select>
+            <button class=think-btn id=thinkBtn onclick=cycleMode()>⚡ 快速</button>
             <button class=dark-btn onclick=toggleDark() id=darkBtn title="深色模式">🌙</button>
           </div>
           <div class=right>
@@ -244,6 +251,11 @@ body.light-mode .interrupted span{border-top-color:rgba(0,0,0,.06)}
 var T=localStorage.getItem('auth_token');if(!T)location.href='/login.html'
 var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat',modelName='',uName='用户',currentAbort=null,msgHistory=[],histIdx=-1,isSending=0
 function now(){var d=new Date();return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.toTimeString().slice(0,8)}
+function cycleMode(){
+  chatMode=chatMode==='chat'?'think':'chat'
+  document.getElementById('thinkBtn').textContent=chatMode==='think'?'🧠 深度思考':'⚡ 快速'
+  document.getElementById('thinkBtn').classList.toggle('on',chatMode==='think')
+}
 
 async function loadModels(){
   var sel=document.getElementById('modelSelect');if(!sel)return
