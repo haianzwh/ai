@@ -78,12 +78,19 @@ async def poll_response(session_id: str, existing_ids: set[str] = None, timeout:
                         continue
                     
                     # 提取文本内容
+                    has_content = False
                     for block in msg.get("content", []):
                         text = block.get("text", "") if isinstance(block, dict) else str(block)
                         if text:
+                            has_content = True
                             yield {"content": text, "done": False}
                     
-                    # finish 为 stop/None 都视为完成
+                    # 没内容则继续轮询（不标记为 seen）
+                    if not has_content:
+                        seen.discard(mid)
+                        continue
+                    
+                    # 有内容才标记完成
                     if msg.get("finish") in ("stop", None, ""):
                         yield {"content": "", "done": True}
                         return
