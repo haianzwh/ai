@@ -55,14 +55,14 @@ async def list_models(user: dict = Depends(get_current_user)):
 @router.get("/sessions")
 async def list_sessions(user: dict = Depends(get_current_user)):
     rows = await execute(
-        "SELECT id, title, model, created_at, updated_at FROM chat_sessions WHERE username=%s ORDER BY updated_at DESC LIMIT 50",
+        "SELECT id, title, model, pinned, created_at, updated_at FROM chat_sessions WHERE username=%s ORDER BY pinned DESC, updated_at DESC LIMIT 50",
         (user["username"],),
     )
     return {
         "success": True,
         "sessions": [
             {
-                "id": r["id"], "title": r["title"], "model": r["model"],
+                "id": r["id"], "title": r["title"], "model": r["model"], "pinned": r["pinned"],
                 "created": r["created_at"].strftime("%m-%d %H:%M"),
                 "updated": r["updated_at"].strftime("%m-%d %H:%M"),
             }
@@ -149,11 +149,14 @@ async def update_session(sid: str, req: TitleReq, user: dict = Depends(get_curre
 
 @router.put("/sessions/{sid}/pin")
 async def pin_session(sid: str, user: dict = Depends(get_current_user)):
-    await execute_write(
-        "UPDATE chat_sessions SET updated_at=NOW() WHERE id=%s AND username=%s",
-        (sid, user["username"]),
-    )
-    return {"success": True}
+    row = await execute_one("SELECT pinned FROM chat_sessions WHERE id=%s AND username=%s", (sid, user["username"]))
+    if row:
+        new_val = 0 if row["pinned"] else 1
+        await execute_write(
+            "UPDATE chat_sessions SET pinned=%s, updated_at=NOW() WHERE id=%s AND username=%s",
+            (new_val, sid, user["username"]),
+        )
+    return {"success": True, "pinned": new_val if row else 0}
 
 
 @router.post("/sessions/{sid}/send")

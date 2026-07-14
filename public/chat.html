@@ -80,8 +80,8 @@ body.light-mode .btn-new:hover{background:rgba(140,180,215,.35);color:rgba(50,95
 .session .menu-item{padding:8px 14px;border-radius:6px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.5);transition:.1s;display:flex;align-items:center;gap:8px;min-width:100px}
 .session .menu-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)}
 .session .menu-item .ico{width:16px;text-align:center;flex-shrink:0;font-size:14px}
-.session .menu-item.danger,.session .menu-item.danger .ico{color:#ef4444}
-.session .menu-item.danger:hover{background:rgba(239,68,68,.1)}
+.session .menu-item.danger{color:#fff;background:rgba(239,68,68,.15)}
+.session .menu-item.danger:hover{background:rgba(239,68,68,.25)}
 body.light-mode .more{color:rgba(0,0,0,.3)}
 body.light-mode .more:hover{color:rgba(0,0,0,.5)}
 body.light-mode .session .menu{background:rgba(248,249,252,.95);border-color:rgba(0,0,0,.08)}
@@ -308,7 +308,7 @@ async function loadSessions(){
     else if(now-dt<6048e5)week.push(s)
     else older.push(s)
   })
-  function renderGroup(label,items){return items.length?'<div class=session-group><div class=group-label>'+label+'</div>'+items.map(function(s){var c=s.id===curSession?' active':'';return'<div class="session'+c+'" onclick="selectSession(\''+s.id+'\')"><span>'+esc(s.title||'新对话')+'</span><button class=more onclick="event.stopPropagation();showMenu(this,\''+s.id+'\')">···</button></div>'}).join('')+'</div>':''}
+  function renderGroup(label,items){return items.length?'<div class=session-group><div class=group-label>'+label+'</div>'+items.map(function(s){var c=s.id===curSession?' active':'',p=s.pinned?' pinned':'';return'<div class="session'+c+p+'" onclick="selectSession(\''+s.id+'\')"><span>'+esc(s.title||'新对话')+'</span><button class=more onclick="event.stopPropagation();showMenu(this,\''+s.id+'\')">···</button></div>'}).join('')+'</div>':''}
   document.getElementById('sessionList').innerHTML=renderGroup('今天',today)+renderGroup('昨天',yesterday)+renderGroup('7天内',week)+renderGroup('30天内',older)
   applySearch()
 }
@@ -439,7 +439,8 @@ function showMenu(btn,sid){
   var existing=btn.parentElement.querySelector('.menu')
   if(existing){existing.style.display=existing.style.display==='none'?'':'none';return}
   var m=document.createElement('div');m.className='menu'
-  m.innerHTML='<div class=menu-item onclick="event.stopPropagation();pinSession(\''+sid+'\')"><span class=ico>📌</span>置顶</div><div class=menu-item onclick="event.stopPropagation();renameSession(\''+sid+'\')"><span class=ico>✏️</span>编辑名称</div><div class="menu-item danger" onclick="event.stopPropagation();delSession(\''+sid+'\')"><span class=ico>🗑</span>删除</div>'
+  var pinned=btn.parentElement.classList.contains('pinned')
+  m.innerHTML='<div class=menu-item onclick="event.stopPropagation();pinSession(\''+sid+'\')"><span class=ico>📌</span>'+(pinned?'取消置顶':'置顶')+'</div><div class=menu-item onclick="event.stopPropagation();renameSession(\''+sid+'\')"><span class=ico>✏️</span>编辑名称</div><div class="menu-item danger" onclick="event.stopPropagation();delSession(\''+sid+'\')"><span class=ico>🗑</span>删除</div>'
   btn.parentElement.appendChild(m)
   var r=btn.getBoundingClientRect();m.style.display='block'
   m.style.top=(r.bottom+4)+'px';m.style.left=Math.max(8,Math.min(r.right-m.offsetWidth,document.body.clientWidth-m.offsetWidth-8))+'px'
@@ -450,7 +451,9 @@ function renameSession(sid){
   if(t&&t.trim())fetch('/auth/api/chat/sessions/'+sid,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({title:t.trim()})}).then(function(){loadSessions()})
 }
 function pinSession(sid){
-  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).then(function(){loadSessions()}).catch(function(){})
+  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).then(function(r){return r.json()}).then(function(d){
+    if(d.success)loadSessions()
+  }).catch(function(){})
 }
 function toggleDark(){
   document.body.classList.toggle('light-mode')
