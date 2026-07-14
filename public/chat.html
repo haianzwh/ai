@@ -61,6 +61,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .msg .meta{font-size:11px;color:var(--text3);margin-bottom:6px;padding:0 4px}
 .msg.user .meta{text-align:right}
 .msg.user{display:flex;flex-direction:column;align-items:flex-end}
+.msg-actions{display:flex;gap:4px;margin-top:4px;padding:0 4px;opacity:0;transition:opacity .2s}
+.msg.user:hover .msg-actions{opacity:1}
+.msg-actions button{background:none;border:1px solid var(--border);color:var(--text3);padding:2px 8px;border-radius:6px;cursor:pointer;font-size:10px;transition:.15s;line-height:1.4}
+.msg-actions button:hover{background:var(--hl-bg);color:var(--hl-color);border-color:var(--primary)}
+.edit-ta{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text);font-size:13px;resize:none;outline:none;min-height:60px;font-family:inherit;box-sizing:border-box}
+.edit-actions{display:flex;gap:6px;margin-top:6px}
+.edit-confirm{padding:4px 14px;border:none;border-radius:8px;background:var(--primary);color:#fff;cursor:pointer;font-size:12px;height:30px}
+.edit-cancel{padding:4px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text2);cursor:pointer;font-size:12px}
 .msg.assistant{display:flex;flex-direction:column;align-items:flex-start}
 .msg .bubble{width:fit-content;max-width:100%;padding:12px 20px;border-radius:20px;font-size:14px;line-height:1.7;text-align:left;word-break:break-word}
 .msg.user .bubble{background:var(--primary);color:#fff;border-bottom-right-radius:6px}
@@ -212,7 +220,9 @@ var el=document.getElementById('msgArea');if(!d.messages.length){el.innerHTML='<
 document.getElementById('chatTitle').textContent=d.messages[0]?d.messages[0].content.slice(0,20)+'…':'对话'
 el.innerHTML=d.messages.map(function(m){
   var label=m.role==='user'?esc(d.username):(d.model||'AI').split('-')[0]
-  return '<div class="msg '+m.role+'"><div class=meta>'+label+' · '+m.time+'</div>'+formatContent(m.content||'',m.thinking||'')+'</div>'
+  var html='<div class="msg '+m.role+'"><div class=meta>'+label+' · '+m.time+'</div>'+formatContent(m.content||'',m.thinking||'')
+  if(m.role==='user')html+='<div class=msg-actions><button onclick=copyMsg(this)>复制</button><button onclick=editMsg(this)>修改</button></div>'
+  return html+'</div>'
 }).join('');el.scrollTop=el.scrollHeight;modelName=d.model||'AI'
 var sel=document.getElementById('modelSelect');if(sel)sel.value=modelName}
 
@@ -224,7 +234,7 @@ async function send(){
   var el=document.getElementById('msgArea')
   var u=document.getElementById('userInfo')
   if(el.querySelector('.empty-state'))el.innerHTML=''
-  el.innerHTML+='<div class="msg user"><div class=meta>'+(u?esc(u.textContent):'我')+' · '+now()+'</div><div class=bubble>'+esc(text)+'</div></div>'
+  el.innerHTML+='<div class="msg user"><div class=meta>'+(u?esc(u.textContent):'我')+' · '+now()+'</div><div class=bubble>'+esc(text)+'</div><div class=msg-actions><button onclick=copyMsg(this)>复制</button><button onclick=editMsg(this)>修改</button></div></div>'
   var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
   // 等待后端回复
   try{
@@ -260,6 +270,25 @@ function formatContent(txt, thinking){
   html+='<div class=bubble>'+(mainText?md(esc(mainText)):'')+'</div>'
   return html
 }
+async function sendText(text){
+  if(!text)return
+  if(!curSession){var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:H});var d=await r.json();curSession=d.id;loadSessions()}
+  var txt=chatMode==='think'?'<think>逐步思考</think>'+text:text
+  var el=document.getElementById('msgArea'),aiDiv
+  if(el.querySelector('.empty-state'))el.innerHTML=''
+  el.innerHTML+='<div class="msg user"><div class=meta>我 · '+now()+'</div><div class=bubble>'+esc(text)+'</div><div class=msg-actions><button onclick=copyMsg(this)>复制</button><button onclick=editMsg(this)>修改</button></div></div>'
+  aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
+  document.querySelector('.send-btn').disabled=true
+  try{
+    var ctrl=new AbortController();setTimeout(function(){ctrl.abort()},90000)
+    var r=await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:txt}),signal:ctrl.signal})
+    if(!r.ok){var t=await r.text().catch(function(){return''});aiDiv.innerHTML='<div class=bubble>❌ '+r.status+': '+esc(t.slice(0,60))+'</div>';return}
+    var d=await r.json()
+    if(d.content||d.thinking){var b=aiDiv.querySelector('.bubble');b.outerHTML=formatContent(d.content||'',d.thinking||'')}else{var b=aiDiv.querySelector('.bubble');b.outerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
+    el.scrollTop=el.scrollHeight;loadSessions()
+  }catch(e){aiDiv.innerHTML='<div class=bubble>❌ '+(e.name==='AbortError'?'请求超时，请重试':esc(e.message))+'</div>'}
+  finally{document.querySelector('.send-btn').disabled=false}
+}
 
 async function uploadFiles(files){for(var i=0;i<files.length;i++){var fd=new FormData();fd.append('file',files[i]);await fetch('/auth/api/upload',{method:'POST',headers:H,body:fd})}loadMessages()}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
@@ -280,6 +309,24 @@ function toggleDark(){
 function toggleSidebar(){
   document.body.classList.toggle('sidebar-hidden')
   localStorage.setItem('sidebar',document.body.classList.contains('sidebar-hidden')?'hidden':'')
+}
+function copyMsg(btn){
+  var txt=btn.closest('.msg').querySelector('.bubble').textContent
+  navigator.clipboard.writeText(txt)
+  var o=btn.textContent;btn.textContent='✓';setTimeout(function(){btn.textContent=o},1000)
+}
+function editMsg(btn){
+  var msg=btn.closest('.msg'),bubble=msg.querySelector('.bubble')
+  if(!msg._orig)msg._orig=bubble.textContent
+  bubble.innerHTML='<textarea class=edit-ta>'+esc(msg._orig)+'</textarea><div class=edit-actions><button class=edit-confirm onclick=confirmEdit(this)>确认</button><button class=edit-cancel onclick=cancelEdit(this)>取消</button></div>'
+}
+function confirmEdit(btn){
+  var msg=btn.closest('.msg'),text=msg.querySelector('textarea').value.trim()
+  if(text){msg.querySelector('.msg-actions').remove();sendText(text)}else cancelEdit(btn)
+}
+function cancelEdit(btn){
+  var msg=btn.closest('.msg')
+  msg.querySelector('.bubble').innerHTML=esc(msg._orig||'')
 }
 // 搜索对话
 document.addEventListener('input',function(e){
