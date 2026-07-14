@@ -144,29 +144,24 @@ async function send(){
   if(el.querySelector('.empty-state'))el.innerHTML=''
   el.innerHTML+='<div class="msg user"><div class=bubble>'+esc(text)+'</div></div>'
   var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
-  try{
-    var r=await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:sendText})})
-    if(!r.ok){var t=await r.text().catch(function(){return''});aiDiv.innerHTML='<div class=bubble>❌ '+r.status+': '+esc(t.slice(0,100))+'</div>';return}
-    var d=await r.json()
-    if(d.content){
-      var txt=d.content,thinking='',mainText=txt
-      var tm=txt.match(/<think>([\s\S]*?)<\/think>/)
-      if(tm){thinking=tm[1];mainText=txt.replace(/<think>[\s\S]*?<\/think>/,'').trim()}
-      var sm=mainText.match(/([\s\S]*?)\n[=\-]{3,}\n([\s\S]*)/)
-      if(sm&&!thinking){thinking=sm[1];mainText=sm[2].trim()}
-      // 思考模式下，如果没有明确的思考块但有步骤推理，也折叠
-      if(!thinking&&chatMode==='think'&&txt.length>100){
-        thinking=txt;mainText=''
-      }
-      var html=''
-      if(thinking)html='<details class=think-wrap><summary>🧠 思维链</summary><div class=think-content>'+esc(thinking)+'</div></details>'
-      html+='<div class=bubble>'+(mainText?esc(mainText):'(见上方推理)')+'</div>'
-      aiDiv.innerHTML=html
-    }else{aiDiv.innerHTML='<div class=bubble>'+(d.error?'❌ '+esc(d.error):'(无回复)')+'</div>'}
-    el.scrollTop=el.scrollHeight;loadSessions()
-  }catch(e){aiDiv.innerHTML='<div class=bubble>❌ 请求失败: '+esc(e.message)+'</div>';document.querySelector('.send-btn').disabled=false}
-  document.querySelector('.send-btn').disabled=false
-}
+  // 发送消息
+  try{var sr=await fetch('/auth/api/chat/sessions/'+curSession+'/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({content:sendText})})}catch(e){aiDiv.innerHTML='<div class=bubble>❌ 发送失败: '+esc(e.message)+'</div>';document.querySelector('.send-btn').disabled=false;return}
+  // 轮询回复 (500ms间隔)
+  var lastText='',pollCount=0,timer=setInterval(async function(){
+    if(++pollCount>120){clearInterval(timer);document.querySelector('.send-btn').disabled=false;return}
+    try{var r=await fetch('/auth/api/chat/sessions/'+curSession+'/messages',{headers:H}),d=await r.json(),msgs=d.messages||[],last=msgs[msgs.length-1]
+    if(last&&last.role==='assistant'){var txt=last.content||''
+      if(txt!==lastText){lastText=txt
+        var thinking='',mainText=txt,tm=txt.match(/<think>([\s\S]*?)<\/think>/)||txt.match(/([\s\S]*?)\n[=\-]{3,}\n([\s\S]*)/)
+        if(tm){thinking=tm[1];mainText=(tm[2]||txt.replace(tm[0],'')).trim()}
+        if(!thinking&&chatMode==='think'&&txt.length>100){thinking=txt;mainText=''}
+        var html=''
+        if(thinking)html='<details class=think-wrap><summary>🧠 思维链</summary><div class=think-content>'+esc(thinking)+'</div></details>'
+        html+='<div class=bubble>'+(mainText?esc(mainText):'')+'</div>'
+        aiDiv.innerHTML=html;el.scrollTop=el.scrollHeight}
+      // 消息稳定后停止轮询
+      if(pollCount>5&&lastText){clearInterval(timer);document.querySelector('.send-btn').disabled=false;loadSessions()}}}catch(e){}
+  },500)}
 
 async function uploadFiles(files){for(var i=0;i<files.length;i++){var fd=new FormData();fd.append('file',files[i]);await fetch('/auth/api/upload',{method:'POST',headers:H,body:fd})}loadMessages()}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}

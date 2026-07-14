@@ -68,29 +68,32 @@ async def poll_response(session_id: str, existing_ids: set[str] = None, timeout:
             for msg in new_messages:
                 mid = msg.get("id", "")
                 seen.add(mid)
-                
                 mtype = msg.get("type", "")
+
                 if mtype == "user":
                     continue
 
                 if mtype == "assistant":
                     if msg.get("finish") == "error":
                         continue
-                    
-                    # 提取文本内容
+
+                    # 提取当前内容（含部分生成的文本）
                     has_content = False
                     for block in msg.get("content", []):
                         text = block.get("text", "") if isinstance(block, dict) else str(block)
                         if text:
                             has_content = True
-                            yield {"content": text, "done": False}
-                    
-                    # 没内容则继续轮询（不标记为 seen）
+                            if text != full_text:  # 新内容或增量
+                                delta = text[len(full_text):] if text.startswith(full_text) else text
+                                full_text = text
+                                yield {"content": delta, "done": False}
+
+                    # 有内容但未完成 → 继续轮询
                     if not has_content:
                         seen.discard(mid)
                         continue
-                    
-                    # 有内容才标记完成
+
+                    # 完成
                     if msg.get("finish") in ("stop", None, ""):
                         yield {"content": "", "done": True}
                         return
