@@ -483,7 +483,7 @@ function pinSession(sid,btn){
     el.classList.add('pinned')
     document.getElementById('sessionList').prepend(el)
     fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H})
-    .catch(function(){loadSessions()})
+    .then(function(){loadSessions()}).catch(function(){loadSessions()})
   }
 }
 function toggleDark(){
