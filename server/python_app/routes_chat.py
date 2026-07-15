@@ -29,6 +29,10 @@ class ApiKeyReq(BaseModel):
     api_key: str
 
 
+class ZenKeyReq(BaseModel):
+    api_key: str
+
+
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/chat", tags=["聊天"])
 
@@ -36,9 +40,13 @@ GO_MODELS = [
     {"id": "deepseek-v4-pro", "name": "DeepSeek V4 Pro (GO)", "provider": "opencode-go"},
     {"id": "deepseek-v4-flash", "name": "DeepSeek V4 Flash (GO)", "provider": "opencode-go"},
 ]
+ZEN_MODELS = [
+    {"id": "deepseek-v4-pro", "name": "DeepSeek V4 Pro (ZEN)", "provider": "opencode-zen"},
+    {"id": "deepseek-v4-flash", "name": "DeepSeek V4 Flash (ZEN)", "provider": "opencode-zen"},
+]
 
 
-async def _call_opencode_go(api_key: str, model: str, messages: list[dict], user_content: str) -> tuple[str, str]:
+async def _call_opencode(api_key: str, base_url: str, model: str, messages: list[dict], user_content: str) -> tuple[str, str]:
     api_messages = []
     for m in messages:
         role = "assistant" if m["role"] == "assistant" else "user"
@@ -47,7 +55,7 @@ async def _call_opencode_go(api_key: str, model: str, messages: list[dict], user
 
     async with httpx.AsyncClient(timeout=120) as client:
         resp = await client.post(
-            "https://opencode.ai/zen/go/v1/chat/completions",
+            base_url,
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             json={"model": model, "messages": api_messages, "stream": False, "max_tokens": 8192},
         )
@@ -78,21 +86,27 @@ async def list_models(user: dict = Depends(get_current_user)):
     except Exception:
         pass
 
-    u = await execute_one("SELECT api_key_deepseek FROM users WHERE id=%s", (user["id"],))
+    u = await execute_one("SELECT api_key_deepseek, api_key_zen FROM users WHERE id=%s", (user["id"],))
     if u and u["api_key_deepseek"]:
         models.extend(GO_MODELS)
+    if u and u["api_key_zen"]:
+        models.extend(ZEN_MODELS)
 
     return {"success": True, "models": models}
 
 
 @router.get("/user/deepseek-key")
 async def get_deepseek_key(user: dict = Depends(get_current_user)):
-    u = await execute_one("SELECT api_key_deepseek FROM users WHERE id=%s", (user["id"],))
+    u = await execute_one("SELECT api_key_deepseek, api_key_zen FROM users WHERE id=%s", (user["id"],))
+    go_masked = ""
     if u and u["api_key_deepseek"]:
-        key = u["api_key_deepseek"]
-        masked = key[:6] + "****" + key[-4:]
-        return {"success": True, "hasKey": True, "maskedKey": masked}
-    return {"success": True, "hasKey": False}
+        k = u["api_key_deepseek"]
+        go_masked = k[:6] + "****" + k[-4:]
+    zen_masked = ""
+    if u and u["api_key_zen"]:
+        k = u["api_key_zen"]
+        zen_masked = k[:6] + "****" + k[-4:]
+    return {"success": True, "hasGOKey": bool(go_masked), "maskedGOKey": go_masked, "hasZenKey": bool(zen_masked), "maskedZenKey": zen_masked}
 
 
 @router.put("/user/deepseek-key")
@@ -101,6 +115,15 @@ async def set_deepseek_key(req: ApiKeyReq, user: dict = Depends(get_current_user
         raise HTTPException(status_code=400, detail={"error": "API key must start with sk-"})
     val = req.api_key.strip() if req.api_key else None
     await execute_write("UPDATE users SET api_key_deepseek=%s WHERE id=%s", (val, user["id"]))
+    return {"success": True}
+
+
+@router.put("/user/zen-key")
+async def set_zen_key(req: ZenKeyReq, user: dict = Depends(get_current_user)):
+    if req.api_key and not req.api_key.startswith("sk-"):
+        raise HTTPException(status_code=400, detail={"error": "API key must start with sk-"})
+    val = req.api_key.strip() if req.api_key else None
+    await execute_write("UPDATE users SET api_key_zen=%s WHERE id=%s", (val, user["id"]))
     return {"success": True}
 
 
@@ -274,15 +297,21 @@ async def send_message(
             "问题：" + content
         )
 
-    # Opencode GO 通道
+    # Opencode GO / ZEN 通道
     if session_model in ("deepseek-v4-pro", "deepseek-v4-flash"):
-        u = await execute_one("SELECT api_key_deepseek FROM users WHERE id=%s", (user["id"],))
-        if u and u["api_key_deepseek"]:
+        u = await execute_one("SELECT api_key_deepseek, api_key_zen FROM users WHERE id=%s", (user["id"],))
+        api_key = ""
+        base_url = ""
+        if u and u["api_key_zen"]:
+            api_key, base_url = u["api_key_zen"], "https://opencode.ai/zen/v1/chat/completions"
+        elif u and u["api_key_deepseek"]:
+            api_key, base_url = u["api_key_deepseek"], "https://opencode.ai/zen/go/v1/chat/completions"
+        if api_key:
             prev = await execute(
                 "SELECT role, content FROM chat_messages WHERE session_id=%s AND id < (SELECT MAX(id) FROM chat_messages WHERE session_id=%s) ORDER BY id ASC",
                 (sid, sid),
             )
-            full_text, thinking_text = await _call_opencode_go(u["api_key_deepseek"], session_model, prev, content)
+            full_text, thinking_text = await _call_opencode(api_key, base_url, session_model, prev, content)
             if full_text:
                 if thinking_text:
                     clean_text = full_text.strip()
