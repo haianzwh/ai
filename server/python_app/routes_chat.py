@@ -3,12 +3,12 @@
   聊天路由 — 基于 opencode web 作为 AI 引擎
 =============================================================================
 """
-import json, uuid, asyncio, logging, httpx
+import json, uuid, asyncio, logging, httpx, aiomysql
 from fastapi import APIRouter, HTTPException, Depends, Query, Body
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from .database import execute, execute_write, execute_one
+from .database import execute, execute_write, execute_one, get_pool
 from .auth import get_current_user
 from .ai_client import create_opencode_session, set_session_model, send_prompt, poll_response, OPENCODE_URL, DEFAULT_MODEL
 
@@ -140,18 +140,25 @@ async def update_session_model(sid: str, req: ModelReq, user: dict = Depends(get
 
 @router.put("/sessions/{sid}/pin")
 async def pin_session(sid: str, user: dict = Depends(get_current_user)):
-    row = await execute_one("SELECT pinned FROM chat_sessions WHERE id=%s AND username=%s", (sid, user["username"]))
-    if row:
-        new_val = 0 if row["pinned"] else 1
-        if new_val == 1:
-            await execute_write(
-                "UPDATE chat_sessions SET pinned=0 WHERE username=%s AND id!=%s",
-                (user["username"], sid),
-            )
-        await execute_write(
-            "UPDATE chat_sessions SET pinned=%s, updated_at=NOW() WHERE id=%s AND username=%s",
-            (new_val, sid, user["username"]),
-        )
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cur:
+            await cur.execute("SELECT pinned FROM chat_sessions WHERE id=%s AND username=%s FOR UPDATE",
+                            (sid, user["username"]))
+            row = await cur.fetchone()
+            new_val = None
+            if row:
+                new_val = 0 if row["pinned"] else 1
+                if new_val == 1:
+                    await cur.execute(
+                        "UPDATE chat_sessions SET pinned=0 WHERE username=%s AND id!=%s",
+                        (user["username"], sid),
+                    )
+                await cur.execute(
+                    "UPDATE chat_sessions SET pinned=%s, updated_at=NOW() WHERE id=%s AND username=%s",
+                    (new_val, sid, user["username"]),
+                )
+            await conn.commit()
     return {"success": True, "pinned": new_val if row else 0}
 
 
