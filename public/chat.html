@@ -488,9 +488,9 @@ function renameSession(sid,el){
   }
   inp.onkeydown=function(e){if(e.key==='Enter')overlay.querySelector('.rnOk').click();if(e.key==='Escape')close()}
 }
-function pinSession(sid){
-  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H})
-  .then(function(){loadSessions()}).catch(function(){loadSessions()})
+async function pinSession(sid){
+  await fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){})
+  loadSessions()
 }
 function toggleDark(){
   document.body.classList.toggle('light-mode')
