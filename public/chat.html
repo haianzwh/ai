@@ -304,7 +304,7 @@ async function selectSession(sid){curSession=sid;loadSessions();loadMessages()}
 
 async function loadSessions(){
   try{
-    var r=await fetch('/auth/api/chat/sessions',{headers:H});if(!r.ok)return
+    var r=await fetch('/auth/api/chat/sessions?_='+Date.now(),{headers:H});if(!r.ok)return
     var d=await r.json();if(!d.sessions)return
   }catch(e){return}
   var today=[],week=[],older=[]
@@ -452,17 +452,18 @@ function showMenu(btn,sid){
 }
 document.getElementById('sessionList').addEventListener('click',function(e){
   var more=e.target.closest('.more')
-  if(more){e.stopPropagation();showMenu(more,more.parentElement.dataset.sid);return}
+  if(more){e.stopPropagation();var __s=more.parentElement.dataset.sid;if(__s)showMenu(more,__s);return}
   var item=e.target.closest('.menu-item')
   if(item){
-    var m=item.closest('.menu'),sid=m.dataset.sid,action=item.dataset.action,el=m.parentElement;m.remove()
+    e.stopPropagation();var m=item.closest('.menu');if(!m)return
+    var sid=m.dataset.sid,action=item.dataset.action,el=m.parentElement;m.remove()
     if(action==='pin')pinSession(sid)
     else if(action==='rename')renameSession(sid,el)
     else if(action==='delete')delSession(sid)
     return
   }
   var session=e.target.closest('.session')
-  if(session)selectSession(session.dataset.sid)
+  if(session){var __s2=session.dataset.sid;if(__s2)selectSession(__s2)}
 })
 document.addEventListener('click',function(){document.querySelectorAll('.session .menu').forEach(function(m){m.remove()})})
 function renameSession(sid,el){
