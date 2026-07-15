@@ -110,10 +110,9 @@ body.light-mode .session .menu-item:hover{background:rgba(0,0,0,.04);color:rgba(
 /* Settings dialog */
 .st-box{background:rgba(25,25,45,.95);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:40px;min-width:580px;max-width:620px}
 .st-box .st-title{font-size:17px;font-weight:600;color:#e0e0e0;margin-bottom:24px;letter-spacing:.3px}
-.st-box .st-opt{display:flex;gap:12px;margin-bottom:16px}
-.st-box .st-opt label{flex:1;display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid rgba(255,255,255,.08);border-radius:10px;cursor:pointer;transition:.15s;user-select:none}
-.st-box .st-opt label:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)}
-.st-box .st-opt label.on{border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.06)}
+.st-box .st-opt,.st-box #providerCbArea{display:flex;gap:12px;margin-bottom:16px}
+.st-box .st-opt label,.st-box .st-sub{flex:1;display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid rgba(255,255,255,.08);border-radius:10px;cursor:pointer;transition:.15s;user-select:none}
+.st-box .st-opt label.on,.st-box .st-sub.on{border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.06)}
 .st-box .st-opt input{width:16px;height:16px;accent-color:#6366f1;cursor:pointer;margin:0}
 .st-box .st-opt .st-name{flex:1;font-size:13px;font-weight:500;color:#e0e0e0}
 .st-box .st-opt .st-desc{font-size:11px;color:rgba(255,255,255,.3)}
@@ -131,11 +130,11 @@ body.light-mode .session .menu-item:hover{background:rgba(0,0,0,.04);color:rgba(
 .st-box .st-status{font-size:12px;color:rgba(255,255,255,.3)}
 body.light-mode .st-box{background:rgba(250,251,253,.97);border-color:rgba(0,0,0,.08)}
 body.light-mode .st-box .st-title{color:#1a1a2e}
-body.light-mode .st-box .st-opt label{border-color:rgba(0,0,0,.1)}
-body.light-mode .st-box .st-opt label:hover{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.15)}
-body.light-mode .st-box .st-opt label.on{border-color:rgba(99,102,241,.25);background:rgba(99,102,241,.04)}
-body.light-mode .st-box .st-opt .st-name{color:#1a1a2e}
-body.light-mode .st-box .st-opt .st-desc{color:rgba(0,0,0,.3)}
+body.light-mode .st-box .st-opt label,body.light-mode .st-box .st-sub{border-color:rgba(0,0,0,.1)}
+body.light-mode .st-box .st-opt label:hover,body.light-mode .st-box .st-sub:hover{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.15)}
+body.light-mode .st-box .st-opt label.on,body.light-mode .st-box .st-sub.on{border-color:rgba(99,102,241,.25);background:rgba(99,102,241,.04)}
+body.light-mode .st-box .st-opt .st-name,body.light-mode .st-box .st-sub .st-name{color:#1a1a2e}
+body.light-mode .st-box .st-opt .st-desc,body.light-mode .st-box .st-sub .st-desc{color:rgba(0,0,0,.3)}
 body.light-mode .st-box .st-field label{color:rgba(0,0,0,.4)}
 body.light-mode .st-box .st-field input{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.12);color:#1a1a2e;font-size:15px}
 body.light-mode .st-box .hint{color:rgba(0,0,0,.3)}
@@ -315,6 +314,7 @@ body.light-mode .think-btn.on{background:rgba(99,102,241,.08);border-color:rgba(
         <textarea id=input rows=1 placeholder="给 AI 发送消息" onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();send()}else if(event.key=='ArrowUp'){event.preventDefault();if(histIdx<msgHistory.length-1){histIdx++;document.getElementById('input').value=msgHistory[msgHistory.length-1-histIdx]}}else if(event.key=='ArrowDown'){event.preventDefault();if(histIdx>0){histIdx--;document.getElementById('input').value=msgHistory[msgHistory.length-1-histIdx]}else{histIdx=-1;document.getElementById('input').value=''}}"></textarea>
         <div class=input-bottom>
           <div class=left>
+            <select id=providerSelect onchange=switchProvider(this.value) style="background:rgba(255,255,255,.06);color:var(--text,#e0e0e0);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:3px 8px;font-size:13px;cursor:pointer;outline:none;transition:.15s"><option value="">加载中...</option></select>
             <select id=modelSelect onchange=switchModel(this.value) style="background:rgba(255,255,255,.06);color:var(--text,#e0e0e0);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:3px 8px;font-size:13px;cursor:pointer;outline:none;transition:.15s"></select>
             <button class=think-btn id=thinkBtn onclick=cycleMode()>⚡ 快速</button>
             <button class=upload-btn onclick="document.getElementById('fileInput').click()" title="上传文件">📎</button>
@@ -333,22 +333,13 @@ body.light-mode .think-btn.on{background:rgba(99,102,241,.08);border-color:rgba(
 
 <div id=settingsOverlay class=rn-overlay style=display:none>
   <div class=st-box>
-    <div class=st-title>设置 — OpenCode API Key</div>
-    <div class=st-opt>
-      <label id=goLabel class=on>
-        <input type=checkbox id=goCb checked onchange=toggleCheck()>
-        <div><div class=st-name>OpenCode GO</div><div class=st-desc>$10/月 订阅</div></div>
-      </label>
-      <label id=zenLabel>
-        <input type=checkbox id=zenCb onchange=toggleCheck()>
-        <div><div class=st-name>OpenCode ZEN</div><div class=st-desc>按量计费</div></div>
-      </label>
-    </div>
+    <div class=st-title>设置 — API Key</div>
+    <div id=providerCbArea></div>
     <div class=st-field>
-      <label id=inputLabel for=keyInput>GO API Key</label>
+      <label id=inputLabel for=keyInput>API Key</label>
       <input id=keyInput type=password placeholder="sk-..." autocomplete=off>
     </div>
-    <div class=hint id=keyHint>在 <a href=https://opencode.ai/go target=_blank style=color:#818cf8>opencode.ai/go</a> 获取 Key</div>
+    <div class=hint id=keyHint></div>
     <div class=st-actions>
       <button class=st-btn onclick=saveKey()>保存</button>
       <button class=st-cancel onclick=closeSettings()>取消</button>
@@ -367,20 +358,42 @@ function cycleMode(){
   document.getElementById('thinkBtn').classList.toggle('on',chatMode==='think')
 }
 
+var _allModels=[],_providers=[]
 async function loadModels(){
   var sel=document.getElementById('modelSelect');if(!sel)return
+  var ps=document.getElementById('providerSelect')
+  // 加载 providers
+  try{
+    var r=await fetch('/auth/api/chat/providers',{headers:H});var d=await r.json()
+    if(d.success&&d.providers){_providers=d.providers
+      ps.innerHTML=''
+      d.providers.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.icon+' '+p.label;ps.appendChild(o)})
+    }
+  }catch(e){}
+  // 加载 models
   var r=await fetch('/auth/api/chat/models',{headers:H});var d=await r.json()
   if(!d.success||!d.models)return
-  sel.innerHTML=''
-  d.models.forEach(function(m){var o=document.createElement('option');o.value=m.id;o.textContent=m.name;sel.appendChild(o)})
-  sel.value=modelName||'deepseek-v4-flash-free'
+  _allModels=d.models
+  filterModels()
 }
+function filterModels(){
+  var sel=document.getElementById('modelSelect');if(!sel)return
+  var pid=document.getElementById('providerSelect').value
+  sel.innerHTML=''
+  var list=_allModels
+  if(pid)list=_allModels.filter(function(m){return m.provider===pid})
+  list.forEach(function(m){var o=document.createElement('option');o.value=m.id;o.textContent=m.name;sel.appendChild(o)})
+  if(sel.options.length)sel.value=modelName||sel.options[0].value
+}
+function switchProvider(pid){filterModels();switchModel(document.getElementById('modelSelect').value)}
 async function switchModel(mid){
   modelName=mid
   if(curSession)await fetch('/auth/api/chat/sessions/'+curSession+'/model',{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({model:mid})})
 }
 async function newChat(){
   var mid=document.getElementById('modelSelect')?document.getElementById('modelSelect').value:''
+  if(!mid){var ps=document.getElementById('providerSelect');if(ps&&ps.options.length>0){var fm=_allModels.filter(function(m){return m.provider===ps.value});if(fm.length)mid=fm[0].id}}
+  var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({model:mid || 'deepseek-v4-flash-free'})})
   var r=await fetch('/auth/api/chat/sessions',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({model:mid})})
   var d=await r.json();if(d.success){curSession=d.id;selectSession(d.id)}
 }
@@ -622,13 +635,23 @@ function pinSession(sid){
   }
   fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){})
 }
-function toggleCheck(){
-  var go=document.getElementById('goCb').checked, zen=document.getElementById('zenCb').checked
-  document.getElementById('goLabel').classList.toggle('on',go)
-  document.getElementById('zenLabel').classList.toggle('on',zen)
-  if(go&&!zen){document.getElementById('inputLabel').textContent='GO API Key';document.getElementById('keyHint').innerHTML='在 <a href=https://opencode.ai/go target=_blank style=color:#818cf8>opencode.ai/go</a> 获取 Key'}
-  else if(zen&&!go){document.getElementById('inputLabel').textContent='ZEN API Key';document.getElementById('keyHint').innerHTML='在 <a href=https://opencode.ai/zen target=_blank style=color:#818cf8>opencode.ai/zen</a> 获取 Key'}
-  else{document.getElementById('inputLabel').textContent='API Key'}
+var _keyProviders=[]
+function toggleSubProvider(el,sk){
+  var cb=el.querySelector('input[type=checkbox]');cb.checked=!cb.checked;el.classList.toggle('on',cb.checked)
+  var checked=document.querySelectorAll('#providerCbArea .st-sub.on').length
+  if(!checked)return
+  var first=document.querySelector('#providerCbArea .st-sub.on')
+  var sp=first&&first.dataset.subkey
+  var pid=first&&first.dataset.pid
+  var cfg=_keyProviders.find(function(p){return p.id===pid})
+  if(cfg&&sp){updateKeyLabel(cfg,sp)}
+}
+function updateKeyLabel(cfg,sk){
+  var sub=cfg.sub_providers.find(function(s){return s.key===sk})
+  document.getElementById('inputLabel').textContent=sub?sub.label+' API Key':'API Key'
+  var link=cfg.key_link||''
+  var text=cfg.key_label||'获取 Key'
+  document.getElementById('keyHint').innerHTML='在 <a href='+link+' target=_blank style=color:#818cf8>'+text+'</a> 获取'
 }
 function openSettings(){
   document.getElementById('settingsOverlay').style.display='flex'
@@ -640,29 +663,45 @@ function closeSettings(){
 }
 async function loadKeyStatus(){
   var s=document.getElementById('keyStatus')
+  var area=document.getElementById('providerCbArea')
   try{
     var r=await fetch('/auth/api/chat/user/deepseek-key',{headers:H});var d=await r.json()
-    var parts=[]
-    if(d.hasGOKey)parts.push('GO: '+d.maskedGOKey)
-    if(d.hasZenKey)parts.push('ZEN: '+d.maskedZenKey)
-    s.textContent=parts.length?('✅ 已配置  '+parts.join(' | ')):''
+    // 构建动态 checkbox
+    area.innerHTML=''
+    _keyProviders=[]
+    _providers.forEach(function(p){
+      if(!p.requires_key)return
+      _keyProviders.push(p)
+      p.sub_providers.forEach(function(sp){
+        var hasKey=sp.key_type==='deepseek'?d.hasGOKey:(sp.key_type==='zen'?d.hasZenKey:false)
+        var masked=sp.key_type==='deepseek'?d.maskedGOKey:(sp.key_type==='zen'?d.maskedZenKey:'')
+        var label=document.createElement('label');label.className='st-sub'+(hasKey?' on':'');label.dataset.subkey=sp.key;label.dataset.pid=p.id
+        label.onclick=function(e){if(e.target.tagName!=='INPUT')toggleSubProvider(this,sp.key)}
+        label.innerHTML='<input type=checkbox'+(hasKey?' checked':'')+' style=display:none><div><div class=st-name>'+p.icon+' '+sp.label+'</div><div class=st-desc>'+(hasKey?'✅ 已配置':'未配置')+'</div></div>'
+        area.appendChild(label)
+      })
+    })
+    if(!_keyProviders.length){area.innerHTML='<div style=color:rgba(255,255,255,.2);font-size:12px;padding:8px>无需 API Key</div>';s.textContent='';return}
+    var checked=document.querySelector('#providerCbArea .st-sub.on')
+    if(checked){var sp=checked.dataset.subkey;var pid=checked.dataset.pid;var cfg=_keyProviders.find(function(p){return p.id===pid});if(cfg)updateKeyLabel(cfg,sp)}
   }catch(e){s.textContent='加载失败'}
 }
 async function saveKey(){
-  var go=document.getElementById('goCb').checked, zen=document.getElementById('zenCb').checked
+  var checked=document.querySelectorAll('#providerCbArea .st-sub.on')
   var key=document.getElementById('keyInput').value.trim()
   var s=document.getElementById('keyStatus')
-  if(!go&&!zen){s.textContent='⚠️ 请至少选择一个服务商';return}
+  if(!checked.length){s.textContent='⚠️ 请至少选择一个服务商';return}
   if(!key){s.textContent='⚠️ 请输入 API Key';return}
   s.textContent='保存中...'
   try{
-    if(go){
-      var r=await fetch('/auth/api/chat/user/deepseek-key',{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({api_key:key})})
-      if(!(await r.json()).success){s.textContent='❌ GO Key 保存失败';return}
-    }
-    if(zen){
-      var r=await fetch('/auth/api/chat/user/zen-key',{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({api_key:key})})
-      if(!(await r.json()).success){s.textContent='❌ ZEN Key 保存失败';return}
+    for(var i=0;i<checked.length;i++){
+      var sp=checked[i].dataset.subkey
+      var pid=checked[i].dataset.pid
+      var cfg=_keyProviders.find(function(p){return p.id===pid})
+      var sub=cfg.sub_providers.find(function(s){return s.key===sp})
+      var url=sub.key_type==='deepseek'?'/auth/api/chat/user/deepseek-key':'/auth/api/chat/user/zen-key'
+      var r=await fetch(url,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({api_key:key})})
+      if(!(await r.json()).success){s.textContent='❌ '+sub.label+' 保存失败';return}
     }
     s.textContent='✅ 已保存，刷新模型列表...'
     loadModels()

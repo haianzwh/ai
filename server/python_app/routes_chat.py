@@ -1,16 +1,29 @@
 """
 =============================================================================
-  聊天路由 — 基于 opencode web 作为 AI 引擎
+  ACP 架构 — Process 层路由
+  负责 HTTP 路由委派，不直接调用 AI 引擎
 =============================================================================
 """
-import json, uuid, asyncio, logging, httpx, aiomysql
-from fastapi import APIRouter, HTTPException, Depends, Query, Body
+import json
+from fastapi import APIRouter, HTTPException, Depends, Body
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from .database import execute, execute_write, execute_one, get_pool
+from .database import execute_write
 from .auth import get_current_user
-from .ai_client import create_opencode_session, set_session_model, send_prompt, poll_response, OPENCODE_URL, DEFAULT_MODEL
+
+# Agent 层
+from .agent.registry import registry as provider_registry
+from .agent.base import ProviderModel
+
+# Control 层
+from .control.auth import get_user_api_keys, mask_key, save_user_api_key
+
+# Process 层
+from .process.chat import (
+    list_sessions, create_session, delete_session, get_messages,
+    update_session_model, update_session_title, toggle_pin, send_message,
+)
 
 
 class SendReq(BaseModel):
@@ -25,6 +38,10 @@ class ModelReq(BaseModel):
     model: str
 
 
+class TitleReq(BaseModel):
+    title: str
+
+
 class ApiKeyReq(BaseModel):
     api_key: str
 
@@ -33,372 +50,105 @@ class ZenKeyReq(BaseModel):
     api_key: str
 
 
-logger = logging.getLogger(__name__)
+logger = __import__("logging").getLogger(__name__)
 router = APIRouter(prefix="/api/chat", tags=["聊天"])
 
-GO_MODELS = [
-    {"id": "deepseek-v4-pro", "name": "DeepSeek V4 Pro (GO)", "provider": "opencode-go"},
-    {"id": "deepseek-v4-flash", "name": "DeepSeek V4 Flash (GO)", "provider": "opencode-go"},
-]
-ZEN_MODELS = [
-    {"id": "deepseek-v4-pro", "name": "DeepSeek V4 Pro (ZEN)", "provider": "opencode-zen"},
-    {"id": "deepseek-v4-flash", "name": "DeepSeek V4 Flash (ZEN)", "provider": "opencode-zen"},
-]
+
+# ── Provider 列表 ─────────────────────────────────────
+
+@router.get("/providers")
+async def list_providers(user: dict = Depends(get_current_user)):
+    return {"success": True, "providers": provider_registry.list_provider_info()}
 
 
-async def _call_opencode(api_key: str, base_url: str, model: str, messages: list[dict], user_content: str) -> tuple[str, str]:
-    api_messages = []
-    for m in messages:
-        role = "assistant" if m["role"] == "assistant" else "user"
-        api_messages.append({"role": role, "content": m["content"]})
-    api_messages.append({"role": "user", "content": user_content})
-
-    async with httpx.AsyncClient(timeout=120) as client:
-        resp = await client.post(
-            base_url,
-            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={"model": model, "messages": api_messages, "stream": False, "max_tokens": 8192},
-        )
-        data = resp.json()
-        choice = data.get("choices", [{}])[0].get("message", {})
-        return choice.get("content", ""), choice.get("reasoning_content", "")
-
-# 发送锁：每个会话同时只允许一个发送请求
-_send_locks: dict[str, asyncio.Lock] = {}
-
-# 内存中缓存：chat_session_id → opencode_session_id
-# 重启丢失，聊天会话需重建
-_oc_cache: dict[str, str] = {}
-
+# ── 模型列表 ──────────────────────────────────────────
 
 @router.get("/models")
 async def list_models(user: dict = Depends(get_current_user)):
-    """从 opencode 获取可用模型列表，如有密钥则追加 DeepSeek 模型"""
-    models = []
-    try:
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(f"{OPENCODE_URL}/api/model")
-            data = resp.json()
-            raw = [
-                {"id": m["id"], "name": m.get("name", m["id"]), "provider": m.get("providerID", ""), "status": m.get("status", "")}
-                for m in data.get("data", [])
-            ]
-            free_active = [m for m in raw if "free" in m["id"] and m["status"] == "active"]
-            free_rest = [m for m in raw if "free" in m["id"] and m["status"] != "active"]
-            other = [m for m in raw if "free" not in m["id"]]
-            models = free_active + free_rest + other
-            for m in models:
-                m.pop("status", None)
-    except Exception:
-        pass
-
-    u = await execute_one("SELECT api_key_deepseek, api_key_zen FROM users WHERE id=%s", (user["id"],))
-    if u and u["api_key_deepseek"]:
-        models.extend(GO_MODELS)
-    if u and u["api_key_zen"]:
-        models.extend(ZEN_MODELS)
-
+    user_keys = await get_user_api_keys(user["id"])
+    models = await provider_registry.list_models(user_keys)
     return {"success": True, "models": models}
 
 
+# ── API Key 管理 ──────────────────────────────────────
+
 @router.get("/user/deepseek-key")
 async def get_deepseek_key(user: dict = Depends(get_current_user)):
-    u = await execute_one("SELECT api_key_deepseek, api_key_zen FROM users WHERE id=%s", (user["id"],))
-    go_masked = ""
-    if u and u["api_key_deepseek"]:
-        k = u["api_key_deepseek"]
-        go_masked = k[:6] + "****" + k[-4:]
-    zen_masked = ""
-    if u and u["api_key_zen"]:
-        k = u["api_key_zen"]
-        zen_masked = k[:6] + "****" + k[-4:]
-    return {"success": True, "hasGOKey": bool(go_masked), "maskedGOKey": go_masked, "hasZenKey": bool(zen_masked), "maskedZenKey": zen_masked}
+    keys = await get_user_api_keys(user["id"])
+    return {
+        "success": True,
+        "hasGOKey": "deepseek" in keys,
+        "maskedGOKey": mask_key(keys.get("deepseek", "")),
+        "hasZenKey": "zen" in keys,
+        "maskedZenKey": mask_key(keys.get("zen", "")),
+    }
 
 
 @router.put("/user/deepseek-key")
 async def set_deepseek_key(req: ApiKeyReq, user: dict = Depends(get_current_user)):
     if req.api_key and not req.api_key.startswith("sk-"):
         raise HTTPException(status_code=400, detail={"error": "API key must start with sk-"})
-    val = req.api_key.strip() if req.api_key else None
-    await execute_write("UPDATE users SET api_key_deepseek=%s WHERE id=%s", (val, user["id"]))
-    return {"success": True}
+    ok = await save_user_api_key(user["id"], "deepseek", req.api_key or "")
+    return {"success": ok}
 
 
 @router.put("/user/zen-key")
 async def set_zen_key(req: ZenKeyReq, user: dict = Depends(get_current_user)):
     if req.api_key and not req.api_key.startswith("sk-"):
         raise HTTPException(status_code=400, detail={"error": "API key must start with sk-"})
-    val = req.api_key.strip() if req.api_key else None
-    await execute_write("UPDATE users SET api_key_zen=%s WHERE id=%s", (val, user["id"]))
-    return {"success": True}
+    ok = await save_user_api_key(user["id"], "zen", req.api_key or "")
+    return {"success": ok}
 
+
+# ── 会话管理 ──────────────────────────────────────────
 
 @router.get("/sessions")
-async def list_sessions(user: dict = Depends(get_current_user)):
-    rows = await execute(
-        "SELECT id, title, model, pinned, created_at, updated_at FROM chat_sessions WHERE username=%s ORDER BY pinned DESC, updated_at DESC LIMIT 50",
-        (user["username"],),
-    )
-    return {
-        "success": True,
-        "sessions": [
-            {
-                "id": r["id"], "title": r["title"], "model": r["model"], "pinned": r["pinned"],
-                "created": r["created_at"].strftime("%m-%d %H:%M"),
-                "updated": r["updated_at"].isoformat(),
-            }
-            for r in rows
-        ],
-    }
+async def get_sessions(user: dict = Depends(get_current_user)):
+    sessions = await list_sessions(user["username"])
+    return {"success": True, "sessions": sessions}
 
 
 @router.post("/sessions")
-async def create_session(req: CreateSessionReq = Body(default=None), user: dict = Depends(get_current_user)):
-    sid = f"chat_{uuid.uuid4().hex[:12]}"
-    model = req.model if req and req.model else DEFAULT_MODEL
-
-    # 提前创建 opencode 会话并设置模型
-    oc_id = ""
-    try:
-        oc = await create_opencode_session()
-        oc_id = oc.get("id", "")
-        if oc_id:
-            await set_session_model(oc_id, model)
-    except Exception:
-        pass
-
-    await execute_write(
-        "INSERT INTO chat_sessions (id, username, title, model, oc_session_id) VALUES (%s,%s,%s,%s,%s)",
-        (sid, user["username"], "新对话", model, oc_id),
-    )
-    return {"success": True, "id": sid, "title": "新对话", "model": model}
+async def new_session(req: CreateSessionReq = Body(default=None), user: dict = Depends(get_current_user)):
+    model = req.model if req and req.model else ""
+    result = await create_session(user["username"], model)
+    return {"success": True, "id": result["id"], "title": result["title"], "model": result["model"]}
 
 
 @router.delete("/sessions/{sid}")
-async def delete_session(sid: str, user: dict = Depends(get_current_user)):
-    await execute_write("DELETE FROM chat_messages WHERE session_id=%s", (sid,))
-    await execute_write("DELETE FROM chat_sessions WHERE id=%s AND username=%s", (sid, user["username"]))
+async def remove_session(sid: str, user: dict = Depends(get_current_user)):
+    await delete_session(sid, user["username"])
     return {"success": True}
 
 
-@router.get("/sessions/{sid}/messages")
-async def get_messages(sid: str, user: dict = Depends(get_current_user)):
-    rows = await execute(
-        "SELECT id, role, content, thinking, tokens_input, tokens_output, created_at FROM chat_messages WHERE session_id=%s ORDER BY id ASC LIMIT 100",
-        (sid,),
-    )
-    session = await execute_one("SELECT model FROM chat_sessions WHERE id=%s", (sid,))
-    return {
-        "success": True,
-        "username": user["username"],
-        "model": session["model"] if session else DEFAULT_MODEL,
-        "messages": [
-            {
-                "id": r["id"], "role": r["role"],
-                "content": r["content"], "thinking": r.get("thinking"),
-                "time": r["created_at"].strftime("%Y/%-m/%-d %H:%M:%S"),
-            }
-            for r in rows
-        ],
-    }
-
-
-class ModelReq(BaseModel):
-    model: str
-
-class TitleReq(BaseModel):
-    title: str
+@router.put("/sessions/{sid}")
+async def rename_session(sid: str, req: TitleReq, user: dict = Depends(get_current_user)):
+    await update_session_title(sid, user["username"], req.title)
+    return {"success": True}
 
 
 @router.put("/sessions/{sid}/model")
-async def update_session_model(sid: str, req: ModelReq, user: dict = Depends(get_current_user)):
-    await execute_write(
-        "UPDATE chat_sessions SET model=%s, oc_session_id='' WHERE id=%s AND username=%s",
-        (req.model, sid, user["username"]),
-    )
+async def change_session_model(sid: str, req: ModelReq, user: dict = Depends(get_current_user)):
+    await update_session_model(sid, user["username"], req.model)
     return {"success": True}
 
 
 @router.put("/sessions/{sid}/pin")
 async def pin_session(sid: str, user: dict = Depends(get_current_user)):
-    pool = await get_pool()
-    async with pool.acquire() as conn:
-        async with conn.cursor(aiomysql.DictCursor) as cur:
-            await cur.execute("SELECT pinned FROM chat_sessions WHERE id=%s AND username=%s FOR UPDATE",
-                            (sid, user["username"]))
-            row = await cur.fetchone()
-            new_val = None
-            if row:
-                new_val = 0 if row["pinned"] else 1
-                if new_val == 1:
-                    await cur.execute(
-                        "UPDATE chat_sessions SET pinned=0 WHERE username=%s AND id!=%s",
-                        (user["username"], sid),
-                    )
-                    await cur.execute(
-                        "UPDATE chat_sessions SET pinned=1, updated_at=NOW() WHERE id=%s AND username=%s",
-                        (sid, user["username"]),
-                    )
-                else:
-                    await cur.execute(
-                        "UPDATE chat_sessions SET pinned=0 WHERE id=%s AND username=%s",
-                        (sid, user["username"]),
-                    )
-            await conn.commit()
-    return {"success": True, "pinned": new_val if row else 0}
+    new_val = await toggle_pin(sid, user["username"])
+    return {"success": True, "pinned": new_val}
 
 
-@router.put("/sessions/{sid}")
-async def update_session(sid: str, req: TitleReq, user: dict = Depends(get_current_user)):
-    await execute_write(
-        "UPDATE chat_sessions SET title=%s WHERE id=%s AND username=%s",
-        (req.title, sid, user["username"]),
-    )
-    return {"success": True}
+@router.get("/sessions/{sid}/messages")
+async def get_session_messages(sid: str, user: dict = Depends(get_current_user)):
+    data = await get_messages(sid, user["username"])
+    return {"success": True, **data}
 
+
+# ── 发送消息 ──────────────────────────────────────────
 
 @router.post("/sessions/{sid}/send")
-async def send_message(
-    sid: str,
-    req: SendReq,
-    user: dict = Depends(get_current_user),
-):
-    """发送消息，同步等待 AI 回复（最大等待 60 秒）"""
-    content = req.content
-    
-    # 保存用户消息
-    await execute_write(
-        "INSERT INTO chat_messages (session_id, role, content) VALUES (%s,%s,%s)",
-        (sid, "user", content),
-    )
-
-    # 获取或创建 opencode 会话
-    session = await execute_one("SELECT oc_session_id, model FROM chat_sessions WHERE id=%s", (sid,))
-    oc_id = session["oc_session_id"] if session else ""
-    session_model = session["model"] if session else DEFAULT_MODEL
-    if not oc_id:
-        oc = await create_opencode_session()
-        oc_id = oc.get("id", "")
-        if oc_id:
-            await set_session_model(oc_id, session_model)
-        await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
-
-    # 首次发消息更新标题
-    count_rows = await execute(
-        "SELECT COUNT(*) as c FROM chat_messages WHERE session_id=%s AND role='user'",
-        (sid,),
-    )
-    if count_rows and count_rows[0]["c"] == 1:
-        title = content[:30] + ("..." if len(content) > 30 else "")
-        await execute_write("UPDATE chat_sessions SET title=%s WHERE id=%s", (title, sid))
-
-    # 检测思考模式：消息开头有 <think> 标签时切换模型
-    is_think = content.startswith("<think>")
-    if is_think:
-        content = content.replace("<think>","").replace("</think>","")
-        content = (
-            "\n\n请按以下格式输出：\n"
-            "<think>\n你的推理过程\n</think>\n"
-            "你的最终答案\n\n"
-            "问题：" + content
-        )
-
-    # Opencode GO / ZEN 通道
-    if session_model in ("deepseek-v4-pro", "deepseek-v4-flash"):
-        u = await execute_one("SELECT api_key_deepseek, api_key_zen FROM users WHERE id=%s", (user["id"],))
-        api_key = ""
-        base_url = ""
-        if u and u["api_key_zen"]:
-            api_key, base_url = u["api_key_zen"], "https://opencode.ai/zen/v1/chat/completions"
-        elif u and u["api_key_deepseek"]:
-            api_key, base_url = u["api_key_deepseek"], "https://opencode.ai/zen/go/v1/chat/completions"
-        if api_key:
-            prev = await execute(
-                "SELECT role, content FROM chat_messages WHERE session_id=%s AND id < (SELECT MAX(id) FROM chat_messages WHERE session_id=%s) ORDER BY id ASC",
-                (sid, sid),
-            )
-            full_text, thinking_text = await _call_opencode(api_key, base_url, session_model, prev, content)
-            if full_text:
-                if thinking_text:
-                    clean_text = full_text.strip()
-                    thinking_part = thinking_text.strip()
-                else:
-                    import re as _re
-                    tm = _re.search(r"<think>(.*?)</think>", full_text, _re.DOTALL)
-                    if tm:
-                        before = full_text[:full_text.index("<think>")].strip()
-                        after = full_text[full_text.index("</think>") + 8:].strip()
-                        tc = tm.group(1).strip()
-                        if before and tc.startswith(before):
-                            tc = tc[len(before):].strip()
-                        thinking_part = (before + "\n\n" + tc).strip()
-                        clean_text = after
-                    else:
-                        thinking_part = ""
-                        clean_text = full_text.strip()
-                await execute_write(
-                    "INSERT INTO chat_messages (session_id, role, content, thinking) VALUES (%s,%s,%s,%s)",
-                    (sid, "assistant", clean_text, thinking_part),
-                )
-                return {"success": True, "content": clean_text, "thinking": thinking_part}
-            return {"success": False, "error": "DeepSeek API returned no content"}
-
-    # 以下走 opencode 通道
-    import httpx as _hx
-    try:
-        r = _hx.get(f"{OPENCODE_URL}/api/session/{oc_id}/message", params={"from": 0, "to": 50}, timeout=5)
-        existing_ids = {m["id"] for m in r.json().get("data", []) if m.get("id")}
-    except:
-        existing_ids = set()
-
-    # 发送 prompt 并同步等待回复
-    await send_prompt(oc_id, content, session_model)
-    
-    full_text = ""
-    for retry in range(2):
-        try:
-            async for chunk in poll_response(oc_id, existing_ids=existing_ids, timeout=120):
-                if chunk.get("done"):
-                    break
-                if chunk.get("content"):
-                    full_text += chunk["content"]
-            break
-        except Exception as e:
-            if "TooLarge" in str(e) or "max bytes" in str(e):
-                oc = await create_opencode_session()
-                oc_id = oc.get("id", "")
-                if oc_id:
-                    await set_session_model(oc_id, session_model)
-                oc_id = oc.get("id", "")
-                await execute_write("UPDATE chat_sessions SET oc_session_id=%s WHERE id=%s", (oc_id, sid))
-                await send_prompt(oc_id, content, session_model)
-                async for chunk in poll_response(oc_id, timeout=120):
-                    if chunk.get("done"):
-                        break
-                    if chunk.get("content"):
-                        full_text += chunk["content"]
-                break
-            else:
-                return {"success": False, "error": str(e)}
-    
-    if full_text:
-        import re as _re
-        tm = _re.search(r"<think>(.*?)</think>", full_text, _re.DOTALL)
-        if tm:
-            before = full_text[:full_text.index("<think>")].strip()
-            after = full_text[full_text.index("</think>") + 8:].strip()
-            tc = tm.group(1).strip()
-            if before and tc.startswith(before):
-                tc = tc[len(before):].strip()
-            thinking_part = (before + "\n\n" + tc).strip()
-            clean_text = after
-        else:
-            thinking_part = ""
-            clean_text = full_text.strip()
-        await execute_write(
-            "INSERT INTO chat_messages (session_id, role, content, thinking) VALUES (%s,%s,%s,%s)",
-            (sid, "assistant", clean_text, thinking_part),
-        )
-    
-    return {"success": True, "content": clean_text, "thinking": thinking_part}
-
+async def send_to_ai(sid: str, req: SendReq, user: dict = Depends(get_current_user)):
+    """Process 层核心入口：编排发送→重试→保存"""
+    result = await send_message(sid, user["id"], user["username"], req.content)
+    return result

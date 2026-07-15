@@ -49,15 +49,27 @@ async def lifespan(app: FastAPI):
     print("[启动] 数据库连接就绪")
 
     # 加载技能插件
-    from .skills import registry
+    from .skills import registry as skill_registry
     from .skills.hello import HelloSkill
     from .skills.photo_edit import PhotoEditSkill
     from .skills.skill_creator import SkillCreator as SkillCreatorSkill
-    registry.register(HelloSkill())
-    registry.register(PhotoEditSkill())
-    registry.register(SkillCreatorSkill())
+    skill_registry.register(HelloSkill())
+    skill_registry.register(PhotoEditSkill())
+    skill_registry.register(SkillCreatorSkill())
     print("[启动] 安装技能插件...")
-    await registry.install(app)
+    await skill_registry.install(app)
+
+    # 加载 AI Provider 配置
+    print("[启动] 加载 AI Provider...")
+    from pathlib import Path
+    from .agent.registry import registry as provider_registry
+    from .agent.opencode import OpenCodeProvider
+    from .agent.deepseek import DeepSeekProvider
+    provider_registry.register(OpenCodeProvider)
+    provider_cfg = Path(__file__).parent / "config" / "providers.yaml"
+    if provider_cfg.exists():
+        provider_registry.load_config(provider_cfg)
+    print("[启动] AI Provider 就绪")
 
     yield  # 应用运行中
 
