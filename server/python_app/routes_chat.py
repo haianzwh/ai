@@ -64,7 +64,7 @@ async def list_sessions(user: dict = Depends(get_current_user)):
             {
                 "id": r["id"], "title": r["title"], "model": r["model"], "pinned": r["pinned"],
                 "created": r["created_at"].strftime("%m-%d %H:%M"),
-                "updated": r["updated_at"].strftime("%m-%d %H:%M"),
+                "updated": r["updated_at"].isoformat(),
             }
             for r in rows
         ],

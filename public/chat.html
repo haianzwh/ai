@@ -477,12 +477,9 @@ function pinSession(sid,btn){
   var el=btn.closest('.session');if(!el)return
   var seq=++_pinSeq
   var isPinned=el.classList.contains('pinned')
-  // 即时反馈
   document.querySelectorAll('#sessionList .pinned').forEach(function(p){if(p!==el)p.classList.remove('pinned')})
   el.classList.toggle('pinned')
   if(!isPinned)document.getElementById('sessionList').prepend(el)
-  else loadSessions()  // 取消置顶时刷新列表回到正确位置
-  // API 同步，只有最新请求生效
   fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H})
   .then(function(){if(seq===_pinSeq)loadSessions()})
   .catch(function(){if(seq===_pinSeq)loadSessions()})
