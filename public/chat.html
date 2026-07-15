@@ -368,7 +368,8 @@ async function send(){
   var el=document.getElementById('msgArea')
   if(el.querySelector('.empty-state'))el.innerHTML=''
   el.innerHTML+='<div class="msg user">'+formatContent(text,'','user','我 · '+now())+'<div class=msg-actions><button onclick=copyMsg(this)>📋 复制</button><button onclick=editMsg(this)>✏️ 修改</button></div></div>'
-  var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight;updateNav()
+  var thinkingLabel=chatMode==='think'?'🧠 深度思考中...':'思考中...'
+  var aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">'+thinkingLabel+'</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight;updateNav()
   try{
     var ctrl=new AbortController();var tmr=setTimeout(function(){currentAbort=null;ctrl.abort()},35000)
     currentAbort=ctrl;document.querySelector('.send-btn').textContent='⏹';document.querySelector('.send-btn').disabled=false
@@ -392,7 +393,7 @@ async function sendText(text){
   var el=document.getElementById('msgArea'),aiDiv
   if(el.querySelector('.empty-state'))el.innerHTML=''
   el.innerHTML+='<div class="msg user">'+formatContent(text,'','user','我 · '+now())+'<div class=msg-actions><button onclick=copyMsg(this)>📋 复制</button><button onclick=editMsg(this)>✏️ 修改</button></div></div>'
-  aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">思考中</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
+  aiDiv=document.createElement('div');aiDiv.className='msg assistant';aiDiv.innerHTML='<div class=meta>'+(modelName||'AI').split('-')[0]+' · '+now()+'</div><div class="bubble thinking">'+(chatMode==='think'?'🧠 深度思考中...':'思考中...')+'</div>';el.appendChild(aiDiv);el.scrollTop=el.scrollHeight
   document.querySelector('.send-btn').disabled=true
   try{
     var ctrl=new AbortController();var tmr=setTimeout(function(){currentAbort=null;ctrl.abort()},35000)
