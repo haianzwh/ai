@@ -390,12 +390,12 @@ async function loadSessions(){
     var d=await r.json();if(!d.sessions)return
   }catch(e){return}
   var today=[],week=[],older=[],pinned=[]
-  var now=new Date(),td=now.toDateString()
-  d.sessions.forEach(function(s){
-    if(s.pinned){pinned.push(s);return}
-    var dt=new Date(s.updated);var dts=dt.toDateString()
-    if(dts===td)today.push(s)
-    else if(now-dt<6048e5)week.push(s)
+  pinned=d.sessions.filter(function(s){return s.pinned})
+  var nonPinned=d.sessions.filter(function(s){return !s.pinned})
+  var total=nonPinned.length
+  nonPinned.forEach(function(s,i){
+    if(i<Math.ceil(total/3))today.push(s)
+    else if(i<Math.ceil(total*2/3))week.push(s)
     else older.push(s)
   })
   function renderGroup(label,items){if(!items.length)return '';var k='group_'+label;var collapsed=sessionStorage.getItem(k)==='1';return '<div class=session-group data-group="'+k+'"><div class="group-label'+(collapsed?' collapsed':'')+'" onclick=toggleGroup(this)>'+label+' <span class=arrow>'+(collapsed?'▶':'▼')+'</span></div><div class=group-body'+(collapsed?' style=display:none':'')+'>'+items.map(function(s){var c=s.id===curSession?' active':'',p=s.pinned?' pinned':'';return'<div class="session'+c+p+'" data-sid="'+s.id+'" data-updated="'+s.updated+'"><span>'+esc(s.title||'新对话')+'</span><button class=more>···</button></div>'}).join('')+'</div></div>'}
