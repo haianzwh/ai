@@ -249,10 +249,9 @@ body.light-mode .interrupted span{border-top-color:rgba(0,0,0,.06)}
 .input-wrap textarea::placeholder{color:rgba(255,255,255,.2)}
 .input-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:8px}
 .input-bottom .left{display:flex;gap:6px;align-items:center}
-.input-bottom .left button{background:none;border:none;color:rgba(255,255,255,.3);padding:4px 8px;border-radius:6px;cursor:pointer;font-size:13px;transition:.15s;line-height:1}
+.input-bottom .left button{background:none;border:none;color:rgba(255,255,255,.3);padding:4px 8px;border-radius:6px;cursor:pointer;font-size:14px;transition:.15s;line-height:1}
 .input-bottom .left button:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.5)}
-.input-bottom .left .dark-btn{font-size:16px;padding:4px 6px}
-.input-bottom .left .think-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.35);padding:3px 10px;border-radius:6px;cursor:pointer;font-size:11px;transition:.15s;white-space:nowrap}
+.input-bottom .left .think-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.35);padding:3px 10px;border-radius:6px;cursor:pointer;font-size:13px;transition:.15s;white-space:nowrap}
 .input-bottom .left .think-btn:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.55)}
 .input-bottom .left .think-btn.on{background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.2);color:#818cf8}
 body.light-mode .think-btn{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.08);color:rgba(0,0,0,.35)}
@@ -312,7 +311,7 @@ body.light-mode .think-btn.on{background:rgba(99,102,241,.08);border-color:rgba(
         <textarea id=input rows=1 placeholder="给 AI 发送消息" onkeydown="if(event.key=='Enter'&&!event.shiftKey){event.preventDefault();send()}else if(event.key=='ArrowUp'){event.preventDefault();if(histIdx<msgHistory.length-1){histIdx++;document.getElementById('input').value=msgHistory[msgHistory.length-1-histIdx]}}else if(event.key=='ArrowDown'){event.preventDefault();if(histIdx>0){histIdx--;document.getElementById('input').value=msgHistory[msgHistory.length-1-histIdx]}else{histIdx=-1;document.getElementById('input').value=''}}"></textarea>
         <div class=input-bottom>
           <div class=left>
-            <select id=modelSelect onchange=switchModel(this.value) style="background:rgba(255,255,255,.06);color:var(--text,#e0e0e0);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:3px 8px;font-size:14px;cursor:pointer;outline:none;max-width:150px;transition:.15s"></select>
+            <select id=modelSelect onchange=switchModel(this.value) style="background:rgba(255,255,255,.06);color:var(--text,#e0e0e0);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:3px 8px;font-size:13px;cursor:pointer;outline:none;transition:.15s"></select>
             <button class=think-btn id=thinkBtn onclick=cycleMode()>⚡ 快速</button>
             <button class=upload-btn onclick="document.getElementById('fileInput').click()" title="上传文件">📎</button>
             <button class=dark-btn onclick=toggleDark() id=darkBtn title="深色模式">🌙</button>
