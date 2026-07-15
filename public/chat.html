@@ -486,10 +486,9 @@ function pinSession(sid,btn){
   // 关闭菜单
   var menu=el.querySelector('.menu');if(menu)menu.remove()
   // 后台同步
-  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){
-    // 失败则恢复
-    el.classList.toggle('pinned')
-  })
+  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H})
+  .then(function(){loadSessions()})
+  .catch(function(){loadSessions()})
 }
 function toggleDark(){
   document.body.classList.toggle('light-mode')
