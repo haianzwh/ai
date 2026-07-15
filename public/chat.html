@@ -14,7 +14,9 @@ body.light-mode .session-group+.session-group{border-top-color:rgba(0,0,0,.06)}
 body.light-mode .group-label{color:rgba(0,0,0,.35)}
 body.light-mode .session{color:rgba(0,0,0,.5)}
 body.light-mode .session:hover{background:rgba(0,0,0,.06);color:#1a1a2e}
+body.light-mode .session.pinned{border-left-color:#d97706;color:#1a1a2e}
 body.light-mode .session.active{background:rgba(99,102,241,.1);color:#1a1a2e}
+body.light-mode .session.active.pinned{border-left-color:#d97706}
 body.light-mode .sidebar-footer{border-top-color:rgba(0,0,0,.06)}
 body.light-mode .sidebar-footer .uname{color:rgba(0,0,0,.5)}
 body.light-mode #sessionSearch{background:#f0f0f5;border:1px solid rgba(0,0,0,.15);color:#1a1a2e}
@@ -73,7 +75,9 @@ body.light-mode .btn-new:hover{background:rgba(140,180,215,.35);color:rgba(50,95
 .group-label{padding:6px 8px 2px;font-size:11px;color:rgba(255,255,255,.2);font-weight:500}
 .session{padding:8px 10px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.35);border-radius:8px;transition:.1s;margin:1px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:2px solid transparent}
 .session:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)}
+.session.pinned{border-left-color:#f59e0b;color:rgba(255,255,255,.65)}
 .session.active{background:rgba(99,102,241,.15);border-left-color:#818cf8;color:#e0e0e0}
+.session.active.pinned{border-left-color:#f59e0b}
 .session .del{display:none}
 .session .more{float:right;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:18px;padding:2px 6px;border-radius:4px;visibility:hidden;letter-spacing:2px;line-height:1;font-weight:700}
 .session:hover .more{visibility:visible}
@@ -307,16 +311,17 @@ async function loadSessions(){
     var r=await fetch('/auth/api/chat/sessions?_='+Date.now(),{headers:H});if(!r.ok)return
     var d=await r.json();if(!d.sessions)return
   }catch(e){return}
-  var today=[],week=[],older=[]
+  var today=[],week=[],older=[],pinned=[]
   var now=new Date(),td=now.toDateString()
   d.sessions.forEach(function(s){
+    if(s.pinned){pinned.push(s);return}
     var dt=new Date(s.updated);var dts=dt.toDateString()
     if(dts===td)today.push(s)
     else if(now-dt<6048e5)week.push(s)
     else older.push(s)
   })
   function renderGroup(label,items){return items.length?'<div class=session-group><div class=group-label>'+label+'</div>'+items.map(function(s){var c=s.id===curSession?' active':'',p=s.pinned?' pinned':'';return'<div class="session'+c+p+'" data-sid="'+s.id+'"><span>'+esc(s.title||'新对话')+'</span><button class=more>···</button></div>'}).join('')+'</div>':''}
-  document.getElementById('sessionList').innerHTML=renderGroup('当天',today)+renderGroup('7天内',week)+renderGroup('30天内',older)
+  document.getElementById('sessionList').innerHTML=renderGroup('置顶',pinned)+renderGroup('当天',today)+renderGroup('7天内',week)+renderGroup('30天内',older)
   applySearch()
 }
 function applySearch(){
