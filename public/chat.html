@@ -503,9 +503,9 @@ function renameSession(sid,el){
   inp.onkeydown=function(e){if(e.key==='Enter')overlay.querySelector('.rnOk').click();if(e.key==='Escape')close()}
 }
 async function pinSession(sid){
-  try{
-    await fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H})
-  }catch(e){}
+  var el=document.querySelector('#sessionList .session[data-sid="'+sid+'"]')
+  if(el)el.classList.toggle('pinned')
+  await fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){})
   loadSessions()
 }
 function toggleDark(){
