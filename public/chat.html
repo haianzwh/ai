@@ -414,6 +414,7 @@ async function toggleGroup(el){
   if(body.style.display==='none'){body.style.display='';el.classList.remove('collapsed');el.querySelector('.arrow').textContent='▼';sessionStorage.setItem(k,'0')}
   else{body.style.display='none';el.classList.add('collapsed');el.querySelector('.arrow').textContent='▶';sessionStorage.setItem(k,'1')}
 }
+async function delSession(sid){
   await fetch('/auth/api/chat/sessions/'+sid,{method:'DELETE',headers:H})
   if(curSession===sid){curSession=null;document.getElementById('msgArea').innerHTML='<div class=empty-state><div class=icon>💬</div><p>开始对话</p></div>'}
   loadSessions()
