@@ -307,13 +307,13 @@ body.light-mode .think-btn.on{background:rgba(99,102,241,.08);border-color:rgba(
 <div id=settingsOverlay class=rn-overlay style=display:none>
   <div class=st-box>
     <div class=rn-title style=margin-bottom:16px>设置</div>
-    <label for=dsKey>DeepSeek API Key</label>
-    <input id=dsKey type=password placeholder="sk-..." autocomplete=off>
-    <div class=hint>在 <a href=https://platform.deepseek.com target=_blank style=color:#818cf8>platform.deepseek.com</a> 创建 API key</div>
+    <label for=goKey>OpenCode GO API Key</label>
+    <input id=goKey type=password placeholder="sk-..." autocomplete=off>
+    <div class=hint>在 <a href=https://opencode.ai/go target=_blank style=color:#818cf8>opencode.ai/go</a> 获取 GO 订阅 API Key，保存后可使用 DeepSeek V4 Pro 等模型</div>
     <div style=display:flex;gap:8px;align-items:center>
-      <button class=st-btn onclick=saveDeepSeekKey()>保存</button>
+      <button class=st-btn onclick=saveGOKey()>保存</button>
       <button class=st-cancel onclick=closeSettings()>取消</button>
-      <span id=dsKeyStatus style=font-size:12px;color:rgba(255,255,255,.3)></span>
+      <span id=goKeyStatus style=font-size:12px;color:rgba(255,255,255,.3)></span>
     </div>
   </div>
 </div>
@@ -575,22 +575,22 @@ function pinSession(sid){
 }
 function openSettings(){
   document.getElementById('settingsOverlay').style.display='flex'
-  loadDeepSeekKey()
+  loadGOKey()
 }
 function closeSettings(){
   document.getElementById('settingsOverlay').style.display='none'
 }
-async function loadDeepSeekKey(){
-  var s=document.getElementById('dsKeyStatus')
+async function loadGOKey(){
+  var s=document.getElementById('goKeyStatus')
   try{
     var r=await fetch('/auth/api/chat/user/deepseek-key',{headers:H});var d=await r.json()
     if(d.hasKey){s.textContent='✅ 已配置 ('+d.maskedKey+')'}
     else{s.textContent='未配置'}
   }catch(e){s.textContent='加载失败'}
 }
-async function saveDeepSeekKey(){
-  var key=document.getElementById('dsKey').value.trim()
-  var s=document.getElementById('dsKeyStatus');s.textContent='保存中...'
+async function saveGOKey(){
+  var key=document.getElementById('goKey').value.trim()
+  var s=document.getElementById('goKeyStatus');s.textContent='保存中...'
   try{
     var r=await fetch('/auth/api/chat/user/deepseek-key',{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({api_key:key})})
     var d=await r.json()

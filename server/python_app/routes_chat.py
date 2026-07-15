@@ -32,14 +32,13 @@ class ApiKeyReq(BaseModel):
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/chat", tags=["聊天"])
 
-DEEPSEEK_MODELS = [
-    {"id": "deepseek-chat", "name": "DeepSeek Chat (自有密钥)", "provider": "deepseek"},
-    {"id": "deepseek-reasoner", "name": "DeepSeek R1 (自有密钥)", "provider": "deepseek"},
+GO_MODELS = [
+    {"id": "deepseek-v4-pro", "name": "DeepSeek V4 Pro (GO)", "provider": "opencode-go"},
+    {"id": "deepseek-v4-flash", "name": "DeepSeek V4 Flash (GO)", "provider": "opencode-go"},
 ]
 
 
-async def _call_deepseek(api_key: str, model: str, messages: list[dict], user_content: str) -> tuple[str, str]:
-    deepseek_model = "deepseek-reasoner" if model == "deepseek-reasoner" else "deepseek-chat"
+async def _call_opencode_go(api_key: str, model: str, messages: list[dict], user_content: str) -> tuple[str, str]:
     api_messages = []
     for m in messages:
         role = "assistant" if m["role"] == "assistant" else "user"
@@ -48,9 +47,9 @@ async def _call_deepseek(api_key: str, model: str, messages: list[dict], user_co
 
     async with httpx.AsyncClient(timeout=120) as client:
         resp = await client.post(
-            "https://api.deepseek.com/chat/completions",
+            "https://opencode.ai/zen/go/v1/chat/completions",
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={"model": deepseek_model, "messages": api_messages, "stream": False, "max_tokens": 8192},
+            json={"model": model, "messages": api_messages, "stream": False, "max_tokens": 8192},
         )
         data = resp.json()
         choice = data.get("choices", [{}])[0].get("message", {})
@@ -81,7 +80,7 @@ async def list_models(user: dict = Depends(get_current_user)):
 
     u = await execute_one("SELECT api_key_deepseek FROM users WHERE id=%s", (user["id"],))
     if u and u["api_key_deepseek"]:
-        models.extend(DEEPSEEK_MODELS)
+        models.extend(GO_MODELS)
 
     return {"success": True, "models": models}
 
@@ -275,15 +274,15 @@ async def send_message(
             "问题：" + content
         )
 
-    # DeepSeek 自有密钥通道
-    if session_model in ("deepseek-chat", "deepseek-reasoner"):
+    # Opencode GO 通道
+    if session_model in ("deepseek-v4-pro", "deepseek-v4-flash"):
         u = await execute_one("SELECT api_key_deepseek FROM users WHERE id=%s", (user["id"],))
         if u and u["api_key_deepseek"]:
             prev = await execute(
                 "SELECT role, content FROM chat_messages WHERE session_id=%s AND id < (SELECT MAX(id) FROM chat_messages WHERE session_id=%s) ORDER BY id ASC",
                 (sid, sid),
             )
-            full_text, thinking_text = await _call_deepseek(u["api_key_deepseek"], session_model, prev, content)
+            full_text, thinking_text = await _call_opencode_go(u["api_key_deepseek"], session_model, prev, content)
             if full_text:
                 if thinking_text:
                     clean_text = full_text.strip()
