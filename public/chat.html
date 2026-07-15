@@ -77,7 +77,9 @@ body.light-mode .btn-new:hover{background:rgba(140,180,215,.35);color:rgba(50,95
 .sidebar .title{padding:8px 16px 4px;font-size:11px;font-weight:600;color:rgba(255,255,255,.25);letter-spacing:.5px;flex-shrink:0}
 .session-group{padding:0 8px;margin-bottom:4px}
 .session-group+.session-group{border-top:1px solid rgba(255,255,255,.06);padding-top:10px;margin-top:6px}
-.group-label{padding:6px 8px 2px;font-size:11px;color:rgba(255,255,255,.2);font-weight:500}
+.group-label{padding:6px 8px 2px;font-size:11px;color:rgba(255,255,255,.2);font-weight:500;cursor:pointer;user-select:none}
+.group-label:hover{color:rgba(255,255,255,.4)}
+.group-label .arrow{font-size:8px;margin-left:2px}
 .session{padding:8px 10px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.35);border-radius:8px;transition:.1s;margin:1px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:2px solid transparent}
 .session:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)}
 .session.pinned{border-left-color:#f59e0b;color:rgba(255,255,255,.65)}
@@ -396,7 +398,7 @@ async function loadSessions(){
     else if(now-dt<6048e5)week.push(s)
     else older.push(s)
   })
-  function renderGroup(label,items){return items.length?'<div class=session-group><div class=group-label>'+label+'</div>'+items.map(function(s){var c=s.id===curSession?' active':'',p=s.pinned?' pinned':'';return'<div class="session'+c+p+'" data-sid="'+s.id+'" data-updated="'+s.updated+'"><span>'+esc(s.title||'新对话')+'</span><button class=more>···</button></div>'}).join('')+'</div>':''}
+  function renderGroup(label,items){if(!items.length)return '';var k='group_'+label;var collapsed=sessionStorage.getItem(k)==='1';return '<div class=session-group data-group="'+k+'"><div class="group-label'+(collapsed?' collapsed':'')+'" onclick=toggleGroup(this)>'+label+' <span class=arrow>'+(collapsed?'▶':'▼')+'</span></div><div class=group-body'+(collapsed?' style=display:none':'')+'>'+items.map(function(s){var c=s.id===curSession?' active':'',p=s.pinned?' pinned':'';return'<div class="session'+c+p+'" data-sid="'+s.id+'" data-updated="'+s.updated+'"><span>'+esc(s.title||'新对话')+'</span><button class=more>···</button></div>'}).join('')+'</div></div>'}
   document.getElementById('sessionList').innerHTML=renderGroup('置顶',pinned)+renderGroup('当天',today)+renderGroup('7天内',week)+renderGroup('30天内',older)
   applySearch()
 }
@@ -407,7 +409,11 @@ function applySearch(){
   })
 }
 document.getElementById('sessionSearch').addEventListener('input',applySearch)
-async function delSession(sid){
+async function toggleGroup(el){
+  var body=el.parentNode.querySelector('.group-body');var k=el.parentNode.dataset.group
+  if(body.style.display==='none'){body.style.display='';el.classList.remove('collapsed');el.querySelector('.arrow').textContent='▼';sessionStorage.setItem(k,'0')}
+  else{body.style.display='none';el.classList.add('collapsed');el.querySelector('.arrow').textContent='▶';sessionStorage.setItem(k,'1')}
+}
   await fetch('/auth/api/chat/sessions/'+sid,{method:'DELETE',headers:H})
   if(curSession===sid){curSession=null;document.getElementById('msgArea').innerHTML='<div class=empty-state><div class=icon>💬</div><p>开始对话</p></div>'}
   loadSessions()
@@ -581,20 +587,25 @@ function moveToGroup(el,label){
   var list=document.getElementById('sessionList'),groups=list.querySelectorAll('.session-group'),target=null,order=['置顶','当天','7天内','30天内']
   for(var i=0;i<groups.length;i++){
     var gl=groups[i].querySelector('.group-label')
-    if(gl&&gl.textContent===label){target=groups[i];break}
+    if(gl&&gl.childNodes[0].nodeValue.trim()===label){target=groups[i];break}
   }
   if(!target){
     target=document.createElement('div');target.className='session-group'
     var h=document.createElement('div');h.className='group-label';h.textContent=label
-    target.appendChild(h);var idx=order.indexOf(label)
+    var arrow=document.createElement('span');arrow.className='arrow';arrow.textContent='▼'
+    h.appendChild(document.createTextNode(' '));h.appendChild(arrow)
+    h.onclick=function(){toggleGroup(this)}
+    var body=document.createElement('div');body.className='group-body'
+    target.appendChild(h);target.appendChild(body)
+    var idx=order.indexOf(label)
     for(var i=0;i<groups.length;i++){
       var gl=groups[i].querySelector('.group-label')
-      if(gl&&order.indexOf(gl.textContent)>idx){list.insertBefore(target,groups[i]);break}
+      if(gl&&order.indexOf(gl.childNodes[0].nodeValue.trim())>idx){list.insertBefore(target,groups[i]);break}
     }
     if(!target.parentNode)list.appendChild(target)
   }
-  target.insertBefore(el,target.querySelector('.session'))
-  for(var i=0;i<groups.length;i++)if(groups[i].querySelectorAll('.session').length===0)groups[i].remove()
+  target.querySelector('.group-body').insertBefore(el,target.querySelector('.group-body .session'))
+  for(var i=0;i<groups.length;i++)if(groups[i].querySelectorAll('.group-body .session').length===0)groups[i].remove()
 }
 function pinSession(sid){
   var el=document.querySelector('#sessionList .session[data-sid="'+sid+'"]')
