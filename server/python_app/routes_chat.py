@@ -143,6 +143,11 @@ async def pin_session(sid: str, user: dict = Depends(get_current_user)):
     row = await execute_one("SELECT pinned FROM chat_sessions WHERE id=%s AND username=%s", (sid, user["username"]))
     if row:
         new_val = 0 if row["pinned"] else 1
+        if new_val == 1:
+            await execute_write(
+                "UPDATE chat_sessions SET pinned=0 WHERE username=%s AND id!=%s",
+                (user["username"], sid),
+            )
         await execute_write(
             "UPDATE chat_sessions SET pinned=%s, updated_at=NOW() WHERE id=%s AND username=%s",
             (new_val, sid, user["username"]),

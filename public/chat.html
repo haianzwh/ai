@@ -472,15 +472,8 @@ function renameSession(sid,btn){
   inp.onkeydown=function(e){if(e.key==='Enter')overlay.querySelector('.rnOk').click();if(e.key==='Escape')close()}
 }
 function pinSession(sid,btn){
-  var el=btn.closest('.session');if(!el)return
-  var wasPinned=el.classList.contains('pinned')
-  el.classList.toggle('pinned')
-  if(!wasPinned){
-    var list=document.getElementById('sessionList')
-    list.insertBefore(el,list.firstChild)
-  }
   fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H})
-  document.querySelectorAll('.session .menu').forEach(function(m){m.remove()})
+  .then(function(){loadSessions()}).catch(function(){loadSessions()})
 }
 function toggleDark(){
   document.body.classList.toggle('light-mode')
