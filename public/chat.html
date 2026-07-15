@@ -303,7 +303,7 @@ async function loadModels(){
   var r=await fetch('/auth/api/chat/models',{headers:H});var d=await r.json()
   if(!d.success||!d.models)return
   sel.innerHTML=''
-  var extras=[{id:'deepseek-v4-flash',name:'DeepSeek V4 Flash'},{id:'deepseek-pro',name:'DeepSeek Pro'}]
+  var extras=[{id:'deepseek-v4-flash',name:'DeepSeek V4 Flash'},{id:'deepseek-v4-pro',name:'DeepSeek V4 Pro'}]
   extras.concat(d.models).forEach(function(m){var o=document.createElement('option');o.value=m.id;o.textContent=m.name;sel.appendChild(o)})
   sel.value=modelName||'deepseek-v4-flash-free'
 }
