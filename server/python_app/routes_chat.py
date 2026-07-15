@@ -45,7 +45,6 @@ async def list_models(user: dict = Depends(get_current_user)):
             models = [
                 {"id": m["id"], "name": m.get("name", m["id"]), "provider": m.get("providerID", "")}
                 for m in data.get("data", [])
-                if m.get("status") == "active"
             ]
         return {"success": True, "models": models}
     except Exception as e:
