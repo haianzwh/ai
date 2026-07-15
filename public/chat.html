@@ -60,6 +60,10 @@ body.light-mode .sidebar-collapse:hover{background:rgba(0,0,0,.04)}
 body.light-mode .sidebar-open-btn{color:#1a1a2e;background:rgba(0,0,0,.06)}
 body.light-mode .session .del{color:rgba(0,0,0,.2)}
 body.light-mode .session .del:hover{color:#ef4444}
+body.light-mode .st-box{background:rgba(248,249,252,.95);border-color:rgba(0,0,0,.08)}
+body.light-mode .st-box label{color:rgba(0,0,0,.45)}
+body.light-mode .st-box .hint{color:rgba(0,0,0,.3)}
+body.light-mode .st-box input{background:#fff;border-color:rgba(0,0,0,.15);color:#1a1a2e}
 select option{background:#fff;color:#1a1a2e}
 
 /* ===== 侧边栏 ===== */
@@ -98,6 +102,17 @@ body.light-mode .session .menu-item:hover{background:rgba(0,0,0,.04);color:rgba(
 .rn-box{background:rgba(25,25,45,.95);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:24px;min-width:320px}
 .rn-title{margin-bottom:14px;font-size:14px;font-weight:600;color:#e0e0e0}
 .rn-input{width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.05);color:#e0e0e0;font-size:13px;outline:none;box-sizing:border-box}
+
+/* Settings dialog */
+.st-box{background:rgba(25,25,45,.95);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:28px;min-width:380px}
+.st-box label{display:block;font-size:12px;color:rgba(255,255,255,.4);margin-bottom:4px}
+.st-box input{width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.05);color:#e0e0e0;font-size:13px;outline:none;box-sizing:border-box;margin-bottom:12px}
+.st-box input:focus{border-color:rgba(99,102,241,.4)}
+.st-box .hint{font-size:11px;color:rgba(255,255,255,.3);margin-top:-8px;margin-bottom:14px}
+.st-box .st-btn{padding:8px 20px;border:none;border-radius:8px;background:#6366f1;color:#fff;cursor:pointer;font-size:13px;margin-right:8px}
+.st-box .st-btn:hover{opacity:.85}
+.st-box .st-cancel{padding:8px 20px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);cursor:pointer;font-size:13px}
+.st-box .st-cancel:hover{background:rgba(255,255,255,.1)}
 .rn-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
 .rn-btns button{padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px}
 .rnCancel{border:1px solid rgba(255,255,255,.08);background:transparent;color:rgba(255,255,255,.4)}
@@ -252,6 +267,7 @@ body.light-mode .think-btn.on{background:rgba(99,102,241,.08);border-color:rgba(
     <div class=avatar>U</div>
     <span class=uname id=userName>用户</span>
     <button onclick="document.getElementById('sessionSearch').focus()" title=搜索 style="background:none;border:none;color:rgba(255,255,255,.25);cursor:pointer;font-size:16px;padding:4px;border-radius:6px;transition:.15s;margin-left:auto">🔍</button>
+    <button onclick=openSettings() title=设置 style="background:none;border:none;color:rgba(255,255,255,.25);cursor:pointer;font-size:16px;padding:4px;border-radius:6px;transition:.15s">⚙️</button>
   </div>
 </div>
 
@@ -285,6 +301,20 @@ body.light-mode .think-btn.on{background:rgba(99,102,241,.08);border-color:rgba(
       <div class=footer-text>内容由 AI 生成，请仔细甄别</div>
     </div>
     <input type=file id=fileInput multiple onchange=uploadFiles(this.files) style=display:none>
+  </div>
+</div>
+
+<div id=settingsOverlay class=rn-overlay style=display:none>
+  <div class=st-box>
+    <div class=rn-title style=margin-bottom:16px>设置</div>
+    <label for=dsKey>DeepSeek API Key</label>
+    <input id=dsKey type=password placeholder="sk-..." autocomplete=off>
+    <div class=hint>在 <a href=https://platform.deepseek.com target=_blank style=color:#818cf8>platform.deepseek.com</a> 创建 API key</div>
+    <div style=display:flex;gap:8px;align-items:center>
+      <button class=st-btn onclick=saveDeepSeekKey()>保存</button>
+      <button class=st-cancel onclick=closeSettings()>取消</button>
+      <span id=dsKeyStatus style=font-size:12px;color:rgba(255,255,255,.3)></span>
+    </div>
   </div>
 </div>
 
@@ -542,6 +572,31 @@ function pinSession(sid){
     moveToGroup(el,'置顶')
   }
   fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){})
+}
+function openSettings(){
+  document.getElementById('settingsOverlay').style.display='flex'
+  loadDeepSeekKey()
+}
+function closeSettings(){
+  document.getElementById('settingsOverlay').style.display='none'
+}
+async function loadDeepSeekKey(){
+  var s=document.getElementById('dsKeyStatus')
+  try{
+    var r=await fetch('/auth/api/chat/user/deepseek-key',{headers:H});var d=await r.json()
+    if(d.hasKey){s.textContent='✅ 已配置 ('+d.maskedKey+')'}
+    else{s.textContent='未配置'}
+  }catch(e){s.textContent='加载失败'}
+}
+async function saveDeepSeekKey(){
+  var key=document.getElementById('dsKey').value.trim()
+  var s=document.getElementById('dsKeyStatus');s.textContent='保存中...'
+  try{
+    var r=await fetch('/auth/api/chat/user/deepseek-key',{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({api_key:key})})
+    var d=await r.json()
+    if(d.success){s.textContent='✅ 已保存，刷新模型列表...';loadModels();setTimeout(closeSettings,1000)}
+    else{s.textContent='❌ 保存失败'}
+  }catch(e){s.textContent='❌ 请求失败'}
 }
 function toggleDark(){
   document.body.classList.toggle('light-mode')

@@ -18,7 +18,7 @@ async def init_db() -> None:
     在 FastAPI 启动事件中调用。
     """
     global _pool
-    _pool = await aiomysql.create_pool(**DB_CONFIG)
+    _pool = await aiomysql.create_pool(autocommit=True, **DB_CONFIG)
 
 
 async def close_db() -> None:

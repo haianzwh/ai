@@ -24,8 +24,37 @@ class CreateSessionReq(BaseModel):
 class ModelReq(BaseModel):
     model: str
 
+
+class ApiKeyReq(BaseModel):
+    api_key: str
+
+
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/chat", tags=["聊天"])
+
+DEEPSEEK_MODELS = [
+    {"id": "deepseek-chat", "name": "DeepSeek Chat (自有密钥)", "provider": "deepseek"},
+    {"id": "deepseek-reasoner", "name": "DeepSeek R1 (自有密钥)", "provider": "deepseek"},
+]
+
+
+async def _call_deepseek(api_key: str, model: str, messages: list[dict], user_content: str) -> tuple[str, str]:
+    deepseek_model = "deepseek-reasoner" if model == "deepseek-reasoner" else "deepseek-chat"
+    api_messages = []
+    for m in messages:
+        role = "assistant" if m["role"] == "assistant" else "user"
+        api_messages.append({"role": role, "content": m["content"]})
+    api_messages.append({"role": "user", "content": user_content})
+
+    async with httpx.AsyncClient(timeout=120) as client:
+        resp = await client.post(
+            "https://api.deepseek.com/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={"model": deepseek_model, "messages": api_messages, "stream": False, "max_tokens": 8192},
+        )
+        data = resp.json()
+        choice = data.get("choices", [{}])[0].get("message", {})
+        return choice.get("content", ""), choice.get("reasoning_content", "")
 
 # 发送锁：每个会话同时只允许一个发送请求
 _send_locks: dict[str, asyncio.Lock] = {}
@@ -37,7 +66,8 @@ _oc_cache: dict[str, str] = {}
 
 @router.get("/models")
 async def list_models(user: dict = Depends(get_current_user)):
-    """从 opencode 获取可用模型列表"""
+    """从 opencode 获取可用模型列表，如有密钥则追加 DeepSeek 模型"""
+    models = []
     try:
         async with httpx.AsyncClient() as client:
             resp = await client.get(f"{OPENCODE_URL}/api/model")
@@ -46,9 +76,33 @@ async def list_models(user: dict = Depends(get_current_user)):
                 {"id": m["id"], "name": m.get("name", m["id"]), "provider": m.get("providerID", "")}
                 for m in data.get("data", [])
             ]
-        return {"success": True, "models": models}
-    except Exception as e:
-        return {"success": False, "models": [], "error": str(e)}
+    except Exception:
+        pass
+
+    u = await execute_one("SELECT api_key_deepseek FROM users WHERE id=%s", (user["id"],))
+    if u and u["api_key_deepseek"]:
+        models.extend(DEEPSEEK_MODELS)
+
+    return {"success": True, "models": models}
+
+
+@router.get("/user/deepseek-key")
+async def get_deepseek_key(user: dict = Depends(get_current_user)):
+    u = await execute_one("SELECT api_key_deepseek FROM users WHERE id=%s", (user["id"],))
+    if u and u["api_key_deepseek"]:
+        key = u["api_key_deepseek"]
+        masked = key[:6] + "****" + key[-4:]
+        return {"success": True, "hasKey": True, "maskedKey": masked}
+    return {"success": True, "hasKey": False}
+
+
+@router.put("/user/deepseek-key")
+async def set_deepseek_key(req: ApiKeyReq, user: dict = Depends(get_current_user)):
+    if req.api_key and not req.api_key.startswith("sk-"):
+        raise HTTPException(status_code=400, detail={"error": "API key must start with sk-"})
+    val = req.api_key.strip() if req.api_key else None
+    await execute_write("UPDATE users SET api_key_deepseek=%s WHERE id=%s", (val, user["id"]))
+    return {"success": True}
 
 
 @router.get("/sessions")
@@ -221,7 +275,41 @@ async def send_message(
             "问题：" + content
         )
 
-    # 记录已有 opencode 消息 ID（防重复取旧回复）
+    # DeepSeek 自有密钥通道
+    if session_model in ("deepseek-chat", "deepseek-reasoner"):
+        u = await execute_one("SELECT api_key_deepseek FROM users WHERE id=%s", (user["id"],))
+        if u and u["api_key_deepseek"]:
+            prev = await execute(
+                "SELECT role, content FROM chat_messages WHERE session_id=%s AND id < (SELECT MAX(id) FROM chat_messages WHERE session_id=%s) ORDER BY id ASC",
+                (sid, sid),
+            )
+            full_text, thinking_text = await _call_deepseek(u["api_key_deepseek"], session_model, prev, content)
+            if full_text:
+                if thinking_text:
+                    clean_text = full_text.strip()
+                    thinking_part = thinking_text.strip()
+                else:
+                    import re as _re
+                    tm = _re.search(r"<think>(.*?)</think>", full_text, _re.DOTALL)
+                    if tm:
+                        before = full_text[:full_text.index("<think>")].strip()
+                        after = full_text[full_text.index("</think>") + 8:].strip()
+                        tc = tm.group(1).strip()
+                        if before and tc.startswith(before):
+                            tc = tc[len(before):].strip()
+                        thinking_part = (before + "\n\n" + tc).strip()
+                        clean_text = after
+                    else:
+                        thinking_part = ""
+                        clean_text = full_text.strip()
+                await execute_write(
+                    "INSERT INTO chat_messages (session_id, role, content, thinking) VALUES (%s,%s,%s,%s)",
+                    (sid, "assistant", clean_text, thinking_part),
+                )
+                return {"success": True, "content": clean_text, "thinking": thinking_part}
+            return {"success": False, "error": "DeepSeek API returned no content"}
+
+    # 以下走 opencode 通道
     import httpx as _hx
     try:
         r = _hx.get(f"{OPENCODE_URL}/api/session/{oc_id}/message", params={"from": 0, "to": 50}, timeout=5)
