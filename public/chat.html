@@ -329,7 +329,7 @@ async function loadSessions(){
     else if(now-dt<6048e5)week.push(s)
     else older.push(s)
   })
-  function renderGroup(label,items){return items.length?'<div class=session-group><div class=group-label>'+label+'</div>'+items.map(function(s){var c=s.id===curSession?' active':'',p=s.pinned?' pinned':'';return'<div class="session'+c+p+'" data-sid="'+s.id+'"><span>'+esc(s.title||'新对话')+'</span><button class=more>···</button></div>'}).join('')+'</div>':''}
+  function renderGroup(label,items){return items.length?'<div class=session-group><div class=group-label>'+label+'</div>'+items.map(function(s){var c=s.id===curSession?' active':'',p=s.pinned?' pinned':'';return'<div class="session'+c+p+'" data-sid="'+s.id+'" data-updated="'+s.updated+'"><span>'+esc(s.title||'新对话')+'</span><button class=more>···</button></div>'}).join('')+'</div>':''}
   document.getElementById('sessionList').innerHTML=renderGroup('置顶',pinned)+renderGroup('当天',today)+renderGroup('7天内',week)+renderGroup('30天内',older)
   applySearch()
 }
@@ -502,11 +502,43 @@ function renameSession(sid,el){
   }
   inp.onkeydown=function(e){if(e.key==='Enter')overlay.querySelector('.rnOk').click();if(e.key==='Escape')close()}
 }
-async function pinSession(sid){
+function timeGroup(dateStr){
+  var dt=new Date(dateStr);if(isNaN(dt))return '当天'
+  var now=new Date(),td=now.toDateString()
+  if(dt.toDateString()===td)return '当天'
+  if(now-dt<6048e5)return '7天内'
+  return '30天内'
+}
+function moveToGroup(el,label){
+  var list=document.getElementById('sessionList'),groups=list.querySelectorAll('.session-group'),target=null,order=['置顶','当天','7天内','30天内']
+  for(var i=0;i<groups.length;i++){
+    var gl=groups[i].querySelector('.group-label')
+    if(gl&&gl.textContent===label){target=groups[i];break}
+  }
+  if(!target){
+    target=document.createElement('div');target.className='session-group'
+    var h=document.createElement('div');h.className='group-label';h.textContent=label
+    target.appendChild(h);var idx=order.indexOf(label)
+    for(var i=0;i<groups.length;i++){
+      var gl=groups[i].querySelector('.group-label')
+      if(gl&&order.indexOf(gl.textContent)>idx){list.insertBefore(target,groups[i]);break}
+    }
+    if(!target.parentNode)list.appendChild(target)
+  }
+  target.insertBefore(el,target.querySelector('.session'))
+  for(var i=0;i<groups.length;i++)if(groups[i].querySelectorAll('.session').length===0)groups[i].remove()
+}
+function pinSession(sid){
   var el=document.querySelector('#sessionList .session[data-sid="'+sid+'"]')
-  if(el)el.classList.toggle('pinned')
-  await fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){})
-  loadSessions()
+  if(!el)return
+  if(el.classList.contains('pinned')){
+    el.classList.remove('pinned')
+    moveToGroup(el,timeGroup(el.dataset.updated))
+  }else{
+    el.classList.add('pinned')
+    moveToGroup(el,'置顶')
+  }
+  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){})
 }
 function toggleDark(){
   document.body.classList.toggle('light-mode')
