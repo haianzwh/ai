@@ -104,15 +104,42 @@ body.light-mode .session .menu-item:hover{background:rgba(0,0,0,.04);color:rgba(
 .rn-input{width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.05);color:#e0e0e0;font-size:13px;outline:none;box-sizing:border-box}
 
 /* Settings dialog */
-.st-box{background:rgba(25,25,45,.95);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:28px;min-width:380px}
-.st-box label{display:block;font-size:12px;color:rgba(255,255,255,.4);margin-bottom:4px}
-.st-box input{width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.05);color:#e0e0e0;font-size:13px;outline:none;box-sizing:border-box;margin-bottom:12px}
-.st-box input:focus{border-color:rgba(99,102,241,.4)}
+.st-box{background:rgba(25,25,45,.95);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:32px;min-width:460px;max-width:500px}
+.st-box .st-title{font-size:15px;font-weight:600;color:#e0e0e0;margin-bottom:20px;letter-spacing:.3px}
+.st-box .st-opt{display:flex;gap:12px;margin-bottom:16px}
+.st-box .st-opt label{flex:1;display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid rgba(255,255,255,.08);border-radius:10px;cursor:pointer;transition:.15s;user-select:none}
+.st-box .st-opt label:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)}
+.st-box .st-opt label.on{border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.06)}
+.st-box .st-opt input{width:16px;height:16px;accent-color:#6366f1;cursor:pointer;margin:0}
+.st-box .st-opt .st-name{flex:1;font-size:13px;font-weight:500;color:#e0e0e0}
+.st-box .st-opt .st-desc{font-size:11px;color:rgba(255,255,255,.3)}
+.st-box .st-field{margin-bottom:14px}
+.st-box .st-field label{display:block;font-size:12px;color:rgba(255,255,255,.4);margin-bottom:5px}
+.st-box .st-field input{width:100%;padding:11px 14px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.05);color:#e0e0e0;font-size:13px;outline:none;box-sizing:border-box;transition:.15s}
+.st-box .st-field input:focus{border-color:rgba(99,102,241,.4);box-shadow:0 0 0 2px rgba(99,102,241,.1)}
+.st-box .st-field input::placeholder{color:rgba(255,255,255,.2)}
 .st-box .hint{font-size:11px;color:rgba(255,255,255,.3);margin-top:-8px;margin-bottom:14px}
-.st-box .st-btn{padding:8px 20px;border:none;border-radius:8px;background:#6366f1;color:#fff;cursor:pointer;font-size:13px;margin-right:8px}
-.st-box .st-btn:hover{opacity:.85}
-.st-box .st-cancel{padding:8px 20px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);cursor:pointer;font-size:13px}
-.st-box .st-cancel:hover{background:rgba(255,255,255,.1)}
+.st-box .st-actions{display:flex;gap:8px;align-items:center;margin-top:16px}
+.st-box .st-btn{padding:9px 22px;border:none;border-radius:8px;background:#6366f1;color:#fff;cursor:pointer;font-size:13px;font-weight:500;transition:.15s}
+.st-box .st-btn:hover{background:#5558e6}
+.st-box .st-cancel{padding:9px 22px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);cursor:pointer;font-size:13px;transition:.15s}
+.st-box .st-cancel:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7)}
+.st-box .st-status{font-size:12px;color:rgba(255,255,255,.3)}
+body.light-mode .st-box{background:rgba(250,251,253,.97);border-color:rgba(0,0,0,.08)}
+body.light-mode .st-box .st-title{color:#1a1a2e}
+body.light-mode .st-box .st-opt label{border-color:rgba(0,0,0,.1)}
+body.light-mode .st-box .st-opt label:hover{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.15)}
+body.light-mode .st-box .st-opt label.on{border-color:rgba(99,102,241,.25);background:rgba(99,102,241,.04)}
+body.light-mode .st-box .st-opt .st-name{color:#1a1a2e}
+body.light-mode .st-box .st-opt .st-desc{color:rgba(0,0,0,.3)}
+body.light-mode .st-box .st-field label{color:rgba(0,0,0,.4)}
+body.light-mode .st-box .st-field input{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.12);color:#1a1a2e}
+body.light-mode .st-box .st-field input:focus{border-color:rgba(99,102,241,.4);box-shadow:0 0 0 2px rgba(99,102,241,.08)}
+body.light-mode .st-box .st-field input::placeholder{color:rgba(0,0,0,.2)}
+body.light-mode .st-box .hint{color:rgba(0,0,0,.3)}
+body.light-mode .st-box .st-cancel{border-color:rgba(0,0,0,.1);background:rgba(0,0,0,.03);color:rgba(0,0,0,.4)}
+body.light-mode .st-box .st-cancel:hover{background:rgba(0,0,0,.06);color:#1a1a2e}
+body.light-mode .st-box .st-status{color:rgba(0,0,0,.3)}
 .rn-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
 .rn-btns button{padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px}
 .rnCancel{border:1px solid rgba(255,255,255,.08);background:transparent;color:rgba(255,255,255,.4)}
@@ -306,25 +333,26 @@ body.light-mode .think-btn.on{background:rgba(99,102,241,.08);border-color:rgba(
 
 <div id=settingsOverlay class=rn-overlay style=display:none>
   <div class=st-box>
-    <div class=rn-title style=margin-bottom:16px>设置 — OpenCode API Key</div>
-    <div style=margin-bottom:12px>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 0">
-        <input type=radio name=provider value=go checked onchange=toggleProvider()>
-        <span style=font-weight:500;color:#e0e0e0>OpenCode GO</span>
-        <span style=font-size:11px;color:rgba(255,255,255,.3)>$10/月 订阅</span>
+    <div class=st-title>设置 — OpenCode API Key</div>
+    <div class=st-opt>
+      <label id=goLabel class=on>
+        <input type=checkbox id=goCb checked onchange=toggleCheck()>
+        <div><div class=st-name>OpenCode GO</div><div class=st-desc>$10/月 订阅</div></div>
       </label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 0">
-        <input type=radio name=provider value=zen onchange=toggleProvider()>
-        <span style=font-weight:500;color:#e0e0e0>OpenCode ZEN</span>
-        <span style=font-size:11px;color:rgba(255,255,255,.3)>按量计费</span>
+      <label id=zenLabel>
+        <input type=checkbox id=zenCb onchange=toggleCheck()>
+        <div><div class=st-name>OpenCode ZEN</div><div class=st-desc>按量计费</div></div>
       </label>
     </div>
-    <input id=keyInput type=password placeholder="sk-..." autocomplete=off>
-    <div class=hint id=keyHint>在 <a href=https://opencode.ai/go target=_blank style=color:#818cf8>opencode.ai/go</a> 获取 GO Key</div>
-    <div style=display:flex;gap:8px;align-items:center;margin-top:8px>
+    <div class=st-field>
+      <label id=inputLabel for=keyInput>GO API Key</label>
+      <input id=keyInput type=password placeholder="sk-..." autocomplete=off>
+    </div>
+    <div class=hint id=keyHint>在 <a href=https://opencode.ai/go target=_blank style=color:#818cf8>opencode.ai/go</a> 获取 Key</div>
+    <div class=st-actions>
       <button class=st-btn onclick=saveKey()>保存</button>
       <button class=st-cancel onclick=closeSettings()>取消</button>
-      <span id=keyStatus style=font-size:12px;color:rgba(255,255,255,.3)></span>
+      <span class=st-status id=keyStatus></span>
     </div>
   </div>
 </div>
@@ -584,9 +612,13 @@ function pinSession(sid){
   }
   fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){})
 }
-function toggleProvider(){
-  var go=document.querySelector('input[name=provider]:checked').value==='go'
-  document.getElementById('keyHint').innerHTML='在 <a href='+(go?'https://opencode.ai/go':'https://opencode.ai/zen')+' target=_blank style=color:#818cf8>'+(go?'opencode.ai/go':'opencode.ai/zen')+'</a> 获取 '+(go?'GO':'ZEN')+' Key'
+function toggleCheck(){
+  var go=document.getElementById('goCb').checked, zen=document.getElementById('zenCb').checked
+  document.getElementById('goLabel').classList.toggle('on',go)
+  document.getElementById('zenLabel').classList.toggle('on',zen)
+  if(go&&!zen){document.getElementById('inputLabel').textContent='GO API Key';document.getElementById('keyHint').innerHTML='在 <a href=https://opencode.ai/go target=_blank style=color:#818cf8>opencode.ai/go</a> 获取 Key'}
+  else if(zen&&!go){document.getElementById('inputLabel').textContent='ZEN API Key';document.getElementById('keyHint').innerHTML='在 <a href=https://opencode.ai/zen target=_blank style=color:#818cf8>opencode.ai/zen</a> 获取 Key'}
+  else{document.getElementById('inputLabel').textContent='API Key'}
 }
 function openSettings(){
   document.getElementById('settingsOverlay').style.display='flex'
@@ -603,21 +635,28 @@ async function loadKeyStatus(){
     var parts=[]
     if(d.hasGOKey)parts.push('GO: '+d.maskedGOKey)
     if(d.hasZenKey)parts.push('ZEN: '+d.maskedZenKey)
-    s.textContent=parts.length?('✅ 已配置  '+parts.join(' | ')):'未配置'
+    s.textContent=parts.length?('✅ 已配置  '+parts.join(' | ')):''
   }catch(e){s.textContent='加载失败'}
 }
 async function saveKey(){
+  var go=document.getElementById('goCb').checked, zen=document.getElementById('zenCb').checked
   var key=document.getElementById('keyInput').value.trim()
-  var isGo=document.querySelector('input[name=provider]:checked').value==='go'
   var s=document.getElementById('keyStatus')
+  if(!go&&!zen){s.textContent='⚠️ 请至少选择一个服务商';return}
   if(!key){s.textContent='⚠️ 请输入 API Key';return}
   s.textContent='保存中...'
   try{
-    var url=isGo?'/auth/api/chat/user/deepseek-key':'/auth/api/chat/user/zen-key'
-    var r=await fetch(url,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({api_key:key})})
-    var d=await r.json()
-    if(d.success){s.textContent='✅ 已保存，刷新模型列表...';loadModels();setTimeout(closeSettings,1000)}
-    else{s.textContent='❌ 保存失败'}
+    if(go){
+      var r=await fetch('/auth/api/chat/user/deepseek-key',{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({api_key:key})})
+      if(!(await r.json()).success){s.textContent='❌ GO Key 保存失败';return}
+    }
+    if(zen){
+      var r=await fetch('/auth/api/chat/user/zen-key',{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({api_key:key})})
+      if(!(await r.json()).success){s.textContent='❌ ZEN Key 保存失败';return}
+    }
+    s.textContent='✅ 已保存，刷新模型列表...'
+    loadModels()
+    setTimeout(closeSettings,1000)
   }catch(e){s.textContent='❌ 请求失败'}
 }
 function toggleDark(){
