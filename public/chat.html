@@ -93,9 +93,18 @@ body.light-mode .more:hover{color:rgba(0,0,0,.5)}
 body.light-mode .session .menu{background:rgba(248,249,252,.95);border-color:rgba(0,0,0,.08)}
 body.light-mode .session .menu-item{color:rgba(0,0,0,.45)}
 body.light-mode .session .menu-item:hover{background:rgba(0,0,0,.04);color:rgba(0,0,0,.7)}
-body.light-mode #rnOverlay>div{background:rgba(250,251,253,.96)!important;border-color:rgba(0,0,0,.08)!important}
-body.light-mode #rnOverlay>div div:first-child{color:#1a1a2e!important}
-body.light-mode #renameInput{background:rgba(0,0,0,.03)!important;border-color:rgba(0,0,0,.1)!important;color:#1a1a2e!important}
+.rn-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center}
+.rn-box{background:rgba(25,25,45,.95);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:24px;min-width:320px}
+.rn-title{margin-bottom:14px;font-size:14px;font-weight:600;color:#e0e0e0}
+.rn-input{width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.05);color:#e0e0e0;font-size:13px;outline:none;box-sizing:border-box}
+.rn-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.rn-btns button{padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px}
+.rnCancel{border:1px solid rgba(255,255,255,.08);background:transparent;color:rgba(255,255,255,.4)}
+.rnOk{border:none;background:#6366f1;color:#fff}
+body.light-mode .rn-box{background:rgba(250,251,253,.96);border-color:rgba(0,0,0,.08)}
+body.light-mode .rn-title{color:#1a1a2e}
+body.light-mode .rn-input{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.1);color:#1a1a2e}
+body.light-mode .rnCancel{border-color:rgba(0,0,0,.08);color:rgba(0,0,0,.4)}
 .sidebar-footer{padding:12px 16px;border-top:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:10px;flex-shrink:0;margin-top:auto}
 .sidebar-footer .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:600}
 .sidebar-footer .uname{font-size:13px;color:rgba(255,255,255,.5);flex:1}
@@ -446,7 +455,6 @@ function cancelEdit(btn){
 }
 function toggleSidebar(){document.body.classList.toggle('sidebar-hidden')}
 function showMenu(btn,sid){
-  event.stopPropagation()
   document.querySelectorAll('.session .menu').forEach(function(m){m.remove()})
   var m=document.createElement('div');m.className='menu';m.dataset.sid=sid
   var pinned=btn.parentElement.classList.contains('pinned')
@@ -476,10 +484,10 @@ function renameSession(sid,el){
   var span=el.querySelector('span')
   var old=span.textContent
   var overlay=document.createElement('div')
-  overlay.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center'
+  overlay.className='rn-overlay'
   var box=document.createElement('div')
-  box.style.cssText='background:rgba(25,25,45,.95);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:24px;min-width:320px'
-  box.innerHTML='<div style="margin-bottom:14px;font-size:14px;font-weight:600;color:#e0e0e0">重命名对话</div><input id=renameInput style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.05);color:#e0e0e0;font-size:13px;outline:none;box-sizing:border-box"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button class=rnCancel style="padding:8px 16px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:transparent;color:rgba(255,255,255,.4);cursor:pointer;font-size:12px">取消</button><button class=rnOk style="padding:8px 16px;border:none;border-radius:8px;background:#6366f1;color:#fff;cursor:pointer;font-size:12px">确认</button></div>'
+  box.className='rn-box'
+  box.innerHTML='<div class=rn-title>重命名对话</div><input id=renameInput class=rn-input><div class=rn-btns><button class=rnCancel>取消</button><button class=rnOk>确认</button></div>'
   overlay.appendChild(box);document.body.appendChild(overlay)
   var inp=document.getElementById('renameInput');inp.value=old;inp.focus();inp.select()
   function close(){overlay.remove()}
@@ -495,7 +503,10 @@ function renameSession(sid,el){
   inp.onkeydown=function(e){if(e.key==='Enter')overlay.querySelector('.rnOk').click();if(e.key==='Escape')close()}
 }
 async function pinSession(sid){
-  await fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){})
+  try{
+    var r=await fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H})
+    if(!r.ok)return
+  }catch(e){return}
   loadSessions()
 }
 function toggleDark(){
