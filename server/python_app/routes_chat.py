@@ -79,10 +79,16 @@ async def list_models(user: dict = Depends(get_current_user)):
         async with httpx.AsyncClient() as client:
             resp = await client.get(f"{OPENCODE_URL}/api/model")
             data = resp.json()
-            models = [
-                {"id": m["id"], "name": m.get("name", m["id"]), "provider": m.get("providerID", "")}
+            raw = [
+                {"id": m["id"], "name": m.get("name", m["id"]), "provider": m.get("providerID", ""), "status": m.get("status", "")}
                 for m in data.get("data", [])
             ]
+            free_active = [m for m in raw if "free" in m["id"] and m["status"] == "active"]
+            free_rest = [m for m in raw if "free" in m["id"] and m["status"] != "active"]
+            other = [m for m in raw if "free" not in m["id"]]
+            models = free_active + free_rest + other
+            for m in models:
+                m.pop("status", None)
     except Exception:
         pass
 
