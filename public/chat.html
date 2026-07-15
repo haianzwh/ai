@@ -302,17 +302,16 @@ async function selectSession(sid){curSession=sid;loadSessions();loadMessages()}
 
 async function loadSessions(){
   var r=await fetch('/auth/api/chat/sessions',{headers:H});var d=await r.json()
-  var today=[],yesterday=[],week=[],older=[]
-  var now=new Date(),td=now.toDateString(),yd=new Date(now-864e5).toDateString()
+  var today=[],week=[],older=[]
+  var now=new Date(),td=now.toDateString()
   d.sessions.forEach(function(s){
-    var dt=new Date(s.created);var dts=dt.toDateString()
+    var dt=new Date(s.updated);var dts=dt.toDateString()
     if(dts===td)today.push(s)
-    else if(dts===yd)yesterday.push(s)
     else if(now-dt<6048e5)week.push(s)
     else older.push(s)
   })
   function renderGroup(label,items){return items.length?'<div class=session-group><div class=group-label>'+label+'</div>'+items.map(function(s){var c=s.id===curSession?' active':'',p=s.pinned?' pinned':'';return'<div class="session'+c+p+'" onclick="selectSession(\''+s.id+'\')"><span>'+esc(s.title||'新对话')+'</span><button class=more onclick="event.stopPropagation();showMenu(this,\''+s.id+'\')">···</button></div>'}).join('')+'</div>':''}
-  document.getElementById('sessionList').innerHTML=renderGroup('今天',today)+renderGroup('昨天',yesterday)+renderGroup('7天内',week)+renderGroup('30天内',older)
+  document.getElementById('sessionList').innerHTML=renderGroup('当天',today)+renderGroup('7天内',week)+renderGroup('30天内',older)
   applySearch()
 }
 function applySearch(){
@@ -472,19 +471,8 @@ function renameSession(sid,btn){
   inp.onkeydown=function(e){if(e.key==='Enter')overlay.querySelector('.rnOk').click();if(e.key==='Escape')close()}
 }
 function pinSession(sid,btn){
-  var el=btn.closest('.session');if(!el)return
-  var isPinned=el.classList.contains('pinned')
-  if(isPinned){
-    el.classList.remove('pinned')
-    fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H})
-    .then(function(){loadSessions()}).catch(function(){loadSessions()})
-  }else{
-    document.querySelectorAll('#sessionList .pinned').forEach(function(p){p.classList.remove('pinned')})
-    el.classList.add('pinned')
-    document.getElementById('sessionList').prepend(el)
-    fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H})
-    .then(function(){loadSessions()}).catch(function(){loadSessions()})
-  }
+  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H})
+  .then(function(){loadSessions()}).catch(function(){loadSessions()})
 }
 function toggleDark(){
   document.body.classList.toggle('light-mode')
