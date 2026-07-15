@@ -443,7 +443,7 @@ function showMenu(btn,sid){
   if(existing){existing.style.display=existing.style.display==='none'?'':'none';return}
   var m=document.createElement('div');m.className='menu'
   var pinned=btn.parentElement.classList.contains('pinned')
-  m.innerHTML='<div class=menu-item onclick="event.stopPropagation();pinSession(\''+sid+'\',this)"><span class=ico>📌</span>'+(pinned?'取消置顶':'置顶')+'</div><div class=menu-item onclick="event.stopPropagation();renameSession(\''+sid+'\',this)"><span class=ico>✏️</span>编辑名称</div><div class="menu-item danger" onclick="event.stopPropagation();delSession(\''+sid+'\')"><span class=ico>🗑</span>删除</div>'
+  m.innerHTML='<div class=menu-item onclick="event.stopPropagation();pinSession(\''+sid+'\',this);this.closest(\'.menu\').remove()"><span class=ico>📌</span>'+(pinned?'取消置顶':'置顶')+'</div><div class=menu-item onclick="event.stopPropagation();renameSession(\''+sid+'\',this)"><span class=ico>✏️</span>编辑名称</div><div class="menu-item danger" onclick="event.stopPropagation();delSession(\''+sid+'\');this.closest(\'.menu\').remove()"><span class=ico>🗑</span>删除</div>'
   btn.parentElement.appendChild(m)
   var r=btn.getBoundingClientRect();m.style.display='block'
   m.style.top=(r.bottom+4)+'px';m.style.left=Math.max(8,Math.min(r.right-m.offsetWidth,document.body.clientWidth-m.offsetWidth-8))+'px'
@@ -471,16 +471,16 @@ function renameSession(sid,btn){
   }
   inp.onkeydown=function(e){if(e.key==='Enter')overlay.querySelector('.rnOk').click();if(e.key==='Escape')close()}
 }
-function pinSession(sid){
-  var el=document.querySelector('.session.active')
-  if(!el)return
+function pinSession(sid,btn){
+  var el=btn.closest('.session');if(!el)return
   var wasPinned=el.classList.contains('pinned')
   el.classList.toggle('pinned')
   if(!wasPinned){
     var list=document.getElementById('sessionList')
     list.insertBefore(el,list.firstChild)
   }
-  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){el.classList.toggle('pinned')})
+  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H})
+  document.querySelectorAll('.session .menu').forEach(function(m){m.remove()})
 }
 function toggleDark(){
   document.body.classList.toggle('light-mode')
