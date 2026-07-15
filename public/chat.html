@@ -472,8 +472,24 @@ function renameSession(sid,btn){
   inp.onkeydown=function(e){if(e.key==='Enter')overlay.querySelector('.rnOk').click();if(e.key==='Escape')close()}
 }
 function pinSession(sid,btn){
-  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H})
-  .then(function(){loadSessions()}).catch(function(){loadSessions()})
+  var el=btn.closest('.session');if(!el)return
+  var isPinned=el.classList.contains('pinned')
+  // 取消其他会话的置顶
+  document.querySelectorAll('#sessionList .pinned').forEach(function(p){p.classList.remove('pinned')})
+  if(isPinned){
+    el.classList.remove('pinned')
+  }else{
+    el.classList.add('pinned')
+    var list=document.getElementById('sessionList')
+    list.insertBefore(el,list.firstChild)
+  }
+  // 关闭菜单
+  var menu=el.querySelector('.menu');if(menu)menu.remove()
+  // 后台同步
+  fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){
+    // 失败则恢复
+    el.classList.toggle('pinned')
+  })
 }
 function toggleDark(){
   document.body.classList.toggle('light-mode')
