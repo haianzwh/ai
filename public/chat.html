@@ -288,7 +288,7 @@ body.light-mode .think-btn.on{background:rgba(99,102,241,.08);border-color:rgba(
 
 <script>
 var T=localStorage.getItem('auth_token');if(!T)location.href='/login.html'
-var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat',modelName='',uName='用户',currentAbort=null,msgHistory=[],histIdx=-1,isSending=0,_pinSeq=0
+var H={Authorization:'Bearer '+T},curSession=null,chatMode='chat',modelName='',uName='用户',currentAbort=null,msgHistory=[],histIdx=-1,isSending=0
 function now(){var d=new Date();return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.toTimeString().slice(0,8)}
 function cycleMode(){
   chatMode=chatMode==='chat'?'think':'chat'
@@ -503,18 +503,8 @@ function renameSession(sid,el){
   inp.onkeydown=function(e){if(e.key==='Enter')overlay.querySelector('.rnOk').click();if(e.key==='Escape')close()}
 }
 async function pinSession(sid){
-  var seq=++_pinSeq
-  var el=document.querySelector('#sessionList .session[data-sid="'+sid+'"]')
-  if(el){
-    var wasPinned=el.classList.contains('pinned')
-    el.classList.toggle('pinned')
-    if(!wasPinned)document.getElementById('sessionList').prepend(el)
-  }
-  try{
-    var r=await fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H})
-    if(!r.ok)return
-  }catch(e){return}
-  if(seq===_pinSeq)loadSessions()
+  await fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){})
+  loadSessions()
 }
 function toggleDark(){
   document.body.classList.toggle('light-mode')
