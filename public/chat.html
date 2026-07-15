@@ -438,12 +438,11 @@ function cancelEdit(btn){
 function toggleSidebar(){document.body.classList.toggle('sidebar-hidden')}
 function showMenu(btn,sid){
   event.stopPropagation()
-  document.querySelectorAll('.session .menu').forEach(function(m){m.style.display='none'})
-  var existing=btn.parentElement.querySelector('.menu')
-  if(existing){existing.style.display=existing.style.display==='none'?'':'none';return}
+  // 移除旧菜单，每次都重新创建
+  var _old=btn.parentElement.querySelector('.menu');if(_old)_old.remove()
   var m=document.createElement('div');m.className='menu'
   var pinned=btn.parentElement.classList.contains('pinned')
-  m.innerHTML='<div class=menu-item onclick="event.stopPropagation();pinSession(\''+sid+'\',this);this.closest(\'.menu\').remove()"><span class=ico>📌</span>'+(pinned?'取消置顶':'置顶')+'</div><div class=menu-item onclick="event.stopPropagation();renameSession(\''+sid+'\',this)"><span class=ico>✏️</span>编辑名称</div><div class="menu-item danger" onclick="event.stopPropagation();delSession(\''+sid+'\');this.closest(\'.menu\').remove()"><span class=ico>🗑</span>删除</div>'
+  m.innerHTML='<div class=menu-item onclick="event.stopPropagation();pinSession(\''+sid+'\',this);this.closest(\'.menu\').remove()"><span class=ico>📌</span>'+(pinned?'取消置顶':'置顶')+'</div><div class=menu-item onclick="event.stopPropagation();renameSession(\''+sid+'\',this);this.closest(\'.menu\').remove()"><span class=ico>✏️</span>编辑名称</div><div class="menu-item danger" onclick="event.stopPropagation();delSession(\''+sid+'\');this.closest(\'.menu\').remove()"><span class=ico>🗑</span>删除</div>'
   btn.parentElement.appendChild(m)
   var r=btn.getBoundingClientRect();m.style.display='block'
   m.style.top=(r.bottom+4)+'px';m.style.left=Math.max(8,Math.min(r.right-m.offsetWidth,document.body.clientWidth-m.offsetWidth-8))+'px'
