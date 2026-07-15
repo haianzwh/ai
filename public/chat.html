@@ -11,7 +11,9 @@ body.light-mode{background:#f5f5f8;color:#1a1a2e}
 body.light-mode .sidebar{background:#fff;border-right-color:rgba(0,0,0,.06)}
 body.light-mode .sidebar .logo{color:#1a1a2e}
 body.light-mode .session-group+.session-group{border-top-color:rgba(0,0,0,.06)}
-body.light-mode .group-label{color:rgba(0,0,0,.35)}
+body.light-mode .group-label{color:rgba(0,0,0,.4)}
+body.light-mode .group-label:hover{color:#1a1a2e}
+body.light-mode .group-label .arrow{color:rgba(0,0,0,.3)}
 body.light-mode .session{color:rgba(0,0,0,.5)}
 body.light-mode .session:hover{background:rgba(0,0,0,.06);color:#1a1a2e}
 body.light-mode .session.pinned{border-left-color:#d97706;color:#1a1a2e}
@@ -75,12 +77,12 @@ select option{background:#fff;color:#1a1a2e}
 body.light-mode .btn-new{background:rgba(140,180,215,.2);color:rgba(60,110,155,.8)}
 body.light-mode .btn-new:hover{background:rgba(140,180,215,.35);color:rgba(50,95,140,.95)}
 .sidebar .title{padding:8px 16px 4px;font-size:11px;font-weight:600;color:rgba(255,255,255,.25);letter-spacing:.5px;flex-shrink:0}
-.session-group{padding:0 8px;margin-bottom:4px}
-.session-group+.session-group{border-top:1px solid rgba(255,255,255,.06);padding-top:10px;margin-top:6px}
-.group-label{padding:6px 8px 2px;font-size:11px;color:rgba(255,255,255,.2);font-weight:500;cursor:pointer;user-select:none}
-.group-label:hover{color:rgba(255,255,255,.4)}
-.group-label .arrow{font-size:8px;margin-left:2px}
-.session{padding:8px 10px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.35);border-radius:8px;transition:.1s;margin:1px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:2px solid transparent}
+.session-group{padding:0 4px;margin-bottom:2px}
+.session-group+.session-group{border-top:1px solid rgba(255,255,255,.06);padding-top:8px;margin-top:4px}
+.group-label{display:flex;align-items:center;gap:4px;padding:7px 8px 3px;font-size:11px;color:rgba(255,255,255,.25);font-weight:600;cursor:pointer;user-select:none;letter-spacing:.3px;transition:.15s}
+.group-label:hover{color:rgba(255,255,255,.55)}
+.group-label .arrow{font-size:7px;transition:.15s;color:rgba(255,255,255,.15)}
+.session{padding:7px 10px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.35);border-radius:6px;transition:.1s;margin:1px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:2px solid transparent}
 .session:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)}
 .session.pinned{border-left-color:#f59e0b;color:rgba(255,255,255,.65)}
 .session.active{background:rgba(99,102,241,.15);border-left-color:#818cf8;color:#e0e0e0}
