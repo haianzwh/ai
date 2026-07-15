@@ -306,15 +306,23 @@ body.light-mode .think-btn.on{background:rgba(99,102,241,.08);border-color:rgba(
 
 <div id=settingsOverlay class=rn-overlay style=display:none>
   <div class=st-box>
-    <div class=rn-title style=margin-bottom:16px>设置 — OpenCode API Keys</div>
-    <label for=goKey>OpenCode GO API Key</label>
-    <input id=goKey type=password placeholder="sk-..." autocomplete=off>
-    <div class=hint>在 <a href=https://opencode.ai/go target=_blank style=color:#818cf8>opencode.ai/go</a> 获取 GO 订阅 Key（$10/月）</div>
-    <label for=zenKey style=margin-top:4px>OpenCode ZEN API Key</label>
-    <input id=zenKey type=password placeholder="sk-..." autocomplete=off>
-    <div class=hint>在 <a href=https://opencode.ai/zen target=_blank style=color:#818cf8>opencode.ai/zen</a> 获取 ZEN Key（按量计费）</div>
+    <div class=rn-title style=margin-bottom:16px>设置 — OpenCode API Key</div>
+    <div style=margin-bottom:12px>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 0">
+        <input type=radio name=provider value=go checked onchange=toggleProvider()>
+        <span style=font-weight:500;color:#e0e0e0>OpenCode GO</span>
+        <span style=font-size:11px;color:rgba(255,255,255,.3)>$10/月 订阅</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 0">
+        <input type=radio name=provider value=zen onchange=toggleProvider()>
+        <span style=font-weight:500;color:#e0e0e0>OpenCode ZEN</span>
+        <span style=font-size:11px;color:rgba(255,255,255,.3)>按量计费</span>
+      </label>
+    </div>
+    <input id=keyInput type=password placeholder="sk-..." autocomplete=off>
+    <div class=hint id=keyHint>在 <a href=https://opencode.ai/go target=_blank style=color:#818cf8>opencode.ai/go</a> 获取 GO Key</div>
     <div style=display:flex;gap:8px;align-items:center;margin-top:8px>
-      <button class=st-btn onclick=saveKeys()>保存</button>
+      <button class=st-btn onclick=saveKey()>保存</button>
       <button class=st-cancel onclick=closeSettings()>取消</button>
       <span id=keyStatus style=font-size:12px;color:rgba(255,255,255,.3)></span>
     </div>
@@ -576,39 +584,40 @@ function pinSession(sid){
   }
   fetch('/auth/api/chat/sessions/'+sid+'/pin',{method:'PUT',headers:H}).catch(function(){})
 }
+function toggleProvider(){
+  var go=document.querySelector('input[name=provider]:checked').value==='go'
+  document.getElementById('keyHint').innerHTML='在 <a href='+(go?'https://opencode.ai/go':'https://opencode.ai/zen')+' target=_blank style=color:#818cf8>'+(go?'opencode.ai/go':'opencode.ai/zen')+'</a> 获取 '+(go?'GO':'ZEN')+' Key'
+}
 function openSettings(){
   document.getElementById('settingsOverlay').style.display='flex'
-  loadKeys()
+  document.getElementById('keyInput').value=''
+  loadKeyStatus()
 }
 function closeSettings(){
   document.getElementById('settingsOverlay').style.display='none'
 }
-async function loadKeys(){
+async function loadKeyStatus(){
   var s=document.getElementById('keyStatus')
   try{
     var r=await fetch('/auth/api/chat/user/deepseek-key',{headers:H});var d=await r.json()
     var parts=[]
-    if(d.hasGOKey){parts.push('GO: '+d.maskedGOKey)}
-    if(d.hasZenKey){parts.push('ZEN: '+d.maskedZenKey)}
-    s.textContent=parts.length?('✅ '+parts.join(' | ')):'未配置'
+    if(d.hasGOKey)parts.push('GO: '+d.maskedGOKey)
+    if(d.hasZenKey)parts.push('ZEN: '+d.maskedZenKey)
+    s.textContent=parts.length?('✅ 已配置  '+parts.join(' | ')):'未配置'
   }catch(e){s.textContent='加载失败'}
 }
-async function saveKeys(){
-  var goKey=document.getElementById('goKey').value.trim()
-  var zenKey=document.getElementById('zenKey').value.trim()
-  var s=document.getElementById('keyStatus');s.textContent='保存中...'
+async function saveKey(){
+  var key=document.getElementById('keyInput').value.trim()
+  var isGo=document.querySelector('input[name=provider]:checked').value==='go'
+  var s=document.getElementById('keyStatus')
+  if(!key){s.textContent='⚠️ 请输入 API Key';return}
+  s.textContent='保存中...'
   try{
-    if(goKey){
-      var r=await fetch('/auth/api/chat/user/deepseek-key',{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({api_key:goKey})})
-      if(!(await r.json()).success){s.textContent='❌ GO Key 保存失败';return}
-    }
-    if(zenKey){
-      var r=await fetch('/auth/api/chat/user/zen-key',{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({api_key:zenKey})})
-      if(!(await r.json()).success){s.textContent='❌ ZEN Key 保存失败';return}
-    }
-    s.textContent='✅ 已保存，刷新模型列表...'
-    loadModels()
-    setTimeout(closeSettings,1000)
+    var url=isGo?'/auth/api/chat/user/deepseek-key':'/auth/api/chat/user/zen-key'
+    var r=await fetch(url,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({api_key:key})})
+    var d=await r.json()
+    if(d.success){s.textContent='✅ 已保存，刷新模型列表...';loadModels();setTimeout(closeSettings,1000)}
+    else{s.textContent='❌ 保存失败'}
   }catch(e){s.textContent='❌ 请求失败'}
 }
 function toggleDark(){
