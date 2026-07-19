@@ -1,0 +1,11 @@
+# =============================================================================
+#   Event 配置
+# =============================================================================
+events:
+  handlers:
+    logging: true
+    metrics: false
+    audit: true
+    webhook: false
+  webhook:
+    url: "http://localhost:8000/webhook"

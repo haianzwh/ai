@@ -1,0 +1,13 @@
+# Daily Report Workflow
+workflows:
+  daily_report:
+    name: Daily Report
+    nodes:
+      - name: gather_data
+        type: skill
+        skill: web_search
+        args:
+          query: "{{input.topic}}"
+      - name: summarize
+        type: llm
+        prompt: "Summarize the following data into a report"

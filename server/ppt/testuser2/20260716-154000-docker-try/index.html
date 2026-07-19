@@ -1,0 +1,311 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>PPT</title><style>body{background:#0b0e14;margin:0;padding:20px;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;}.slidewrap{margin:0 auto 16px;max-width:1280px;}.slidewrap .slide{height:720px;}</style></head><body><div style="position:fixed;top:10px;right:16px;z-index:99;background:#11182a;color:#cfe;padding:8px 12px;border-radius:8px;font-size:13px;">PPT · 共 7 页</div><section class="slidewrap">
+<div class="circle circle-1"></div>
+<div class="circle circle-2"></div>
+<div class="circle circle-3"></div>
+<div class="container">
+  <div class="icon">🐳</div>
+  <h1>试试 Docker</h1>
+  <div class="divider"></div>
+  <div class="subtitle">从了解到上手，只需一堂课</div>
+  <div class="badge">🚀 团队技术分享</div>
+</div>
+<div class="footer">试试 · Docker</div>
+</section><section class="slidewrap">
+<h1>你是否也说过<span class="highlight">这句话</span>？</h1>
+<div class="subtitle">一个困扰了开发者几十年的经典难题</div>
+<div class="content">
+  <div class="left-panel">
+    <div class="quote-box">
+      <div class="quote">"But it works on my machine"</div>
+      <div class="author">😭 开发者经典语录 · 2026 依然高频</div>
+    </div>
+    <div class="scenes">
+      <div class="scene-item"><span class="icon">🖥️</span> 开发环境跑得好好的，上线就崩了</div>
+      <div class="scene-item"><span class="icon">👥</span> 同事的代码我能拉下来但跑不起来</div>
+      <div class="scene-item"><span class="icon">🆕</span> 换台电脑配环境花半天时间</div>
+      <div class="scene-item"><span class="icon">📋</span> 项目依赖版本冲突，不敢升级</div>
+    </div>
+  </div>
+  <div class="right-panel">
+    <div class="stat-number">92%</div>
+    <div class="stat-label">IT 专业人士<br>已在用容器解决这个问题</div>
+    <div class="stat-divider"></div>
+    <div class="stat-number" style="font-size: 2rem; color: #34a853;">+12%</div>
+    <div class="stat-label">较 2024 年使用率增长<br>（80% → 92%）</div>
+    <div class="arrow-note">📊 Docker 2025 应用开发现状报告</div>
+  </div>
+</div>
+<div class="footer-bar">
+  <span>环境一致性 · 从痛点开始</span>
+  <span class="page-num">2 / 7</span>
+</div>
+</section><section class="slidewrap">
+<h1>Docker = 应用的<span style="color:#1a73e8;">便携集装箱</span></h1>
+<div class="subtitle">一次构建，到处运行 — 把应用和环境打包在一起</div>
+<div class="content">
+  <div class="cards">
+    <div class="card tag-blue">
+      <div class="card-icon">🖼️</div>
+      <h3>镜像 (Image)</h3>
+      <p>应用的"蓝图"模板，包含操作系统、依赖、代码等所有内容。分层结构，只读不可变。</p>
+    </div>
+    <div class="card tag-green">
+      <div class="card-icon">📦</div>
+      <h3>容器 (Container)</h3>
+      <p>镜像的运行实例，轻量、隔离、可启停。每个容器就是一个小型沙箱环境。</p>
+    </div>
+    <div class="card tag-orange">
+      <div class="card-icon">🏪</div>
+      <h3>仓库 (Registry)</h3>
+      <p>镜像的"应用商店"，Docker Hub 上有数百万个公共镜像，随拉随用。</p>
+    </div>
+  </div>
+  <div class="analogy-box">
+    <h3>💡 生活类比</h3>
+    <div class="analogy-item">
+      <span class="label">镜像 →</span>
+      <span class="desc">📀 系统安装光盘（类），可以创建多个实例</span>
+    </div>
+    <div class="analogy-item">
+      <span class="label">容器 →</span>
+      <span class="desc">🖥️ 安装好的系统（对象），独立运行互不干扰</span>
+    </div>
+    <div class="analogy-item">
+      <span class="label">仓库 →</span>
+      <span class="desc">📱 应用商店，需要什么直接下载安装</span>
+    </div>
+    <div class="analogy-item">
+      <span class="label">Dockerfile →</span>
+      <span class="desc">📋 制作镜像的"配方说明书"</span>
+    </div>
+    <div class="callout">🐳 核心能力：轻量 · 隔离 · 可移植 · 一致</div>
+  </div>
+</div>
+<div class="footer-bar">
+  <span>核心概念 · Docker 三要素</span>
+  <span class="page-num">3 / 7</span>
+</div>
+</section><section class="slidewrap">
+<h1>为什么全球 <span class="highlight">2000 万</span> 开发者选择 Docker？</h1>
+<div class="subtitle">容器技术已经成为现代开发的标配</div>
+<div class="content">
+  <div class="advantages">
+    <div class="adv-card">
+      <div class="adv-icon">🚀</div>
+      <h3>秒级启动</h3>
+      <p>容器启动毫秒级，虚拟机分钟级。开发测试迭代效率大幅提升。</p>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">📦</div>
+      <h3>环境一致</h3>
+      <p>"一次构建，到处运行"。彻底告别环境差异导致的各类奇怪 Bug。</p>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">💪</div>
+      <h3>轻量高效</h3>
+      <p>共享宿主机内核，无完整 OS 开销。单机运行上千容器，资源利用率极高。</p>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">🔄</div>
+      <h3>CI/CD 就绪</h3>
+      <p>从开发到测试到生产，用同一份镜像。GitHub Actions、GitLab CI 原生集成。</p>
+    </div>
+  </div>
+  <div class="compare-box">
+    <h3>⚖️ Docker 容器 vs 传统虚拟机</h3>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>对比维度</th>
+          <th>🐳 Docker</th>
+          <th>💻 虚拟机</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>启动速度</td>
+          <td><span class="check">秒级/毫秒级</span></td>
+          <td><span class="cross">分钟级</span></td>
+        </tr>
+        <tr>
+          <td>镜像体积</td>
+          <td><span class="check">MB 级</span></td>
+          <td><span class="cross">GB 级</span></td>
+        </tr>
+        <tr>
+          <td>资源开销</td>
+          <td><span class="check">极低（共享内核）</span></td>
+          <td><span class="cross">高（完整 OS）</span></td>
+        </tr>
+        <tr>
+          <td>单机数量</td>
+          <td><span class="check">上千个</span></td>
+          <td><span class="cross">几十个</span></td>
+        </tr>
+        <tr>
+          <td>性能</td>
+          <td><span class="check">接近原生</span></td>
+          <td><span class="cross">有损耗</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="global-stats">
+      <div class="stat-item">
+        <div class="stat-num">2000万+</div>
+        <div class="stat-label">月活开发者</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">200亿+</div>
+        <div class="stat-label">月镜像拉取</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">92%</div>
+        <div class="stat-label">IT 行业使用率</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="footer-bar">
+  <span>优势对比 · 数据来源于 Docker 2025 报告</span>
+  <span class="page-num">4 / 7</span>
+</div>
+</section><section class="slidewrap">
+<h1>5 分钟，从 <span class="highlight">0 到第一个容器</span></h1>
+<div class="subtitle">安装 → 运行 → 部署，比你想象的简单</div>
+<div class="content">
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">📥 安装 Docker</div>
+        <div class="step-desc">一行命令搞定（Linux/Mac/Windows 均支持）</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">✅ 验证安装</div>
+        <div class="step-desc">运行 hello-world 确认 Docker 就绪</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">🌐 运行 Nginx 服务</div>
+        <div class="step-desc">一条命令启动一个 Web 服务器</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">🧩 多服务一键启动</div>
+        <div class="step-desc">Docker Compose 定义完整应用栈</div>
+      </div>
+    </div>
+    <div class="tip-box">
+      <span class="icon">💡</span>
+      <p>Docker Desktop 提供图形界面，适合初学者。安装后打开即可开始。</p>
+    </div>
+  </div>
+  <div class="code-block">
+    <span class="comment"># 1. 安装（Linux）</span><br>
+    curl -fsSL https://get.docker.com | sh<br><br>
+    <span class="comment"># 2. 验证</span><br>
+    docker run hello-world<br><br>
+    <span class="comment"># 3. 运行 Web 服务</span><br>
+    docker run -d -p 8080:80 nginx:alpine<br>
+    <span class="output">→ 访问 http://localhost:8080</span><br><br>
+    <span class="comment"># 4. 多服务（docker-compose.yml）</span><br>
+    <span class="kw">version</span>: <span class="str">'3'</span><br>
+    <span class="kw">services</span>:<br>
+    &nbsp;&nbsp;<span class="cmd">web</span>:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">image</span>: nginx:alpine<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">ports</span>:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="str">"8080:80"</span>
+  </div>
+</div>
+<div class="footer-bar">
+  <span>快速上手 · 从安装到运行只需 5 分钟</span>
+  <span class="page-num">5 / 7</span>
+</div>
+</section><section class="slidewrap">
+<h1>在团队中 <span class="highlight">试试 Docker</span></h1>
+<div class="subtitle">从个人到团队，Docker 带来的改变</div>
+<div class="content">
+  <div class="practice-card">
+    <div class="practice-icon">🔧</div>
+    <h3>开发环境标准化</h3>
+    <ul>
+      <li>docker compose up 一键启动完整服务栈</li>
+      <li>新项目附带 Dockerfile + compose.yml</li>
+      <li>所有开发者运行完全一致的环境</li>
+      <li>告别"我本地 OK 啊"的 Debug 循环</li>
+    </ul>
+    <span class="tag tag-1">⚡ 立竿见影</span>
+  </div>
+  <div class="practice-card">
+    <div class="practice-icon">👥</div>
+    <h3>新成员 Onboarding</h3>
+    <ul>
+      <li>从 git clone 到开始编码只需 10 分钟</li>
+      <li>无需手动安装数据库、消息队列等依赖</li>
+      <li>Wiki 文档简化为：docker compose up</li>
+      <li>降低新人的技术栈学习门槛</li>
+    </ul>
+    <span class="tag tag-2">🎯 提升效率</span>
+  </div>
+  <div class="practice-card">
+    <div class="practice-icon">🏗️</div>
+    <h3>CI/CD 流水线</h3>
+    <ul>
+      <li>开发、测试、生产使用同一份镜像</li>
+      <li>GitHub Actions / GitLab CI 原生支持</li>
+      <li>自动化构建、测试、部署一气呵成</li>
+      <li>不可变基础设施，回滚只需切换镜像 Tag</li>
+    </ul>
+    <span class="tag tag-3">🚀 工程化进阶</span>
+  </div>
+</div>
+<div class="workflow-bar">
+  <span>📋 推荐路线</span>
+  <span class="arrow">→</span>
+  <span>个人项目容器化</span>
+  <span class="arrow">→</span>
+  <span class="highlight-item">团队统一环境</span>
+  <span class="arrow">→</span>
+  <span>CI/CD 自动化</span>
+  <span class="arrow">→</span>
+  <span>云原生架构</span>
+</div>
+<div class="footer-bar">
+  <span>团队实践 · 从简单开始，逐步深入</span>
+  <span class="page-num">6 / 7</span>
+</div>
+</section><section class="slidewrap">
+<div class="circle circle-1"></div>
+<div class="circle circle-2"></div>
+<div class="circle circle-3"></div>
+<div class="container">
+  <h1>所以，试试？</h1>
+  <div class="subtitle">从今天开始，用 Docker 改变你的开发体验</div>
+  <div class="divider"></div>
+  <div class="action-items">
+    <div class="action-item">
+      <span class="num">1</span>
+      安装 Docker Desktop
+    </div>
+    <div class="action-item">
+      <span class="num">2</span>
+      容器化一个已有项目
+    </div>
+    <div class="action-item">
+      <span class="num">3</span>
+      和团队分享你的经验
+    </div>
+  </div>
+  <div class="final-msg">
+    🐳 试试看，你会发现新世界
+  </div>
+</div>
+<div class="footer">试试 · Docker · 感谢聆听</div>
+</section></body></html>

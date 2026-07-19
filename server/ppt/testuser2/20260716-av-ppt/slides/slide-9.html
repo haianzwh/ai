@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:1280px; height:720px; overflow:hidden; }
+body{
+  font-family:'Segoe UI','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+  color:#E8F1FB;
+  background: radial-gradient(1200px 820px at 78% -12%, #11335A 0%, #0A1428 46%, #070B18 100%);
+  position:relative;
+}
+body::before{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    linear-gradient(rgba(120,160,210,0.05) 1px, transparent 1px) 0 0/44px 44px,
+    linear-gradient(90deg, rgba(120,160,210,0.05) 1px, transparent 1px) 0 0/44px 44px;
+  -webkit-mask-image: radial-gradient(1200px 900px at 70% 0%, #000 35%, transparent 85%);
+  mask-image: radial-gradient(1200px 900px at 70% 0%, #000 35%, transparent 85%);
+}
+body::after{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(420px 300px at 86% 10%, rgba(56,189,248,0.16), transparent 70%),
+    radial-gradient(360px 260px at 10% 96%, rgba(129,140,248,0.14), transparent 70%);
+}
+.slide{ position:relative; width:1280px; height:720px; padding:54px 64px; z-index:2; }
+.kicker{ display:inline-flex; align-items:center; gap:10px; font-size:13px; letter-spacing:3px;
+  text-transform:uppercase; color:#38BDF8; font-weight:600; margin-bottom:14px; }
+.kicker::before{ content:""; width:30px; height:2px; background:linear-gradient(90deg,#38BDF8,#22D3EE); border-radius:2px; }
+.title{ font-size:44px; font-weight:800; line-height:1.12; letter-spacing:-0.5px;
+  background:linear-gradient(120deg,#E8F1FB 30%,#7DD3FC 100%); -webkit-background-clip:text;
+  background-clip:text; color:transparent; }
+.h2{ font-size:30px; font-weight:700; color:#E8F1FB; }
+.sub{ color:#9FB3C8; font-size:17px; line-height:1.65; }
+.accent{ color:#38BDF8; } .accent-g{ color:#34D399; } .accent-a{ color:#FBBF24; }
+.card{ background:rgba(18,30,52,0.74); border:1px solid rgba(56,189,248,0.22); border-radius:16px;
+  padding:22px 24px; box-shadow:0 0 30px rgba(56,189,248,0.10); }
+.card-h{ font-size:15px; font-weight:700; color:#7DD3FC; margin-bottom:10px; letter-spacing:.5px; }
+.mono{ font-family:'SFMono-Regular',Consolas,monospace; }
+.footer{ position:absolute; left:64px; bottom:24px; display:flex; align-items:center; gap:12px;
+  color:#5E7390; font-size:12px; letter-spacing:1px; z-index:3; }
+.footer .dot{ width:7px; height:7px; border-radius:50%; background:#38BDF8; box-shadow:0 0 10px #38BDF8; }
+.pagenum{ position:absolute; right:64px; bottom:24px; color:#5E7390; font-size:12px; letter-spacing:1px; z-index:3; }
+.chip{ display:inline-block; padding:5px 13px; border-radius:999px; font-size:13px; font-weight:600;
+  border:1px solid rgba(56,189,248,0.35); color:#7DD3FC; background:rgba(56,189,248,0.08); }
+.table{ width:100%; border-collapse:collapse; font-size:15px; }
+.table th{ text-align:left; color:#7DD3FC; font-weight:700; padding:11px 14px; border-bottom:1px solid rgba(56,189,248,0.3); font-size:13px; letter-spacing:.5px; }
+.table td{ padding:11px 14px; border-bottom:1px solid rgba(120,160,210,0.12); color:#D6E4F0; vertical-align:top; }
+.table tr:last-child td{ border-bottom:none; }
+.big{ font-size:46px; font-weight:800; line-height:1; }
+.unit{ font-size:16px; color:#9FB3C8; font-weight:600; }
+.metric-label{ font-size:13px; color:#9FB3C8; letter-spacing:.5px; }
+</style></head>
+<body><div class="slide">
+<div class="kicker">03 · 技术内核</div>
+<div class="title">感知：车辆的眼睛与大脑</div>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:26px; margin-top:30px;">
+  <div>
+    <div class="card" style="margin-bottom:18px;"><div class="card-h">传感器四件套</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span class="chip">摄像头</span><span class="chip">LiDAR</span><span class="chip">Radar</span><span class="chip">GNSS/IMU</span>
+      </div>
+    </div>
+    <div class="card"><div class="card-h">成本锚点</div>
+      <div class="sub">消费级 ADAS <span class="accent">&lt; $500</span>；Robotaxi 方案 <span class="accent">&lt; $15,000</span>；L4 系统 2027 预计降至 <span class="accent">~$18,000</span>。</div>
+    </div>
+  </div>
+  <div class="card" style="height:100%;">
+    <div class="card-h">两条技术路线</div>
+    <div style="margin-top:6px;">
+      <div style="margin-bottom:16px;"><span class="accent mono" style="font-size:17px;">LiDAR 中心融合</span> · Waymo
+        <div class="sub" style="margin-top:3px;">5 个 LiDAR + 8 摄像头，雨天目标召回率 <span class="accent">95.2%</span>。高精度、高成本。</div></div>
+      <div><span class="accent-g mono" style="font-size:17px;">纯视觉端到端</span> · Tesla
+        <div class="sub" style="margin-top:3px;">8 摄像头 + 神经网络，低成本消费级路线，依赖海量数据迭代。</div></div>
+    </div>
+  </div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">9 / 15</div></body></html>

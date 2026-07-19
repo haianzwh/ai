@@ -1,0 +1,34 @@
+workflows:
+  report_generator:
+    name: Report Generator
+    nodes:
+      - name: search_data
+        type: skill
+        skill: web_search
+        args:
+          query: "{{input.topic}} latest news"
+      - name: generate_report
+        type: llm
+        prompt: "Generate a report based on: {{results[0].result}}"
+  customer_support:
+    name: Customer Support
+    nodes:
+      - name: classify_intent
+        type: llm
+        prompt: "Classify this customer query: {{input.query}}"
+      - name: handle_query
+        type: skill
+        skill: web_search
+        args:
+          query: "{{input.query}}"
+  code_review:
+    name: Code Review
+    nodes:
+      - name: read_code
+        type: skill
+        skill: file_reader
+        args:
+          path: "{{input.file}}"
+      - name: review
+        type: llm
+        prompt: "Review this code for bugs: {{results[0].content}}"

@@ -1,0 +1,138 @@
+{
+  "page": {
+    "slide_number": 1,
+    "page_type": "cover",
+    "narrative_role": "cover",
+    "title": "自动驾驶的预测、规划、决策与仿真",
+    "page_goal": "点题四大模块构成思考-行动-验证闭环",
+    "audience_takeaway": "记住预测/决策/规划/仿真四者构成闭环",
+    "visual_weight": 3,
+    "density_label": "low",
+    "density_reason": "封面页聚焦标题与一句话定位，低密度留出呼吸感",
+    "density_contract": {
+      "deck_bias": "balanced",
+      "page_lower_bound": "low",
+      "page_upper_bound": "mid_low",
+      "max_cards": 2,
+      "max_charts": 1,
+      "min_body_font_px": 24,
+      "max_lines_per_card": 3,
+      "image_policy": "flexible",
+      "decoration_budget": "generous",
+      "overflow_strategy": "rebalance_layout"
+    },
+    "layout_hint": "hero-top",
+    "layout_variation_note": "封面居中 hero 聚焦，与后续内容页左对齐网格形成反差",
+    "focus_zone": "画面中心偏上：主标题 + 副标题",
+    "negative_space_target": "high",
+    "page_text_strategy": "主标题一句话点题，副标题一句定位",
+    "rhythm_action": "铺垫",
+    "must_avoid": [
+      "避免把四大模块拆成并排卡片，封面应保持极简聚焦"
+    ],
+    "variation_guardrails": {
+      "same_gene_as_deck": "科技蓝细竖线锚点、白底、字体角色、圆角与全 deck 一致",
+      "different_from_previous": [
+        "居中构图而非左对齐",
+        "呼吸页留白强度远高于内容页"
+      ]
+    },
+    "director_command": {
+      "mood": "克制、专业、可信",
+      "spatial_strategy": "中心轴线对称，主标题为视觉重心，下方细线引导一行定位语",
+      "anchor_treatment": "主标题大字重科技蓝，副标题灰色弱化",
+      "techniques": [
+        "center-axis",
+        "thin-blue-rule",
+        "generous-whitespace"
+      ],
+      "prose": "干净白光里标题如路牌稳立画面中央，四周大量留白"
+    },
+    "decoration_hints": {
+      "background": {
+        "feel": "纯净通透",
+        "restraint": "仅极淡蓝灰渐变角",
+        "techniques": [
+          "soft-corner-gradient"
+        ]
+      },
+      "floating": {
+        "feel": "几乎无",
+        "restraint": "高",
+        "techniques": [
+          "single-blue-dot"
+        ]
+      },
+      "page_accent": {
+        "feel": "科技蓝细竖线",
+        "restraint": "中",
+        "techniques": [
+          "left-blue-rule"
+        ]
+      }
+    },
+    "source_guidance": {
+      "brief_sections": [
+        "总览：四大模块的闭环关系"
+      ],
+      "citation_expectation": "封面不引用具体数据",
+      "strictness": "仅用原文总览句做副标题"
+    },
+    "resources": {
+      "page_template": "cover",
+      "layout_refs": [
+        "hero-top"
+      ],
+      "block_refs": [],
+      "chart_refs": [],
+      "principle_refs": [
+        "color-psychology",
+        "composition"
+      ],
+      "resource_rationale": "封面需情绪校准与构图稳定，选用 cover 模板与 hero-top 布局"
+    },
+    "cards": [
+      {
+        "card_id": "s1-anchor-1",
+        "role": "anchor",
+        "card_type": "text",
+        "card_style": "accent",
+        "argument_role": "claim",
+        "headline": "思考-行动-验证闭环",
+        "body": [
+          "预测、决策、规划、仿真",
+          "让车辆在复杂交通中安全行驶"
+        ],
+        "data_points": [],
+        "chart": {
+          "chart_type": null
+        },
+        "content_budget": {
+          "headline_max_chars": 12,
+          "body_max_bullets": 2,
+          "body_max_lines": 2
+        },
+        "image": {
+          "mode": "decorate",
+          "needed": false,
+          "usage": null,
+          "placement": null,
+          "content_description": null,
+          "source_hint": null,
+          "decorate_brief": "右侧极淡科技蓝环形箭头示意闭环"
+        },
+        "resource_ref": {
+          "chart": null,
+          "principle": "visual-hierarchy"
+        }
+      }
+    ],
+    "workflow_metadata": {
+      "stage": "planning",
+      "workflow_version": "2026.04.09-v4.1",
+      "planning_schema_version": "4.1",
+      "planning_packet_version": "4.1",
+      "planning_continuity_version": "4.1"
+    }
+  }
+}

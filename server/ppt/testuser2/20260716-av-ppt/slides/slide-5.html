@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:1280px; height:720px; overflow:hidden; }
+body{
+  font-family:'Segoe UI','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+  color:#E8F1FB;
+  background: radial-gradient(1200px 820px at 78% -12%, #11335A 0%, #0A1428 46%, #070B18 100%);
+  position:relative;
+}
+body::before{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    linear-gradient(rgba(120,160,210,0.05) 1px, transparent 1px) 0 0/44px 44px,
+    linear-gradient(90deg, rgba(120,160,210,0.05) 1px, transparent 1px) 0 0/44px 44px;
+  -webkit-mask-image: radial-gradient(1200px 900px at 70% 0%, #000 35%, transparent 85%);
+  mask-image: radial-gradient(1200px 900px at 70% 0%, #000 35%, transparent 85%);
+}
+body::after{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(420px 300px at 86% 10%, rgba(56,189,248,0.16), transparent 70%),
+    radial-gradient(360px 260px at 10% 96%, rgba(129,140,248,0.14), transparent 70%);
+}
+.slide{ position:relative; width:1280px; height:720px; padding:54px 64px; z-index:2; }
+.kicker{ display:inline-flex; align-items:center; gap:10px; font-size:13px; letter-spacing:3px;
+  text-transform:uppercase; color:#38BDF8; font-weight:600; margin-bottom:14px; }
+.kicker::before{ content:""; width:30px; height:2px; background:linear-gradient(90deg,#38BDF8,#22D3EE); border-radius:2px; }
+.title{ font-size:44px; font-weight:800; line-height:1.12; letter-spacing:-0.5px;
+  background:linear-gradient(120deg,#E8F1FB 30%,#7DD3FC 100%); -webkit-background-clip:text;
+  background-clip:text; color:transparent; }
+.h2{ font-size:30px; font-weight:700; color:#E8F1FB; }
+.sub{ color:#9FB3C8; font-size:17px; line-height:1.65; }
+.accent{ color:#38BDF8; } .accent-g{ color:#34D399; } .accent-a{ color:#FBBF24; }
+.card{ background:rgba(18,30,52,0.74); border:1px solid rgba(56,189,248,0.22); border-radius:16px;
+  padding:22px 24px; box-shadow:0 0 30px rgba(56,189,248,0.10); }
+.card-h{ font-size:15px; font-weight:700; color:#7DD3FC; margin-bottom:10px; letter-spacing:.5px; }
+.mono{ font-family:'SFMono-Regular',Consolas,monospace; }
+.footer{ position:absolute; left:64px; bottom:24px; display:flex; align-items:center; gap:12px;
+  color:#5E7390; font-size:12px; letter-spacing:1px; z-index:3; }
+.footer .dot{ width:7px; height:7px; border-radius:50%; background:#38BDF8; box-shadow:0 0 10px #38BDF8; }
+.pagenum{ position:absolute; right:64px; bottom:24px; color:#5E7390; font-size:12px; letter-spacing:1px; z-index:3; }
+.chip{ display:inline-block; padding:5px 13px; border-radius:999px; font-size:13px; font-weight:600;
+  border:1px solid rgba(56,189,248,0.35); color:#7DD3FC; background:rgba(56,189,248,0.08); }
+.table{ width:100%; border-collapse:collapse; font-size:15px; }
+.table th{ text-align:left; color:#7DD3FC; font-weight:700; padding:11px 14px; border-bottom:1px solid rgba(56,189,248,0.3); font-size:13px; letter-spacing:.5px; }
+.table td{ padding:11px 14px; border-bottom:1px solid rgba(120,160,210,0.12); color:#D6E4F0; vertical-align:top; }
+.table tr:last-child td{ border-bottom:none; }
+.big{ font-size:46px; font-weight:800; line-height:1; }
+.unit{ font-size:16px; color:#9FB3C8; font-weight:600; }
+.metric-label{ font-size:13px; color:#9FB3C8; letter-spacing:.5px; }
+</style></head>
+<body><div class="slide">
+<div class="kicker">02 · 分级</div>
+<div class="title">SAE 自动化分级 L0–L5</div>
+<div style="margin-top:26px;">
+<table class="table">
+  <tr><th style="width:90px;">等级</th><th style="width:150px;">名称</th><th style="width:170px;">谁在开</th>
+      <th style="width:160px;">法律责任</th><th>代表系统</th></tr>
+  <tr><td class="accent">L0</td><td>无自动化</td><td>人</td><td>驾驶员</td><td>仅预警 / AEB</td></tr>
+  <tr><td class="accent">L1</td><td>驾驶辅助</td><td>人（偶尔）</td><td>驾驶员</td><td>自适应巡航 ACC</td></tr>
+  <tr><td class="accent">L2</td><td>部分自动化</td><td>车（转向+速度）</td><td>驾驶员监督</td><td>Tesla AP、Super Cruise</td></tr>
+  <tr style="background:rgba(52,211,153,0.06);"><td class="accent-g">L3</td><td>有条件自动化</td><td>车</td><td>车企（限 ODD）</td><td>奔驰 Drive Pilot</td></tr>
+  <tr style="background:rgba(52,211,153,0.06);"><td class="accent-g">L4</td><td>高度自动化</td><td>车（全）</td><td>车企（限 ODD）</td><td>Waymo、Apollo Go</td></tr>
+  <tr style="background:rgba(52,211,153,0.06);"><td class="accent-g">L5</td><td>完全自动化</td><td>车（全）</td><td>车企（无限）</td><td>暂无量产</td></tr>
+</table>
+</div>
+<div style="display:flex; gap:12px; margin-top:18px; align-items:center;">
+  <span class="chip" style="border-color:rgba(56,189,248,.4);">蓝色 = 驾驶辅助（人负责）</span>
+  <span class="chip" style="border-color:rgba(52,211,153,.4); color:#34D399;">绿色 = 自动驾驶（车负责）</span>
+  <span class="chip accent-a" style="border-color:rgba(251,191,36,.4); color:#FBBF24;">临界点 L2→L3：责任转移</span>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">5 / 15</div></body></html>

@@ -1,0 +1,205 @@
+{
+  "page": {
+    "slide_number": 9,
+    "page_type": "content",
+    "narrative_role": "comparison",
+    "title": "闭环关系与价值总结",
+    "page_goal": "四模块首尾反馈形成持续优化的闭环",
+    "audience_takeaway": "收束整套 deck 的核心结论",
+    "visual_weight": 6,
+    "density_label": "medium",
+    "density_reason": "结论页，环形关系 + 价值收束，medium 密度",
+    "density_contract": {
+      "deck_bias": "balanced",
+      "page_lower_bound": "medium",
+      "page_upper_bound": "high",
+      "max_cards": 4,
+      "max_charts": 2,
+      "min_body_font_px": 18,
+      "max_lines_per_card": 5,
+      "image_policy": "support_only",
+      "decoration_budget": "medium",
+      "overflow_strategy": "tighten_budget"
+    },
+    "layout_hint": "l-shape",
+    "layout_variation_note": "L 型：主体环形关系，底部一句价值收束",
+    "focus_zone": "主体环形链路回顾",
+    "negative_space_target": "medium",
+    "page_text_strategy": "关系为锚，价值收束于底",
+    "rhythm_action": "收束",
+    "must_avoid": [
+      "避免与第2页总览完全雷同，本页加价值升华"
+    ],
+    "variation_guardrails": {
+      "same_gene_as_deck": "科技蓝细竖线锚点、白底、字体角色、圆角与全 deck 一致",
+      "different_from_previous": [
+        "底部加价值收束带",
+        "比总览更凝练"
+      ]
+    },
+    "director_command": {
+      "mood": "收束、升华、通透",
+      "spatial_strategy": "L 形主体回顾环路，底部一条 accent 价值带收束",
+      "anchor_treatment": "环形 accent，底部带强调",
+      "techniques": [
+        "loop-diagram",
+        "bottom-summary-band"
+      ],
+      "prose": "环路再次浮现，底部一句点透价值"
+    },
+    "decoration_hints": {
+      "background": {
+        "feel": "极淡分区底色",
+        "restraint": "低",
+        "techniques": [
+          "section-tint"
+        ]
+      },
+      "floating": {
+        "feel": "弱",
+        "restraint": "高",
+        "techniques": [
+          "none"
+        ]
+      },
+      "page_accent": {
+        "feel": "科技蓝环形箭头",
+        "restraint": "中",
+        "techniques": [
+          "loop-accent"
+        ]
+      }
+    },
+    "source_guidance": {
+      "brief_sections": [
+        "总览：四大模块的闭环关系"
+      ],
+      "citation_expectation": "用原文闭环与价值论述",
+      "strictness": "严格基于原文"
+    },
+    "resources": {
+      "page_template": null,
+      "layout_refs": [
+        "l-shape"
+      ],
+      "block_refs": [],
+      "chart_refs": [],
+      "principle_refs": [
+        "visual-hierarchy",
+        "composition"
+      ],
+      "resource_rationale": "L 型适合核心论证 + 底部总结"
+    },
+    "cards": [
+      {
+        "card_id": "s9-anchor-1",
+        "role": "anchor",
+        "card_type": "diagram",
+        "card_style": "accent",
+        "argument_role": "claim",
+        "headline": "闭环回顾",
+        "body": [
+          "预测→决策→规划→仿真",
+          "仿真反馈优化，循环不止"
+        ],
+        "data_points": [],
+        "chart": {
+          "chart_type": null
+        },
+        "content_budget": {
+          "headline_max_chars": 8,
+          "body_max_bullets": 2,
+          "body_max_lines": 2
+        },
+        "image": {
+          "mode": "decorate",
+          "needed": false,
+          "usage": null,
+          "placement": null,
+          "content_description": null,
+          "source_hint": null,
+          "decorate_brief": "四节点环形箭头浓缩版"
+        },
+        "resource_ref": {
+          "chart": null,
+          "principle": "visual-hierarchy"
+        }
+      },
+      {
+        "card_id": "s9-support-1",
+        "role": "support",
+        "card_type": "text",
+        "card_style": "outline",
+        "argument_role": "evidence",
+        "headline": "预测为基",
+        "body": [
+          "精度决定决策可靠性",
+          "基础模块"
+        ],
+        "data_points": [],
+        "chart": {
+          "chart_type": null
+        },
+        "content_budget": {
+          "headline_max_chars": 6,
+          "body_max_bullets": 2,
+          "body_max_lines": 2
+        },
+        "image": {
+          "mode": "decorate",
+          "needed": false,
+          "usage": null,
+          "placement": null,
+          "content_description": null,
+          "source_hint": null,
+          "decorate_brief": "浅灰描边卡片内用科技蓝小图标点缀"
+        },
+        "resource_ref": {
+          "chart": null,
+          "principle": "visual-hierarchy"
+        }
+      },
+      {
+        "card_id": "s9-support-2",
+        "role": "support",
+        "card_type": "text",
+        "card_style": "outline",
+        "argument_role": "evidence",
+        "headline": "仿真为场",
+        "body": [
+          "低成本验证长尾场景",
+          "闭环考场"
+        ],
+        "data_points": [],
+        "chart": {
+          "chart_type": null
+        },
+        "content_budget": {
+          "headline_max_chars": 6,
+          "body_max_bullets": 2,
+          "body_max_lines": 2
+        },
+        "image": {
+          "mode": "decorate",
+          "needed": false,
+          "usage": null,
+          "placement": null,
+          "content_description": null,
+          "source_hint": null,
+          "decorate_brief": "浅灰描边卡片内用科技蓝小图标点缀"
+        },
+        "resource_ref": {
+          "chart": null,
+          "principle": "visual-hierarchy"
+        }
+      }
+    ],
+    "workflow_metadata": {
+      "stage": "planning",
+      "workflow_version": "2026.04.09-v4.1",
+      "planning_schema_version": "4.1",
+      "planning_packet_version": "4.1",
+      "planning_continuity_version": "4.1"
+    }
+  }
+}

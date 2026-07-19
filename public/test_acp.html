@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><body>
+<h2>ACP 测试</h2>
+<button onclick="test()">测试</button>
+<pre id="out"></pre>
+<script>
+var T=localStorage.getItem('auth_token')
+var H={Authorization:'Bearer '+T}
+function log(s){document.getElementById('out').textContent+=s+'\n'}
+async function test(){
+  log('发送请求...')
+  var t=Date.now()
+  try{
+    var r=await fetch('/auth/api/chat/acp/chat/completions',{
+      method:'POST',
+      headers:Object.assign({'Content-Type':'application/json'},H),
+      body:JSON.stringify({params:{model:'deepseek-v4-flash-free',provider:'opencode',messages:[{role:'user',content:'hi'}],session_id:''},stream:true})
+    })
+    log('状态: '+r.status+' ('+(Date.now()-t)+'ms)')
+    log('Content-Type: '+r.headers.get('Content-Type'))
+    var txt=await r.text()
+    log('响应体 ('+txt.length+' 字节):')
+    log(txt.slice(0,500))
+  }catch(e){
+    log('错误: '+e.message)
+  }
+}
+</script></body></html>

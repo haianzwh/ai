@@ -1,0 +1,74 @@
+# Docker 搜索原始资料
+
+## 1. Docker 核心概念
+- Docker 是一种开源的容器化平台，使用 Go 语言开发
+- 基于 Linux 的 CGroup、Namespace、UnionFS 等内核特性，实现操作系统级虚拟化
+- 核心概念：镜像(Image) → 容器(Container) → 仓库(Registry)
+- "一次构建，到处运行" (Build once, run anywhere)
+- 2025 年容器使用率：IT专业人士中达 92%（较2024年的80%大幅上升）
+- 全球超 2000 万开发者使用 Docker
+
+## 2. Docker vs 传统虚拟机
+| 特性 | Docker容器 | 传统虚拟机 |
+|------|-----------|-----------|
+| 启动速度 | 秒级/毫秒级 | 分钟级 |
+| 资源占用 | 极低（共享内核） | 高（完整OS） |
+| 性能 | 接近原生 | 弱于原生 |
+| 单机支持 | 上千个 | 几十个 |
+| 镜像大小 | MB级 | GB级 |
+| 隔离性 | 进程级 | OS级完全隔离 |
+
+## 3. Docker 核心优势
+- **环境一致性**：告别"在我机器上能跑"的问题
+- **轻量高效**：无需虚拟完整操作系统，资源占用小
+- **启动快速**：秒级甚至毫秒级启动
+- **CI/CD 友好**：支持镜像定制与流水线部署
+- **易迁移**：跨平台部署一致性高
+- **分层镜像**：模块化维护，成本低
+- **团队协作**：共享标准化开发环境
+
+## 4. Docker 核心组件
+- **Docker Daemon (dockerd)**：后台守护进程，管理容器生命周期
+- **Docker Client (docker CLI)**：用户交互入口
+- **Docker Image**：只读模板，分层存储（基于 UnionFS）
+- **Docker Container**：镜像的运行实例
+- **Docker Registry**：镜像仓库（Docker Hub 是最大的公共仓库）
+
+## 5. 核心技术原理
+- **Namespace**：资源隔离（进程、网络、文件系统等6大命名空间）
+- **Cgroup**：资源限制（CPU、内存等）
+- **写时复制 (Copy-on-Write)**：高效文件操作
+- **联合挂载 (Union Mount)**：将多层整合为统一文件系统
+
+## 6. 常用命令
+- `docker run` - 运行容器
+- `docker build` - 构建镜像
+- `docker pull` - 拉取镜像
+- `docker ps` - 查看运行中的容器
+- `docker stop/rm` - 停止/删除容器
+- `docker compose up` - 启动多容器应用
+
+## 7. Docker Compose
+- 定义和运行多容器应用，通过 YAML 文件配置
+- 2026 年依然是本地开发的首选编排工具
+- `compose.yaml` 定义 services/volumes/networks
+- 支持多阶段构建（600MB → 80MB）
+- 适合本地开发、单机部署、CI/CD 测试
+
+## 8. Docker 与 DevOps/CI-CD
+- Docker 是 CI/CD 的基石 - 提供可重现的构建环境
+- 集成 Jenkins、GitLab CI、CircleCI、GitHub Actions
+- 微服务架构的理想容器化平台
+- 支持不可变基础设施理念
+
+## 9. 2025 Docker 应用开发报告关键数据
+- Python 超越 JavaScript 成为最流行语言（64% vs 57%）
+- 容器使用率 IT 专业人士中达 92%
+- GitHub Actions (40%)、GitLab (39%) 为主要 CI/CD 工具
+- 安全已非主要瓶颈，规划和执行才是更大挑战
+
+## 10. Docker 安装方式
+- **Linux**: `curl -fsSL https://get.docker.com | sh`
+- **macOS**: `brew install --cask docker`
+- **Windows**: winget 或 Docker Desktop 安装
+- **验证**: `docker run hello-world`

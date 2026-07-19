@@ -1,0 +1,18 @@
+# =============================================================================
+#   ACP 引擎配置
+# =============================================================================
+acp:
+  version: "2.0"
+  server:
+    rpc_path: /api/chat/acp/rpc
+  middleware:
+    logging:
+      enabled: true
+    rate_limit:
+      enabled: true
+      max_per_minute: 60
+  external:
+    timeout: 300
+    backoff_base: 2
+  fallback:
+    deepseek: opencode

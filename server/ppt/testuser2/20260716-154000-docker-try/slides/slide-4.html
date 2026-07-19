@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>试试 Docker - 优势</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+  width: 1280px; height: 720px; overflow: hidden;
+  background: #ffffff;
+  display: flex; flex-direction: column; padding: 3rem 4rem;
+}
+h1 {
+  font-size: 2.2rem; font-weight: 700; color: #202124;
+  margin-bottom: 0.5rem;
+}
+h1 .highlight { color: #1a73e8; }
+.subtitle {
+  font-size: 1.1rem; color: #5f6368; margin-bottom: 2rem;
+}
+.content { flex: 1; display: grid; grid-template-columns: 1fr 1.1fr; gap: 2rem; }
+.advantages { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.adv-card {
+  background: #f8f9fa; border-radius: 16px; padding: 1.25rem;
+  border-left: 3px solid #1a73e8;
+}
+.adv-card:nth-child(2) { border-left-color: #34a853; }
+.adv-card:nth-child(3) { border-left-color: #fbbc04; }
+.adv-card:nth-child(4) { border-left-color: #ea4335; }
+.adv-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.adv-card h3 { font-size: 1rem; font-weight: 600; color: #202124; margin-bottom: 0.3rem; }
+.adv-card p { font-size: 0.82rem; color: #5f6368; line-height: 1.5; }
+.compare-box {
+  background: #f8f9fa; border-radius: 16px; padding: 1.5rem;
+}
+.compare-box h3 { font-size: 1rem; font-weight: 600; color: #202124; margin-bottom: 1rem; text-align: center; }
+.compare-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.compare-table th {
+  padding: 0.6rem; text-align: center; font-weight: 600;
+  border-bottom: 2px solid #e0e0e0;
+}
+.compare-table th:first-child { text-align: left; }
+.compare-table th:nth-child(2) { color: #1a73e8; }
+.compare-table th:nth-child(3) { color: #9aa0a6; }
+.compare-table td {
+  padding: 0.65rem 0.6rem; text-align: center;
+  border-bottom: 1px solid #e8eaed;
+}
+.compare-table td:first-child { text-align: left; font-weight: 500; color: #5f6368; }
+.compare-table .check { color: #34a853; font-weight: 700; }
+.compare-table .cross { color: #ea4335; }
+.global-stats {
+  display: flex; justify-content: space-around; margin-top: 1rem;
+  padding-top: 1rem; border-top: 1px solid #e0e0e0;
+}
+.stat-item { text-align: center; }
+.stat-num { font-size: 1.3rem; font-weight: 700; color: #1a73e8; }
+.stat-label { font-size: 0.75rem; color: #5f6368; margin-top: 0.2rem; }
+.footer-bar {
+  margin-top: auto; padding-top: 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid #e8eaed;
+  font-size: 0.8rem; color: #9aa0a6;
+}
+.page-num { font-weight: 500; }
+</style>
+</head>
+<body>
+<h1>为什么全球 <span class="highlight">2000 万</span> 开发者选择 Docker？</h1>
+<div class="subtitle">容器技术已经成为现代开发的标配</div>
+<div class="content">
+  <div class="advantages">
+    <div class="adv-card">
+      <div class="adv-icon">🚀</div>
+      <h3>秒级启动</h3>
+      <p>容器启动毫秒级，虚拟机分钟级。开发测试迭代效率大幅提升。</p>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">📦</div>
+      <h3>环境一致</h3>
+      <p>"一次构建，到处运行"。彻底告别环境差异导致的各类奇怪 Bug。</p>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">💪</div>
+      <h3>轻量高效</h3>
+      <p>共享宿主机内核，无完整 OS 开销。单机运行上千容器，资源利用率极高。</p>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">🔄</div>
+      <h3>CI/CD 就绪</h3>
+      <p>从开发到测试到生产，用同一份镜像。GitHub Actions、GitLab CI 原生集成。</p>
+    </div>
+  </div>
+  <div class="compare-box">
+    <h3>⚖️ Docker 容器 vs 传统虚拟机</h3>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>对比维度</th>
+          <th>🐳 Docker</th>
+          <th>💻 虚拟机</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>启动速度</td>
+          <td><span class="check">秒级/毫秒级</span></td>
+          <td><span class="cross">分钟级</span></td>
+        </tr>
+        <tr>
+          <td>镜像体积</td>
+          <td><span class="check">MB 级</span></td>
+          <td><span class="cross">GB 级</span></td>
+        </tr>
+        <tr>
+          <td>资源开销</td>
+          <td><span class="check">极低（共享内核）</span></td>
+          <td><span class="cross">高（完整 OS）</span></td>
+        </tr>
+        <tr>
+          <td>单机数量</td>
+          <td><span class="check">上千个</span></td>
+          <td><span class="cross">几十个</span></td>
+        </tr>
+        <tr>
+          <td>性能</td>
+          <td><span class="check">接近原生</span></td>
+          <td><span class="cross">有损耗</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="global-stats">
+      <div class="stat-item">
+        <div class="stat-num">2000万+</div>
+        <div class="stat-label">月活开发者</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">200亿+</div>
+        <div class="stat-label">月镜像拉取</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">92%</div>
+        <div class="stat-label">IT 行业使用率</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="footer-bar">
+  <span>优势对比 · 数据来源于 Docker 2025 报告</span>
+  <span class="page-num">4 / 7</span>
+</div>
+</body>
+</html>

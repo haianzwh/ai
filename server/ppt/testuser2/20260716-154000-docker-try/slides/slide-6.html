@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>试试 Docker - 团队实践</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+  width: 1280px; height: 720px; overflow: hidden;
+  background: #ffffff;
+  display: flex; flex-direction: column; padding: 3rem 4rem;
+}
+h1 {
+  font-size: 2.2rem; font-weight: 700; color: #202124;
+  margin-bottom: 0.5rem;
+}
+h1 .highlight { color: #1a73e8; }
+.subtitle {
+  font-size: 1.1rem; color: #5f6368; margin-bottom: 2.5rem;
+}
+.content { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+.practice-card {
+  background: #ffffff; border: 1px solid #e0e0e0; border-radius: 20px;
+  padding: 1.75rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex; flex-direction: column;
+}
+.practice-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+.practice-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.practice-card h3 { font-size: 1.1rem; font-weight: 600; color: #202124; margin-bottom: 0.75rem; }
+.practice-card ul { list-style: none; padding: 0; flex: 1; }
+.practice-card ul li {
+  font-size: 0.85rem; color: #5f6368; line-height: 1.6;
+  padding: 0.4rem 0; padding-left: 1.2rem; position: relative;
+}
+.practice-card ul li::before {
+  content: "✓"; position: absolute; left: 0;
+  color: #34a853; font-weight: 700;
+}
+.practice-card .tag {
+  display: inline-block; margin-top: 1rem; padding: 0.3rem 0.8rem;
+  border-radius: 20px; font-size: 0.75rem; font-weight: 500;
+  align-self: flex-start;
+}
+.tag-1 { background: #e8f0fe; color: #1a73e8; }
+.tag-2 { background: #e6f4ea; color: #34a853; }
+.tag-3 { background: #fef7e0; color: #ea8c00; }
+.workflow-bar {
+  margin-top: 1.5rem; display: flex; align-items: center;
+  justify-content: center; gap: 0.5rem;
+  padding: 1rem 2rem; background: #f8f9fa; border-radius: 12px;
+}
+.workflow-bar span {
+  font-size: 0.85rem; color: #5f6368; white-space: nowrap;
+}
+.workflow-bar .arrow { color: #1a73e8; font-weight: 700; }
+.workflow-bar .highlight-item {
+  padding: 0.3rem 0.8rem; background: #1a73e8; color: #fff;
+  border-radius: 6px; font-weight: 500;
+}
+.footer-bar {
+  margin-top: auto; padding-top: 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid #e8eaed;
+  font-size: 0.8rem; color: #9aa0a6;
+}
+.page-num { font-weight: 500; }
+</style>
+</head>
+<body>
+<h1>在团队中 <span class="highlight">试试 Docker</span></h1>
+<div class="subtitle">从个人到团队，Docker 带来的改变</div>
+<div class="content">
+  <div class="practice-card">
+    <div class="practice-icon">🔧</div>
+    <h3>开发环境标准化</h3>
+    <ul>
+      <li>docker compose up 一键启动完整服务栈</li>
+      <li>新项目附带 Dockerfile + compose.yml</li>
+      <li>所有开发者运行完全一致的环境</li>
+      <li>告别"我本地 OK 啊"的 Debug 循环</li>
+    </ul>
+    <span class="tag tag-1">⚡ 立竿见影</span>
+  </div>
+  <div class="practice-card">
+    <div class="practice-icon">👥</div>
+    <h3>新成员 Onboarding</h3>
+    <ul>
+      <li>从 git clone 到开始编码只需 10 分钟</li>
+      <li>无需手动安装数据库、消息队列等依赖</li>
+      <li>Wiki 文档简化为：docker compose up</li>
+      <li>降低新人的技术栈学习门槛</li>
+    </ul>
+    <span class="tag tag-2">🎯 提升效率</span>
+  </div>
+  <div class="practice-card">
+    <div class="practice-icon">🏗️</div>
+    <h3>CI/CD 流水线</h3>
+    <ul>
+      <li>开发、测试、生产使用同一份镜像</li>
+      <li>GitHub Actions / GitLab CI 原生支持</li>
+      <li>自动化构建、测试、部署一气呵成</li>
+      <li>不可变基础设施，回滚只需切换镜像 Tag</li>
+    </ul>
+    <span class="tag tag-3">🚀 工程化进阶</span>
+  </div>
+</div>
+<div class="workflow-bar">
+  <span>📋 推荐路线</span>
+  <span class="arrow">→</span>
+  <span>个人项目容器化</span>
+  <span class="arrow">→</span>
+  <span class="highlight-item">团队统一环境</span>
+  <span class="arrow">→</span>
+  <span>CI/CD 自动化</span>
+  <span class="arrow">→</span>
+  <span>云原生架构</span>
+</div>
+<div class="footer-bar">
+  <span>团队实践 · 从简单开始，逐步深入</span>
+  <span class="page-num">6 / 7</span>
+</div>
+</body>
+</html>

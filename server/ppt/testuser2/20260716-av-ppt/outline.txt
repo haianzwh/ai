@@ -1,0 +1,93 @@
+# 自动驾驶 PPT 大纲 (outline.txt)
+# deck_bias: balanced | 目标页数: 15
+
+## density_curve (页级节奏)
+P1 cover: relaxed | P2 目录: relaxed | P3 概念: balanced | P4 为什么重要: balanced
+P5 SAE分级: dashboard | P6 L0-L2: balanced | P7 L3-L5: balanced | P8 技术栈: dashboard
+P9 感知路线: balanced | P10 市场: dashboard | P11 案例: balanced | P12 时间线: balanced
+P13 挑战: balanced | P14 趋势: relaxed | P15 结尾: relaxed
+
+---
+
+## P1 — 封面 (cover)
+- 标题：自动驾驶：驶向无人之境
+- 副标题：从辅助驾驶到 Robotaxi 的技术与应用全景
+- 锚点：大标题 + 科技感背景
+
+## P2 — 目录 (section)
+- 四大板块：1 概念与价值 2 自动化分级 3 技术内核 4 市场与未来
+
+## P3 — 什么是自动驾驶 (balanced)
+- 定义：无需人类持续操作的机动车辆驾驶（SAE J3016）
+- 核心概念：DDT（动态驾驶任务）、ODD（运行设计域）
+- 一句话：把"驾驶"从人转移到系统的渐进过程
+
+## P4 — 为什么重要 (balanced)
+- 安全：消除人为失误（主要事故根源）
+- 效率：减少拥堵、优化出行
+- 普惠：出行服务化（MaaS），老人/无驾照人群受益
+- 数据卡：全球每年交通事故死亡约 130 万（背景注）
+
+## P5 — SAE 自动化分级 L0-L5 (dashboard)
+- 六级总览表：等级/名称/谁在开/法律责任/代表系统
+- 双色分界：L0-L2 蓝色"驾驶辅助" vs L3-L5 绿色"自动驾驶"
+- 临界点标注：L2→L3 责任转移
+
+## P6 — L0–L2：辅助驾驶时代 (balanced)
+- L0 无自动化：仅预警/AEB
+- L1 驾驶辅助：ACC 或车道保持（二选一）
+- L2 部分自动化：转向+速度同时，人须监督（Tesla AP、Super Cruise）
+- 关键：L2 下"你就是司机"
+
+## P7 — L3–L5：迈向真正无人 (balanced)
+- L3 有条件：车内可脱眼，系统请求时人须接管（奔驰 Drive Pilot）
+- L4 高度：ODD 内全无人，自动最小风险（Waymo）
+- L5 完全：无限 ODD，尚无量产
+- 关键点：L4 是 Robotaxi 的基础
+
+## P8 — 技术内核：系统架构 (dashboard)
+- 模块化流水线：感知 → 预测 → 规划 → 控制
+- 端到端（E2E）：传感器 → 轨迹（神经网络直接映射）
+- 统一表示：BEV 鸟瞰图融合
+- 前沿方向：Occupancy、UniAD、World Model
+
+## P9 — 感知：眼睛与大脑 (balanced)
+- 传感器四件套：摄像头、LiDAR、Radar、GNSS/IMU
+- 两条路线对比：LiDAR 中心融合（Waymo）vs 纯视觉（Tesla）
+- Waymo 配置：5 LiDAR + 8 摄像头，雨天召回 95.2%
+- 成本锚点：消费级 <$500 / Robotaxi <$15,000
+
+## P10 — 市场与商业 (dashboard)
+- 自动驾驶市场：2024 $680.9B → 2030 $214.3B（CAGR 19.9%）
+- Robotaxi：2023 $0.4B → 2030 $45.7B（CAGR 91.8%）
+- 美国 robotaxi：1,500 辆 → 2030 ~35,000 辆，占网约车 8%
+- 毛利率：垂直整合 40-50%
+
+## P11 — 玩家图鉴 (balanced)
+- Waymo：L4 标杆，3,500 车，>2,000 万行程
+- Tesla：纯视觉，Robotaxi 小规模扩张
+- Baidu Apollo Go：中国规模第一，瑞士出海
+- Zoox：无方向盘原生车
+- 中国军团：Pony.ai / WeRide × Uber 进中东
+
+## P12 — 时间线：关键里程碑 (balanced)
+- 2020 Waymo 商用 → 2021 本田/奔驰 L3 → 2025 Tesla Robotaxi
+- 2026 Waymo 14+ 城、100 万次/周目标、$16B 融资
+- 2030 robotaxi 全球大规模商用
+
+## P13 — 挑战与边界 (balanced)
+- 法规碎片化（各国不一）
+- 责任与保险（L3 责任转移难题）
+- 边缘场景与极端天气
+- 基础设施与公众信任
+
+## P14 — 未来趋势 (relaxed)
+- 成本骤降（L4 系统 2027 降至 ~$18,000）
+- 多模态融合 + 车路云协同
+- World Model 与世界模型规划
+- 中美双引擎，Robotaxi 先行
+
+## P15 — 结尾 (relaxed)
+- 金句：自动驾驶不是"某一天"，而是"每一天都在扩展的地理围栏"
+- 行动召唤：关注你所在城市的 Robotaxi
+- 致谢 / Q&A

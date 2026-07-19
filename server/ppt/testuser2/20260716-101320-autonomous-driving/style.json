@@ -1,0 +1,32 @@
+{
+  "style_id": "tech-blue-dark-av",
+  "style_name": "科技蓝深色 · 未来出行",
+  "mood_keywords": ["科技感", "未来感", "深邃", "专业", "灵动"],
+  "design_soul": "以深邃夜空为底，用科技蓝与青色光带勾勒自动驾驶的算法脉络，让数据像车流一样在暗场中流动，传递前沿、可信、面向未来的行业气质。",
+  "variation_strategy": "封面与章节页用大面积暗场+发光主标题营造沉浸感；内容页以半透明玻璃卡片承载信息，KPI 页用发光数字与进度光带突出张力；全篇以青蓝渐变光晕与细网格线作为统一视觉母题，仅在强调处使用高饱和强调色。",
+  "decoration_dna": {
+    "signature_move": "暗场背景上的青蓝径向光晕 + 极细科技网格线 + 发光描边卡片，关键数据用渐变光带高亮",
+    "forbidden": ["高饱和大红大绿平涂", "纯白刺眼背景", "拟物写实图标堆砌"],
+    "recommended_combos": ["深蓝渐变 + 青色发光描边", "玻璃拟态卡片 + 细网格底纹", "光带进度条 + 数字发光"]
+  },
+  "css_variables": {
+    "bg_primary": "#070B18",
+    "bg_secondary": "#0D1426",
+    "card_bg_from": "rgba(20,32,58,0.72)",
+    "card_bg_to": "rgba(13,20,38,0.55)",
+    "card_border": "rgba(80,170,255,0.28)",
+    "card_radius": "16px",
+    "text_primary": "#EAF2FF",
+    "text_secondary": "#9DB2D6",
+    "accent_1": "#3B82F6",
+    "accent_2": "#22D3EE",
+    "accent_3": "#60A5FA",
+    "accent_4": "#A78BFA"
+  },
+  "font_family": "\"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans SC\", system-ui, sans-serif",
+  "css_snippets": {
+    "body": "background: radial-gradient(1200px 600px at 80% -10%, rgba(34,211,238,0.12), transparent 60%), radial-gradient(900px 500px at 10% 110%, rgba(59,130,246,0.14), transparent 60%), #070B18; color:#EAF2FF;",
+    "card": "background:linear-gradient(135deg, rgba(20,32,58,0.72), rgba(13,20,38,0.55)); border:1px solid rgba(80,170,255,0.28); border-radius:16px; backdrop-filter: blur(6px); box-shadow:0 8px 30px rgba(0,0,0,0.35);",
+    "glow_text": "background:linear-gradient(90deg,#22D3EE,#60A5FA); -webkit-background-clip:text; background-clip:text; color:transparent;"
+  }
+}

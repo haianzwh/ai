@@ -1,0 +1,274 @@
+{
+  "page": {
+    "slide_number": 2,
+    "page_type": "content",
+    "narrative_role": "comparison",
+    "title": "四大模块的“思考-行动-验证”闭环",
+    "page_goal": "预测到仿真构成相互反馈的完整闭环",
+    "audience_takeaway": "一眼看懂四模块首尾相接的关系",
+    "visual_weight": 7,
+    "density_label": "high",
+    "density_reason": "总览页需承载环形链路与四模块说明共5卡，提升至 high 密度以容纳",
+    "density_contract": {
+      "deck_bias": "balanced",
+      "page_lower_bound": "high",
+      "page_upper_bound": "dashboard",
+      "max_cards": 6,
+      "max_charts": 2,
+      "min_body_font_px": 16,
+      "max_lines_per_card": 4,
+      "image_policy": "support_only",
+      "decoration_budget": "low",
+      "overflow_strategy": "table_or_microchart"
+    },
+    "layout_hint": "l-shape",
+    "layout_variation_note": "总览用 L 型：左上主体关系链 + 右侧四模块说明 + 底部一句定位",
+    "focus_zone": "主体左侧：预测→决策→规划→仿真 的环形链路",
+    "negative_space_target": "medium",
+    "page_text_strategy": "以关系链为锚，模块说明为辅助",
+    "rhythm_action": "铺垫",
+    "must_avoid": [
+      "避免四模块做成平均四宫格，必须体现流向与闭环"
+    ],
+    "variation_guardrails": {
+      "same_gene_as_deck": "科技蓝细竖线锚点、白底、字体角色、圆角与全 deck 一致",
+      "different_from_previous": [
+        "增加关系链主锚",
+        "用环形而非并列"
+      ]
+    },
+    "director_command": {
+      "mood": "清晰、系统、有结构感",
+      "spatial_strategy": "L 形主体承载环形链路，右侧列四模块一句话定位，底部收束",
+      "anchor_treatment": "环形链路用 accent 强调，模块卡片 outline 弱化",
+      "techniques": [
+        "loop-diagram",
+        "l-shape",
+        "flow-arrows"
+      ],
+      "prose": "四条线索首尾相扣成环，像仪表盘的中心结构图"
+    },
+    "decoration_hints": {
+      "background": {
+        "feel": "极淡分区底色",
+        "restraint": "低",
+        "techniques": [
+          "section-tint"
+        ]
+      },
+      "floating": {
+        "feel": "弱",
+        "restraint": "高",
+        "techniques": [
+          "none"
+        ]
+      },
+      "page_accent": {
+        "feel": "科技蓝环形箭头",
+        "restraint": "中",
+        "techniques": [
+          "loop-accent"
+        ]
+      }
+    },
+    "source_guidance": {
+      "brief_sections": [
+        "总览：四大模块的闭环关系"
+      ],
+      "citation_expectation": "用原文四模块定义做卡片文案",
+      "strictness": "严格基于原文"
+    },
+    "resources": {
+      "page_template": null,
+      "layout_refs": [
+        "l-shape"
+      ],
+      "block_refs": [],
+      "chart_refs": [],
+      "principle_refs": [
+        "visual-hierarchy",
+        "composition"
+      ],
+      "resource_rationale": "L 型适合核心论证+侧面佐证+底部总结的三段式"
+    },
+    "cards": [
+      {
+        "card_id": "s2-anchor-1",
+        "role": "anchor",
+        "card_type": "diagram",
+        "card_style": "accent",
+        "argument_role": "claim",
+        "headline": "闭环链路",
+        "body": [
+          "预测 → 决策 → 规划 → 仿真",
+          "仿真反馈优化前三者，形成闭环"
+        ],
+        "data_points": [],
+        "chart": {
+          "chart_type": null
+        },
+        "content_budget": {
+          "headline_max_chars": 8,
+          "body_max_bullets": 2,
+          "body_max_lines": 2
+        },
+        "image": {
+          "mode": "decorate",
+          "needed": false,
+          "usage": null,
+          "placement": null,
+          "content_description": null,
+          "source_hint": null,
+          "decorate_brief": "四节点环形箭头，节点用科技蓝"
+        },
+        "resource_ref": {
+          "chart": null,
+          "principle": "visual-hierarchy"
+        }
+      },
+      {
+        "card_id": "s2-support-1",
+        "role": "support",
+        "card_type": "text",
+        "card_style": "outline",
+        "argument_role": "evidence",
+        "headline": "预测",
+        "body": [
+          "“猜”他车与行人动向",
+          "决策的依据"
+        ],
+        "data_points": [],
+        "chart": {
+          "chart_type": null
+        },
+        "content_budget": {
+          "headline_max_chars": 6,
+          "body_max_bullets": 2,
+          "body_max_lines": 2
+        },
+        "image": {
+          "mode": "decorate",
+          "needed": false,
+          "usage": null,
+          "placement": null,
+          "content_description": null,
+          "source_hint": null,
+          "decorate_brief": "浅灰描边卡片内用科技蓝小图标点缀"
+        },
+        "resource_ref": {
+          "chart": null,
+          "principle": "visual-hierarchy"
+        }
+      },
+      {
+        "card_id": "s2-support-2",
+        "role": "support",
+        "card_type": "text",
+        "card_style": "outline",
+        "argument_role": "evidence",
+        "headline": "决策",
+        "body": [
+          "决定下一步做什么",
+          "跟车、变道等宏观行为"
+        ],
+        "data_points": [],
+        "chart": {
+          "chart_type": null
+        },
+        "content_budget": {
+          "headline_max_chars": 6,
+          "body_max_bullets": 2,
+          "body_max_lines": 2
+        },
+        "image": {
+          "mode": "decorate",
+          "needed": false,
+          "usage": null,
+          "placement": null,
+          "content_description": null,
+          "source_hint": null,
+          "decorate_brief": "浅灰描边卡片内用科技蓝小图标点缀"
+        },
+        "resource_ref": {
+          "chart": null,
+          "principle": "visual-hierarchy"
+        }
+      },
+      {
+        "card_id": "s2-support-3",
+        "role": "support",
+        "card_type": "text",
+        "card_style": "outline",
+        "argument_role": "evidence",
+        "headline": "规划",
+        "body": [
+          "把决策变可执行路径",
+          "生成轨迹与速度曲线"
+        ],
+        "data_points": [],
+        "chart": {
+          "chart_type": null
+        },
+        "content_budget": {
+          "headline_max_chars": 6,
+          "body_max_bullets": 2,
+          "body_max_lines": 2
+        },
+        "image": {
+          "mode": "decorate",
+          "needed": false,
+          "usage": null,
+          "placement": null,
+          "content_description": null,
+          "source_hint": null,
+          "decorate_brief": "浅灰描边卡片内用科技蓝小图标点缀"
+        },
+        "resource_ref": {
+          "chart": null,
+          "principle": "visual-hierarchy"
+        }
+      },
+      {
+        "card_id": "s2-support-4",
+        "role": "support",
+        "card_type": "text",
+        "card_style": "outline",
+        "argument_role": "evidence",
+        "headline": "仿真",
+        "body": [
+          "虚拟训练场与考场",
+          "高效安全测试优化算法"
+        ],
+        "data_points": [],
+        "chart": {
+          "chart_type": null
+        },
+        "content_budget": {
+          "headline_max_chars": 6,
+          "body_max_bullets": 2,
+          "body_max_lines": 2
+        },
+        "image": {
+          "mode": "decorate",
+          "needed": false,
+          "usage": null,
+          "placement": null,
+          "content_description": null,
+          "source_hint": null,
+          "decorate_brief": "浅灰描边卡片内用科技蓝小图标点缀"
+        },
+        "resource_ref": {
+          "chart": null,
+          "principle": "visual-hierarchy"
+        }
+      }
+    ],
+    "workflow_metadata": {
+      "stage": "planning",
+      "workflow_version": "2026.04.09-v4.1",
+      "planning_schema_version": "4.1",
+      "planning_packet_version": "4.1",
+      "planning_continuity_version": "4.1"
+    }
+  }
+}

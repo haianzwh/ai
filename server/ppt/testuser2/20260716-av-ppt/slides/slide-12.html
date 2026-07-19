@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:1280px; height:720px; overflow:hidden; }
+body{
+  font-family:'Segoe UI','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+  color:#E8F1FB;
+  background: radial-gradient(1200px 820px at 78% -12%, #11335A 0%, #0A1428 46%, #070B18 100%);
+  position:relative;
+}
+body::before{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    linear-gradient(rgba(120,160,210,0.05) 1px, transparent 1px) 0 0/44px 44px,
+    linear-gradient(90deg, rgba(120,160,210,0.05) 1px, transparent 1px) 0 0/44px 44px;
+  -webkit-mask-image: radial-gradient(1200px 900px at 70% 0%, #000 35%, transparent 85%);
+  mask-image: radial-gradient(1200px 900px at 70% 0%, #000 35%, transparent 85%);
+}
+body::after{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(420px 300px at 86% 10%, rgba(56,189,248,0.16), transparent 70%),
+    radial-gradient(360px 260px at 10% 96%, rgba(129,140,248,0.14), transparent 70%);
+}
+.slide{ position:relative; width:1280px; height:720px; padding:54px 64px; z-index:2; }
+.kicker{ display:inline-flex; align-items:center; gap:10px; font-size:13px; letter-spacing:3px;
+  text-transform:uppercase; color:#38BDF8; font-weight:600; margin-bottom:14px; }
+.kicker::before{ content:""; width:30px; height:2px; background:linear-gradient(90deg,#38BDF8,#22D3EE); border-radius:2px; }
+.title{ font-size:44px; font-weight:800; line-height:1.12; letter-spacing:-0.5px;
+  background:linear-gradient(120deg,#E8F1FB 30%,#7DD3FC 100%); -webkit-background-clip:text;
+  background-clip:text; color:transparent; }
+.h2{ font-size:30px; font-weight:700; color:#E8F1FB; }
+.sub{ color:#9FB3C8; font-size:17px; line-height:1.65; }
+.accent{ color:#38BDF8; } .accent-g{ color:#34D399; } .accent-a{ color:#FBBF24; }
+.card{ background:rgba(18,30,52,0.74); border:1px solid rgba(56,189,248,0.22); border-radius:16px;
+  padding:22px 24px; box-shadow:0 0 30px rgba(56,189,248,0.10); }
+.card-h{ font-size:15px; font-weight:700; color:#7DD3FC; margin-bottom:10px; letter-spacing:.5px; }
+.mono{ font-family:'SFMono-Regular',Consolas,monospace; }
+.footer{ position:absolute; left:64px; bottom:24px; display:flex; align-items:center; gap:12px;
+  color:#5E7390; font-size:12px; letter-spacing:1px; z-index:3; }
+.footer .dot{ width:7px; height:7px; border-radius:50%; background:#38BDF8; box-shadow:0 0 10px #38BDF8; }
+.pagenum{ position:absolute; right:64px; bottom:24px; color:#5E7390; font-size:12px; letter-spacing:1px; z-index:3; }
+.chip{ display:inline-block; padding:5px 13px; border-radius:999px; font-size:13px; font-weight:600;
+  border:1px solid rgba(56,189,248,0.35); color:#7DD3FC; background:rgba(56,189,248,0.08); }
+.table{ width:100%; border-collapse:collapse; font-size:15px; }
+.table th{ text-align:left; color:#7DD3FC; font-weight:700; padding:11px 14px; border-bottom:1px solid rgba(56,189,248,0.3); font-size:13px; letter-spacing:.5px; }
+.table td{ padding:11px 14px; border-bottom:1px solid rgba(120,160,210,0.12); color:#D6E4F0; vertical-align:top; }
+.table tr:last-child td{ border-bottom:none; }
+.big{ font-size:46px; font-weight:800; line-height:1; }
+.unit{ font-size:16px; color:#9FB3C8; font-weight:600; }
+.metric-label{ font-size:13px; color:#9FB3C8; letter-spacing:.5px; }
+</style></head>
+<body><div class="slide">
+<div class="kicker">04 · 里程碑</div>
+<div class="title">时间线：关键节点</div>
+<div style="position:relative; margin-top:46px; padding-left:10px;">
+  <div style="position:absolute; left:18px; top:6px; bottom:6px; width:2px; background:linear-gradient(180deg,#38BDF8,#22D3EE,#34D399);"></div>
+  <div style="display:grid; grid-template-columns:90px 1fr; gap:18px; align-items:start; margin-bottom:20px;">
+    <div class="accent mono" style="font-weight:700;">2020</div><div class="sub">Waymo One 商用落地，Robotaxi 从实验走向运营。</div></div>
+  <div style="display:grid; grid-template-columns:90px 1fr; gap:18px; align-items:start; margin-bottom:20px;">
+    <div class="accent mono" style="font-weight:700;">2021</div><div class="sub">本田 Legend、奔驰 Drive Pilot 获批 L3，责任首次转向车企。</div></div>
+  <div style="display:grid; grid-template-columns:90px 1fr; gap:18px; align-items:start; margin-bottom:20px;">
+    <div class="accent-g mono" style="font-weight:700;">2025</div><div class="sub">Tesla Robotaxi 奥斯汀上线；Waymo 5 城商用、~45 万次/周。</div></div>
+  <div style="display:grid; grid-template-columns:90px 1fr; gap:18px; align-items:start; margin-bottom:20px;">
+    <div class="accent-g mono" style="font-weight:700;">2026</div><div class="sub">Waymo 14+ 城全无人、目标 100 万次/周、$16B 融资（$126B 估值）。</div></div>
+  <div style="display:grid; grid-template-columns:90px 1fr; gap:18px; align-items:start;">
+    <div class="accent-a mono" style="font-weight:700;">2030</div><div class="sub">Robotaxi 全球大规模商用预期，美国车辆达 ~35,000 辆。</div></div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">12 / 15</div></body></html>

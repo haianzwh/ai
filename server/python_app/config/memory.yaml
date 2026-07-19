@@ -1,0 +1,12 @@
+# =============================================================================
+#   Memory 配置
+# =============================================================================
+memory:
+  short_term:
+    type: dict
+    max_size: 100
+  long_term:
+    type: json_file
+    path: /tmp/acp_ltm.json
+  working:
+    type: dict

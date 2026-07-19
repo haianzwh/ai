@@ -1,0 +1,20 @@
+<!DOCTYPE html><html lang=zh-CN><head><meta charset=UTF-8><meta http-equiv=refresh content=5><title>ACP Dashboard</title>
+<style>body{font:15px system-ui;max-width:900px;margin:40px auto;padding:20px;color:#e0e0e0;background:#1a1a2e}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px}
+.val{font-size:32px;font-weight:700;color:#818cf8}.label{color:rgba(255,255,255,.4);margin-top:8px}</style></head><body>
+<h1>ACP 监控面板</h1>
+<div class=grid>
+<div class=card><div class=val id=plugins>-</div><div class=label>已加载插件</div></div>
+<div class=card><div class=val id=skills>-</div><div class=label>已注册技能</div></div>
+<div class=card><div class=val id=workflows>-</div><div class=label>工作流</div></div>
+</div>
+<script>
+fetch('/api/admin/stats').then(r=>r.json()).then(d=>{
+  document.getElementById('plugins').textContent=d.plugins
+  document.getElementById('skills').textContent=d.skills
+})
+fetch('/api/workflows/').then(r=>r.json()).then(d=>{
+  document.getElementById('workflows').textContent=(d.workflows||[]).length
+})
+</script></body></html>

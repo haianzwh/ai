@@ -1,0 +1,27 @@
+{
+  "style_id": "clean-white-tech",
+  "style_name": "简洁白 · 专业科技",
+  "mood_keywords": ["克制", "清爽", "专业", "通透", "理性"],
+  "design_soul": "以纯净白底与克制的中性灰阶建立专业可信的阅读场，用一抹科技蓝作为唯一强调色引导视线，让内容本身成为主角，杜绝花哨装饰对信息密度的干扰。",
+  "variation_strategy": "跨页保持白底、字体角色、圆角体系与强调色关系完全一致；允许变化的维度是每页的锚点尺度（标题字号/图表占比）与留白强度（封面与结尾更松、内容页更紧）；禁止改变主色相或引入第二种强调色。",
+  "decoration_dna": {
+    "signature_move": "左侧细科技蓝竖线 + 页眉小号模块编号（如 03 / 预测）作为跨页可识别的节奏锚点",
+    "forbidden": ["渐变大色块背景", "高饱和撞色", "拟物图标堆砌", "过度阴影与立体投影"],
+    "recommended_combos": ["细竖线 + 灰色分隔线 + 角标编号", "白卡片 + 1px 浅灰描边 + 科技蓝小标题"]
+  },
+  "css_variables": {
+    "bg_primary": "#FFFFFF",
+    "bg_secondary": "#F5F7FA",
+    "card_bg_from": "#FFFFFF",
+    "card_bg_to": "#FAFBFC",
+    "card_border": "#E4E8EE",
+    "card_radius": "12px",
+    "text_primary": "#1A2230",
+    "text_secondary": "#5A6573",
+    "accent_1": "#1F6FEB",
+    "accent_2": "#2EA8E0",
+    "accent_3": "#0E2A47",
+    "accent_4": "#9AA6B2"
+  },
+  "font_family": "-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+}

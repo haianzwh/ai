@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>试试 Docker - 上手</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+  width: 1280px; height: 720px; overflow: hidden;
+  background: #ffffff;
+  display: flex; flex-direction: column; padding: 3rem 4rem;
+}
+h1 {
+  font-size: 2.2rem; font-weight: 700; color: #202124;
+  margin-bottom: 0.5rem;
+}
+h1 .highlight { color: #34a853; }
+.subtitle {
+  font-size: 1.1rem; color: #5f6368; margin-bottom: 2rem;
+}
+.content { flex: 1; display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; }
+.steps { display: flex; flex-direction: column; gap: 0.75rem; }
+.step {
+  display: flex; align-items: stretch; gap: 1rem;
+  background: #f8f9fa; border-radius: 12px; padding: 0.1rem;
+}
+.step-num {
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; background: #1a73e8; color: #fff;
+  font-weight: 700; font-size: 0.9rem; border-radius: 12px 0 0 12px;
+}
+.step-body { padding: 1rem 1rem 1rem 0; flex: 1; }
+.step-title { font-weight: 600; color: #202124; font-size: 0.95rem; margin-bottom: 0.3rem; }
+.step-desc { font-size: 0.82rem; color: #5f6368; }
+.code-block {
+  background: #1e1e1e; border-radius: 12px; padding: 1.25rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.85rem; line-height: 1.7; color: #d4d4d4;
+  overflow-x: auto;
+}
+.code-block .comment { color: #6a9955; }
+.code-block .cmd { color: #569cd6; }
+.code-block .str { color: #ce9178; }
+.code-block .kw { color: #c586c0; }
+.code-block .output { color: #9cdcfe; }
+.tip-box {
+  margin-top: 1rem; padding: 1rem 1.25rem;
+  background: #e8f0fe; border-radius: 12px;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.tip-box .icon { font-size: 1.5rem; }
+.tip-box p { font-size: 0.85rem; color: #1a73e8; font-weight: 500; }
+.footer-bar {
+  margin-top: auto; padding-top: 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid #e8eaed;
+  font-size: 0.8rem; color: #9aa0a6;
+}
+.page-num { font-weight: 500; }
+</style>
+</head>
+<body>
+<h1>5 分钟，从 <span class="highlight">0 到第一个容器</span></h1>
+<div class="subtitle">安装 → 运行 → 部署，比你想象的简单</div>
+<div class="content">
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">📥 安装 Docker</div>
+        <div class="step-desc">一行命令搞定（Linux/Mac/Windows 均支持）</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">✅ 验证安装</div>
+        <div class="step-desc">运行 hello-world 确认 Docker 就绪</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">🌐 运行 Nginx 服务</div>
+        <div class="step-desc">一条命令启动一个 Web 服务器</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">🧩 多服务一键启动</div>
+        <div class="step-desc">Docker Compose 定义完整应用栈</div>
+      </div>
+    </div>
+    <div class="tip-box">
+      <span class="icon">💡</span>
+      <p>Docker Desktop 提供图形界面，适合初学者。安装后打开即可开始。</p>
+    </div>
+  </div>
+  <div class="code-block">
+    <span class="comment"># 1. 安装（Linux）</span><br>
+    curl -fsSL https://get.docker.com | sh<br><br>
+    <span class="comment"># 2. 验证</span><br>
+    docker run hello-world<br><br>
+    <span class="comment"># 3. 运行 Web 服务</span><br>
+    docker run -d -p 8080:80 nginx:alpine<br>
+    <span class="output">→ 访问 http://localhost:8080</span><br><br>
+    <span class="comment"># 4. 多服务（docker-compose.yml）</span><br>
+    <span class="kw">version</span>: <span class="str">'3'</span><br>
+    <span class="kw">services</span>:<br>
+    &nbsp;&nbsp;<span class="cmd">web</span>:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">image</span>: nginx:alpine<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">ports</span>:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="str">"8080:80"</span>
+  </div>
+</div>
+<div class="footer-bar">
+  <span>快速上手 · 从安装到运行只需 5 分钟</span>
+  <span class="page-num">5 / 7</span>
+</div>
+</body>
+</html>

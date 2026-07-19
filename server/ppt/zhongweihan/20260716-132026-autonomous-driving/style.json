@@ -1,0 +1,35 @@
+{
+  "style_id": "auto-tech-blue-2026",
+  "style_name": "科技蓝 · 自动驾驶闭环",
+  "mood_keywords": ["科技", "专业", "冷静", "未来感"],
+  "design_soul": "以深邃科技蓝为底，用克制的几何光带与节点连线隐喻'思考—行动—验证'的算法闭环；信息层级靠留白与强调色拉开，拒绝花哨装饰，让技术本身的秩序感成为视觉主角。",
+  "variation_strategy": "全篇统一科技蓝基调，四模块（预测/决策/规划/仿真）各分配一个强调色作为'章节色'形成辨识度；封面与结尾用大留白呼吸，方法对比页用横向双栏矩阵，总对比页用紧凑仪表盘网格，节奏由疏到密再到收束。",
+  "decoration_dna": {
+    "signature_move": "用细节点状节点 + 连线光带构成'闭环环线'主视觉母题，在封面/总览/总结页以半透明大环贯穿，章节页以环上高亮节点标示当前模块。",
+    "forbidden": ["渐变彩虹滥用", "高饱和撞色", "拟物化图标", "无意义装饰花纹"],
+    "recommended_combos": ["节点环线 + 半透明卡片", "章节色强调条 + 几何分割线", "箭头流程带 + 留白"]
+  },
+  "css_variables": {
+    "bg_primary": "#0B1B33",
+    "bg_secondary": "#0F2547",
+    "card_bg_from": "#12294D",
+    "card_bg_to": "#0E2040",
+    "card_border": "rgba(94, 162, 255, 0.22)",
+    "card_radius": "14px",
+    "text_primary": "#EAF2FF",
+    "text_secondary": "#9DB4D6",
+    "accent_1": "#3FA9F5",
+    "accent_2": "#5EE7C2",
+    "accent_3": "#FFB454",
+    "accent_4": "#B98CFF"
+  },
+  "font_family": "'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, -apple-system, 'Segoe UI', sans-serif",
+  "css_snippets": {
+    "body": "margin:0; background:radial-gradient(1200px 800px at 70% -10%, #16345f 0%, #0B1B33 55%) fixed, #0B1B33; color:#EAF2FF; font-family:var(--font);",
+    "card": "background:linear-gradient(160deg, #12294D, #0E2040); border:1px solid rgba(94,162,255,0.22); border-radius:14px; padding:22px 24px;",
+    "h1": "font-size:40px; font-weight:800; letter-spacing:0.5px; color:#EAF2FF;",
+    "h2": "font-size:26px; font-weight:700; color:#EAF2FF;",
+    "accent_bar": "height:4px; width:54px; background:linear-gradient(90deg,#3FA9F5,#5EE7C2); border-radius:3px;",
+    "tag": "display:inline-block; padding:4px 12px; border-radius:999px; background:rgba(63,169,245,0.15); color:#9FD0FF; font-size:13px; font-weight:600;"
+  }
+}

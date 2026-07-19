@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>试试 Docker - 封面</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+  width: 1280px; height: 720px; overflow: hidden;
+  background: linear-gradient(135deg, #0d47a1 0%, #1a73e8 50%, #2196f3 100%);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+/* 装饰圆 */
+.circle { position: absolute; border-radius: 50%; opacity: 0.1; }
+.circle-1 { width: 500px; height: 500px; background: #fff; top: -150px; right: -100px; }
+.circle-2 { width: 300px; height: 300px; background: #fff; bottom: -80px; left: -80px; }
+.circle-3 { width: 200px; height: 200px; background: #fff; bottom: 50px; right: 100px; }
+.container { text-align: center; z-index: 1; padding: 3rem; }
+.icon { font-size: 5rem; margin-bottom: 1.5rem; line-height: 1; }
+h1 {
+  font-size: 4rem; font-weight: 800; color: #fff;
+  letter-spacing: -0.03em; margin-bottom: 0.75rem;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+.subtitle {
+  font-size: 1.5rem; font-weight: 400; color: rgba(255,255,255,0.85);
+  margin-bottom: 2.5rem; letter-spacing: 0.02em;
+}
+.badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.25);
+  padding: 0.6rem 1.5rem;
+  border-radius: 50px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.divider { width: 60px; height: 3px; background: rgba(255,255,255,0.4); margin: 0 auto 2rem; border-radius: 2px; }
+.footer {
+  position: absolute; bottom: 2rem; left: 0; right: 0;
+  text-align: center; color: rgba(255,255,255,0.4);
+  font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="circle circle-1"></div>
+<div class="circle circle-2"></div>
+<div class="circle circle-3"></div>
+<div class="container">
+  <div class="icon">🐳</div>
+  <h1>试试 Docker</h1>
+  <div class="divider"></div>
+  <div class="subtitle">从了解到上手，只需一堂课</div>
+  <div class="badge">🚀 团队技术分享</div>
+</div>
+<div class="footer">试试 · Docker</div>
+</body>
+</html>

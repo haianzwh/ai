@@ -1,0 +1,17 @@
+<!DOCTYPE html><html lang=zh-CN><head><meta charset=UTF-8><title>ACP Admin</title>
+<style>body{font:15px system-ui;max-width:800px;margin:40px auto;padding:20px;color:#e0e0e0;background:#1a1a2e}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px;margin-bottom:16px}
+h2{margin-top:0;color:#818cf8}.val{color:#10b981;font-weight:700;font-size:24px}</style></head><body>
+<h1>ACP 管理后台</h1>
+<div class=card><h2>系统状态</h2><p id=status>加载中...</p></div>
+<div class=card><h2>统计</h2>
+<p>插件：<span class=val id=nPlugins>-</span></p><p>技能：<span class=val id=nSkills>-</span></p></div>
+<script>
+fetch('/api/admin/stats').then(r=>r.json()).then(d=>{
+  document.getElementById('nPlugins').textContent=d.plugins
+  document.getElementById('nSkills').textContent=d.skills
+})
+fetch('/api/admin/health').then(r=>r.json()).then(d=>{
+  document.getElementById('status').innerHTML='<span style=color:#10b981>&#9679;</span> '+d.status+' (v'+d.version+')'
+})
+</script></body></html>

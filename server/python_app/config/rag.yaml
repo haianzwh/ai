@@ -1,0 +1,14 @@
+# =============================================================================
+#   RAG 配置
+# =============================================================================
+rag:
+  indexer:
+    chunk_size: 500
+    chunk_overlap: 50
+  retriever:
+    top_k: 5
+  embedding:
+    provider: local
+  store:
+    type: chromadb
+    path: ./data/chroma

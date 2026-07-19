@@ -72,6 +72,7 @@ class ProviderRegistry:
                 "label": cfg.get("label", pid),
                 "icon": cfg.get("icon", "🤖"),
                 "requires_key": cfg.get("requires_key", False),
+                "type": cfg.get("type", "internal"),
                 "has_sub_providers": bool(cfg.get("sub_providers")),
                 "sub_providers": [],
             }
@@ -105,9 +106,10 @@ class ProviderRegistry:
                 except Exception:
                     pass
             else:
-                # 需要 key 的 provider: 有 key 才显示模型
+                # 需要 key 的 provider: 有 key（用户key或默认key）才显示模型
                 sub_providers = cfg.get("sub_providers", {})
                 has_main_key = user_keys and user_keys.get(pid)
+                has_default_key = bool(cfg.get("default_key"))
                 for sub_key, sub_cfg in sub_providers.items():
                     kt = sub_cfg.get("key_type", sub_key)
                     if user_keys and user_keys.get(kt):
@@ -119,7 +121,7 @@ class ProviderRegistry:
                                 "provider": pid,
                                 "sub_key": sub_key,
                             })
-                    elif has_main_key:
+                    elif has_main_key or has_default_key:
                         label_suffix = sub_cfg.get("label", sub_key)
                         for m in cfg.get("models", []):
                             models.append({

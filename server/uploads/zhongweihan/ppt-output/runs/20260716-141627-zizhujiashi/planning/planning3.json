@@ -1,0 +1,205 @@
+{
+  "page": {
+    "slide_number": 3,
+    "page_type": "content",
+    "narrative_role": "evidence",
+    "title": "预测——洞悉他人的未来",
+    "page_goal": "预测是决策与规划的基础，精度决定可靠性",
+    "audience_takeaway": "理解预测的定位与核心价值",
+    "visual_weight": 5,
+    "density_label": "medium",
+    "density_reason": "解释页，定位+价值两要点，medium 密度",
+    "density_contract": {
+      "deck_bias": "balanced",
+      "page_lower_bound": "medium",
+      "page_upper_bound": "high",
+      "max_cards": 4,
+      "max_charts": 2,
+      "min_body_font_px": 18,
+      "max_lines_per_card": 5,
+      "image_policy": "support_only",
+      "decoration_budget": "medium",
+      "overflow_strategy": "tighten_budget"
+    },
+    "layout_hint": "primary-secondary",
+    "layout_variation_note": "主次结合：左侧大卡讲定位，右侧两小卡讲价值与精度",
+    "focus_zone": "左侧大卡：预测是决策与规划的基础",
+    "negative_space_target": "medium",
+    "page_text_strategy": "主卡定调，小卡补价值与约束",
+    "rhythm_action": "推进",
+    "must_avoid": [
+      "避免把预测讲成方法罗列，本页聚焦定位而非方法"
+    ],
+    "variation_guardrails": {
+      "same_gene_as_deck": "科技蓝细竖线锚点、白底、字体角色、圆角与全 deck 一致",
+      "different_from_previous": [
+        "主卡放大为 anchor",
+        "改用主次结合而非对比"
+      ]
+    },
+    "director_command": {
+      "mood": "严谨、基础、明了",
+      "spatial_strategy": "左大右小，左卡为 anchor 占据 2/3，右两小卡堆叠",
+      "anchor_treatment": "左卡 accent 强调，右卡 outline 弱化",
+      "techniques": [
+        "primary-secondary",
+        "left-anchor"
+      ],
+      "prose": "左侧一块重墨定调，右侧轻点两点支撑"
+    },
+    "decoration_hints": {
+      "background": {
+        "feel": "极淡分区底色",
+        "restraint": "低",
+        "techniques": [
+          "section-tint"
+        ]
+      },
+      "floating": {
+        "feel": "弱",
+        "restraint": "高",
+        "techniques": [
+          "none"
+        ]
+      },
+      "page_accent": {
+        "feel": "左侧科技蓝标题竖线",
+        "restraint": "中",
+        "techniques": [
+          "left-blue-rule"
+        ]
+      }
+    },
+    "source_guidance": {
+      "brief_sections": [
+        "预测模块（洞悉他人的未来）"
+      ],
+      "citation_expectation": "用原文定义与精度论述",
+      "strictness": "严格基于原文"
+    },
+    "resources": {
+      "page_template": null,
+      "layout_refs": [
+        "primary-secondary"
+      ],
+      "block_refs": [],
+      "chart_refs": [],
+      "principle_refs": [
+        "visual-hierarchy",
+        "composition"
+      ],
+      "resource_rationale": "主次结合版式适合 1 核心 + 2 辅助"
+    },
+    "cards": [
+      {
+        "card_id": "s3-anchor-1",
+        "role": "anchor",
+        "card_type": "text",
+        "card_style": "accent",
+        "argument_role": "claim",
+        "headline": "预测的定位",
+        "body": [
+          "推断周边交通参与者的未来轨迹",
+          "是决策与规划的基础"
+        ],
+        "data_points": [],
+        "chart": {
+          "chart_type": null
+        },
+        "content_budget": {
+          "headline_max_chars": 8,
+          "body_max_bullets": 2,
+          "body_max_lines": 2
+        },
+        "image": {
+          "mode": "decorate",
+          "needed": false,
+          "usage": null,
+          "placement": null,
+          "content_description": null,
+          "source_hint": null,
+          "decorate_brief": "浅灰描边卡片内用科技蓝小图标点缀"
+        },
+        "resource_ref": {
+          "chart": null,
+          "principle": "visual-hierarchy"
+        }
+      },
+      {
+        "card_id": "s3-support-1",
+        "role": "support",
+        "card_type": "text",
+        "card_style": "outline",
+        "argument_role": "evidence",
+        "headline": "核心目标",
+        "body": [
+          "预测精度直接影响后续决策可靠性",
+          "基础不牢，上层全崩"
+        ],
+        "data_points": [],
+        "chart": {
+          "chart_type": null
+        },
+        "content_budget": {
+          "headline_max_chars": 8,
+          "body_max_bullets": 2,
+          "body_max_lines": 2
+        },
+        "image": {
+          "mode": "decorate",
+          "needed": false,
+          "usage": null,
+          "placement": null,
+          "content_description": null,
+          "source_hint": null,
+          "decorate_brief": "浅灰描边卡片内用科技蓝小图标点缀"
+        },
+        "resource_ref": {
+          "chart": null,
+          "principle": "visual-hierarchy"
+        }
+      },
+      {
+        "card_id": "s3-support-2",
+        "role": "support",
+        "card_type": "text",
+        "card_style": "outline",
+        "argument_role": "evidence",
+        "headline": "为什么难",
+        "body": [
+          "交通参与者高度交互",
+          "存在显著不确定性"
+        ],
+        "data_points": [],
+        "chart": {
+          "chart_type": null
+        },
+        "content_budget": {
+          "headline_max_chars": 8,
+          "body_max_bullets": 2,
+          "body_max_lines": 2
+        },
+        "image": {
+          "mode": "decorate",
+          "needed": false,
+          "usage": null,
+          "placement": null,
+          "content_description": null,
+          "source_hint": null,
+          "decorate_brief": "浅灰描边卡片内用科技蓝小图标点缀"
+        },
+        "resource_ref": {
+          "chart": null,
+          "principle": "visual-hierarchy"
+        }
+      }
+    ],
+    "workflow_metadata": {
+      "stage": "planning",
+      "workflow_version": "2026.04.09-v4.1",
+      "planning_schema_version": "4.1",
+      "planning_packet_version": "4.1",
+      "planning_continuity_version": "4.1"
+    }
+  }
+}

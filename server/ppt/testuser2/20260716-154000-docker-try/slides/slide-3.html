@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>试试 Docker - 概念</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+  width: 1280px; height: 720px; overflow: hidden;
+  background: #ffffff;
+  display: flex; flex-direction: column; padding: 3rem 4rem;
+}
+h1 {
+  font-size: 2.2rem; font-weight: 700; color: #202124;
+  margin-bottom: 0.5rem;
+}
+.subtitle {
+  font-size: 1.1rem; color: #5f6368; margin-bottom: 2.5rem;
+}
+.content { flex: 1; display: grid; grid-template-columns: 3fr 2fr; gap: 2rem; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.card {
+  background: #ffffff; border: 1px solid #e0e0e0; border-radius: 16px;
+  padding: 1.75rem 1.25rem; text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+.card-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.card h3 { font-size: 1.1rem; font-weight: 600; color: #202124; margin-bottom: 0.5rem; }
+.card p { font-size: 0.85rem; color: #5f6368; line-height: 1.5; }
+.card.tag-blue { border-top: 3px solid #1a73e8; }
+.card.tag-green { border-top: 3px solid #34a853; }
+.card.tag-orange { border-top: 3px solid #fbbc04; }
+.analogy-box {
+  background: #f8f9fa; border-radius: 16px; padding: 1.75rem;
+}
+.analogy-box h3 { font-size: 1rem; font-weight: 600; color: #202124; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+.analogy-item {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #e8eaed;
+}
+.analogy-item:last-child { border-bottom: none; }
+.analogy-item .label { font-weight: 600; color: #1a73e8; white-space: nowrap; min-width: 70px; }
+.analogy-item .desc { font-size: 0.9rem; color: #5f6368; }
+.callout {
+  margin-top: 1rem; padding: 0.75rem 1rem;
+  background: #e8f0fe; border-radius: 10px; color: #1a73e8;
+  font-weight: 500; text-align: center; font-size: 0.9rem;
+}
+.footer-bar {
+  margin-top: auto; padding-top: 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid #e8eaed;
+  font-size: 0.8rem; color: #9aa0a6;
+}
+.page-num { font-weight: 500; }
+</style>
+</head>
+<body>
+<h1>Docker = 应用的<span style="color:#1a73e8;">便携集装箱</span></h1>
+<div class="subtitle">一次构建，到处运行 — 把应用和环境打包在一起</div>
+<div class="content">
+  <div class="cards">
+    <div class="card tag-blue">
+      <div class="card-icon">🖼️</div>
+      <h3>镜像 (Image)</h3>
+      <p>应用的"蓝图"模板，包含操作系统、依赖、代码等所有内容。分层结构，只读不可变。</p>
+    </div>
+    <div class="card tag-green">
+      <div class="card-icon">📦</div>
+      <h3>容器 (Container)</h3>
+      <p>镜像的运行实例，轻量、隔离、可启停。每个容器就是一个小型沙箱环境。</p>
+    </div>
+    <div class="card tag-orange">
+      <div class="card-icon">🏪</div>
+      <h3>仓库 (Registry)</h3>
+      <p>镜像的"应用商店"，Docker Hub 上有数百万个公共镜像，随拉随用。</p>
+    </div>
+  </div>
+  <div class="analogy-box">
+    <h3>💡 生活类比</h3>
+    <div class="analogy-item">
+      <span class="label">镜像 →</span>
+      <span class="desc">📀 系统安装光盘（类），可以创建多个实例</span>
+    </div>
+    <div class="analogy-item">
+      <span class="label">容器 →</span>
+      <span class="desc">🖥️ 安装好的系统（对象），独立运行互不干扰</span>
+    </div>
+    <div class="analogy-item">
+      <span class="label">仓库 →</span>
+      <span class="desc">📱 应用商店，需要什么直接下载安装</span>
+    </div>
+    <div class="analogy-item">
+      <span class="label">Dockerfile →</span>
+      <span class="desc">📋 制作镜像的"配方说明书"</span>
+    </div>
+    <div class="callout">🐳 核心能力：轻量 · 隔离 · 可移植 · 一致</div>
+  </div>
+</div>
+<div class="footer-bar">
+  <span>核心概念 · Docker 三要素</span>
+  <span class="page-num">3 / 7</span>
+</div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>技术架构</title><link rel="stylesheet" href="_base.css"></head>
+<body><div class="slide">
+
+<div class="kicker">ARCHITECTURE · 三支柱</div>
+<h2>如何「看懂」世界？——<span class="glow">技术架构三支柱</span></h2>
+<div class="body" style="justify-content:flex-start;">
+  <div class="grid3">
+    <div class="card"><div class="tag">① PERCEPTION</div><h3>感知 Perception</h3><p>摄像头 / 激光雷达 LiDAR / 毫米波雷达 / 超声波雷达；多传感器融合（卡尔曼滤波、Transformer 跨模态注意力）。</p></div>
+    <div class="card"><div class="tag">② PLANNING</div><h3>决策规划 Planning</h3><p>预测障碍物轨迹 → 全局路径(A*/Dijkstra) + 局部规划(Lattice/RRT/MPC) → 行为决策。</p></div>
+    <div class="card"><div class="tag">③ CONTROL</div><h3>执行控制 Control</h3><p>线控底盘：纵向 PID + 横向 Pure Pursuit / MPC，将决策精确转化为油门、制动、转向。</p></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><div class="tag">LOCALIZATION</div><h3>定位与融合</h3><p>RTK-GNSS+IMU 组合、激光/视觉 SLAM、高精地图辅助，实现厘米级定位。</p></div>
+    <div class="card"><div class="tag">SOFTWARE</div><h3>软件架构路线</h3><p>模块化 Pipeline（可解释强）与端到端 E2E（误差不传播）两条路线并存演进。</p></div>
+  </div>
+</div>
+<div class="foot">自动驾驶 · 行业科普与商业汇报</div>
+</div></body></html>

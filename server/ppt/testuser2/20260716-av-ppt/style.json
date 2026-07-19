@@ -1,0 +1,35 @@
+{
+  "theme": "dark-tech-blue",
+  "background": {
+    "base": "#070B18",
+    "gradient": "radial-gradient(1200px 800px at 75% -10%, #0E2A4A 0%, #0A1428 45%, #070B18 100%)",
+    "accent_glow": "rgba(56,189,248,0.18)"
+  },
+  "colors": {
+    "primary": "#38BDF8",
+    "primary2": "#22D3EE",
+    "secondary": "#818CF8",
+    "accent_green": "#34D399",
+    "accent_amber": "#FBBF24",
+    "text_primary": "#E8F1FB",
+    "text_secondary": "#9FB3C8",
+    "text_muted": "#5E7390",
+    "card_bg": "rgba(18,30,52,0.72)",
+    "card_border": "rgba(56,189,248,0.22)",
+    "grid_line": "rgba(120,160,210,0.14)"
+  },
+  "typography": {
+    "font_family": "'Segoe UI','PingFang SC','Microsoft YaHei',system-ui,sans-serif",
+    "title_size": 44,
+    "h2_size": 30,
+    "body_size": 17,
+    "mono": "'SFMono-Regular',Consolas,monospace"
+  },
+  "effects": {
+    "card_radius": 16,
+    "glow": "0 0 32px rgba(56,189,248,0.18)",
+    "grid_overlay": "linear-gradient(rgba(120,160,210,0.05) 1px, transparent 1px) 0 0/40px 40px"
+  },
+  "density_bias": "balanced",
+  "page_template": "full-bleed dark canvas, top-left kicker + title, subtle grid, neon accent line"
+}

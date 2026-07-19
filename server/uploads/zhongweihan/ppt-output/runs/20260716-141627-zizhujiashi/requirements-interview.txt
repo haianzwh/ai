@@ -1,0 +1,20 @@
+# Requirements Interview (归一化需求)
+
+scenario: 自动驾驶从业人员内部技术交流与分享
+audience: 自动驾驶行业从业者，具备专业背景
+target_action: 讲清预测/决策/规划/仿真四大模块的定位、方法、相互关系与价值
+expected_pages: 约10页（封面+总览+4模块+总结；自定义，可后续调整）
+page_density: balanced（适中）
+style: 简洁白（极简白底，干净清爽，专业克制）
+brand: 无特定品牌色，保持中性专业
+must_include: 预测模块（传统拟合/AI模型）、决策与规划（Frenet/搜索采样）、仿真（价值/前沿）、四者闭环关系
+must_avoid: 过度科普、堆砌大图、无关装饰
+language: 中文
+imagery: decorate（简洁图标/装饰，不堆砌大图）
+material_strategy: 仅限用户上传 docx（7d9ce6c191eb.docx），不联网扩写
+branch: 非research（基于本地资料直接制作）
+subagent_model_strategy: 本环境无独立 subagent 工具，主 agent 以 harness 隔离管线逐级执行
+subagent_thinking_effort: medium
+manual_audit_mode: off
+manual_audit_scope: 无
+manual_audit_assets: 无

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>试试 Docker - 痛点</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+  width: 1280px; height: 720px; overflow: hidden;
+  background: #ffffff;
+  display: flex; flex-direction: column; padding: 3rem 4rem;
+}
+h1 {
+  font-size: 2.2rem; font-weight: 700; color: #202124;
+  margin-bottom: 0.75rem;
+}
+h1 .highlight { color: #ea4335; }
+.subtitle {
+  font-size: 1.1rem; color: #5f6368; margin-bottom: 2.5rem;
+}
+.content { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
+.left-panel { }
+.quote-box {
+  background: #f8f9fa; border-radius: 16px; padding: 2rem;
+  border-left: 4px solid #ea4335;
+  margin-bottom: 1.5rem;
+}
+.quote-box .quote {
+  font-size: 1.6rem; font-weight: 700; color: #202124;
+  font-style: italic; margin-bottom: 0.5rem;
+}
+.quote-box .author { font-size: 0.95rem; color: #5f6368; }
+.scenes { display: flex; flex-direction: column; gap: 0.75rem; }
+.scene-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1rem; background: #f8f9fa; border-radius: 10px;
+  font-size: 0.95rem; color: #5f6368;
+}
+.scene-item .icon { font-size: 1.2rem; }
+.right-panel {
+  background: #f8f9fa; border-radius: 20px; padding: 2.5rem;
+  text-align: center;
+}
+.stat-number { font-size: 3.5rem; font-weight: 800; color: #1a73e8; margin-bottom: 0.5rem; }
+.stat-label { font-size: 1rem; color: #5f6368; line-height: 1.5; }
+.stat-divider { width: 40px; height: 3px; background: #1a73e8; margin: 1.5rem auto; border-radius: 2px; }
+.chart-label { font-size: 0.85rem; color: #9aa0a6; margin-top: 1rem; }
+.arrow-note {
+  margin-top: 1rem; padding: 0.75rem 1rem;
+  background: #e8f0fe; border-radius: 8px; color: #1a73e8;
+  font-weight: 500; font-size: 0.9rem;
+}
+.footer-bar {
+  margin-top: auto; padding-top: 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid #e8eaed;
+  font-size: 0.8rem; color: #9aa0a6;
+}
+.page-num { font-weight: 500; }
+</style>
+</head>
+<body>
+<h1>你是否也说过<span class="highlight">这句话</span>？</h1>
+<div class="subtitle">一个困扰了开发者几十年的经典难题</div>
+<div class="content">
+  <div class="left-panel">
+    <div class="quote-box">
+      <div class="quote">"But it works on my machine"</div>
+      <div class="author">😭 开发者经典语录 · 2026 依然高频</div>
+    </div>
+    <div class="scenes">
+      <div class="scene-item"><span class="icon">🖥️</span> 开发环境跑得好好的，上线就崩了</div>
+      <div class="scene-item"><span class="icon">👥</span> 同事的代码我能拉下来但跑不起来</div>
+      <div class="scene-item"><span class="icon">🆕</span> 换台电脑配环境花半天时间</div>
+      <div class="scene-item"><span class="icon">📋</span> 项目依赖版本冲突，不敢升级</div>
+    </div>
+  </div>
+  <div class="right-panel">
+    <div class="stat-number">92%</div>
+    <div class="stat-label">IT 专业人士<br>已在用容器解决这个问题</div>
+    <div class="stat-divider"></div>
+    <div class="stat-number" style="font-size: 2rem; color: #34a853;">+12%</div>
+    <div class="stat-label">较 2024 年使用率增长<br>（80% → 92%）</div>
+    <div class="arrow-note">📊 Docker 2025 应用开发现状报告</div>
+  </div>
+</div>
+<div class="footer-bar">
+  <span>环境一致性 · 从痛点开始</span>
+  <span class="page-num">2 / 7</span>
+</div>
+</body>
+</html>

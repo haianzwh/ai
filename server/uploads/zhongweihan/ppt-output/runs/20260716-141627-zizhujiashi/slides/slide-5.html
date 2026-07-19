@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>决策与规划——自车的行动指南</title>
+<style>
+  :root {
+    --bg-primary:#E9EDF3; --bg-secondary:#F5F7FA;
+    --card-bg-from:#FFFFFF; --card-bg-to:#FAFBFC;
+    --card-border:#E4E8EE; --card-radius:12px;
+    --text-primary:#1A2230; --text-secondary:#5A6573;
+    --accent-1:#1F6FEB; --accent-2:#2EA8E0; --accent-3:#0E2A47; --accent-4:#7B8794;
+    --font-primary:-apple-system,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; padding:0; }
+  body { width:1280px; height:720px; overflow:hidden;
+    background:var(--bg-primary);
+    font-family:var(--font-primary); color:var(--text-primary);
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    position:relative; border:6px solid #1F6FEB; }
+  .slide { position:relative; width:1280px; height:720px; padding:0; }
+  /* decoration signature */
+  .deco-bg { position:absolute; inset:0; background:
+      radial-gradient(900px 600px at 100% 0%, rgba(31,111,235,0.06), transparent 60%),
+      radial-gradient(700px 500px at 0% 100%, rgba(46,168,224,0.05), transparent 60%);
+    z-index:0; }
+  .deco-dot { position:absolute; top:34px; right:40px; width:10px; height:10px; border-radius:50%;
+    background:var(--accent-1); box-shadow:18px 6px 0 -2px var(--accent-2); z-index:0; }
+  .slide-header { position:absolute; top:26px; left:54px; right:54px; z-index:3; }
+  .overline { display:block; font-size:18px; letter-spacing:3px; color:var(--accent-1);
+    font-weight:600; text-transform:uppercase; }
+  .page-title { margin:8px 0 0; font-size:30px; font-weight:700; color:var(--text-primary);
+    border-left:4px solid var(--accent-1); padding-left:14px; line-height:1.2; }
+  .slide-footer { position:absolute; bottom:22px; left:54px; right:54px; z-index:3;
+    display:flex; justify-content:space-between; font-size:16px; color:var(--accent-4);
+    border-top:1px solid #C9D3DF; padding-top:10px; }
+
+  /* card base */
+  .card { position:relative; border-radius:var(--card-radius); padding:24px 26px; min-height:0;
+    display:flex; flex-direction:column; box-shadow:0 6px 18px rgba(26,34,48,0.06); }
+  .card-rule { position:absolute; left:0; top:18px; bottom:18px; width:4px; border-radius:3px;
+    background:linear-gradient(180deg,#FFFFFF,#BFD7FF); }
+  .card-inner { padding-left:6px; }
+  .card-h { margin:0 0 10px; font-size:22px; font-weight:700; color:var(--text-primary); }
+  .card-body p { margin:0 0 8px; font-size:16px; line-height:1.6; color:var(--text-secondary); }
+  .card-anchor .card-h { color:#FFFFFF; font-size:26px; }
+  .card-anchor .card-body p { color:rgba(255,255,255,0.92); font-size:17px; }
+  .card-support .card-h { font-size:20px; }
+
+  /* content area fills the canvas (edge-to-edge) to avoid pure-white margins */
+  .content-area { position:absolute; left:40px; right:40px; top:116px; bottom:62px; z-index:2; }
+
+  .hero-top-wrap { position:absolute; left:40px; right:40px; top:0; bottom:62px;
+    display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:2; }
+  .hero-anchor { width:780px; max-width:82%; }
+  .hero-anchor .card { padding:44px 52px; text-align:center; }
+  .hero-anchor .card-h { font-size:42px; border:none; padding:0; }
+  .hero-anchor .card-body p { font-size:19px; }
+  .hero-sub { margin-top:26px; display:flex; gap:20px; }
+
+  .primary-secondary { position:absolute; left:40px; right:40px; top:116px; bottom:62px;
+    display:grid; grid-template-columns:1.7fr 1fr; gap:22px; z-index:2; align-items:stretch; }
+  .ps-side { display:flex; flex-direction:column; gap:20px; }
+
+  .asymmetric { position:absolute; left:40px; right:40px; top:116px; bottom:62px;
+    display:grid; grid-template-columns:1fr 1.5fr; gap:22px; z-index:2; align-items:stretch; }
+  .asym-left { display:flex; flex-direction:column; gap:20px; justify-content:center; }
+  .asym-right { display:flex; }
+
+  .l-shape { position:absolute; left:40px; right:40px; top:116px; bottom:62px;
+    display:grid; grid-template-columns:1.6fr 1fr; grid-template-rows:1fr 1fr; gap:20px; z-index:2; }
+  .ls-main { grid-row:1 / span 2; display:flex; }
+  .ls-side { display:grid; grid-template-rows:1fr 1fr; gap:20px; }
+
+  .mixed-grid { position:absolute; left:40px; right:40px; top:116px; bottom:62px;
+    display:grid; grid-template-columns:1fr 1fr; gap:22px; z-index:2; align-items:stretch; }
+
+  .default-grid { position:absolute; left:40px; right:40px; top:116px; bottom:62px;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:22px; z-index:2; }
+
+  /* cover / end */
+  .slide-cover { display:flex; align-items:center; justify-content:center; }
+  .cover-inner { position:relative; z-index:2; text-align:center; max-width:900px;
+    background:linear-gradient(135deg,#0E2A47 0%,#1F6FEB 100%); border-radius:18px;
+    padding:60px 70px; box-shadow:0 18px 48px rgba(14,42,71,0.35); }
+  .cover-inner[data-card-id] { }
+  .cover-kicker { font-size:24px; letter-spacing:6px; color:#BFD7FF; font-weight:600; }
+  .cover-title { font-size:52px; font-weight:800; line-height:1.18; margin:18px 0 0; color:#FFFFFF; }
+  .cover-sub { margin-top:22px; font-size:24px; color:rgba(255,255,255,0.9); line-height:1.6; }
+  .cover-loop { margin:34px auto 0; width:120px; height:120px; }
+</style>
+</head>
+<body>
+
+    <div class="deco-bg" data-decoration-layer="background" aria-hidden="true"></div>
+    <div class="deco-dot" data-decoration-layer="floating" aria-hidden="true"></div>
+    
+<div class="slide slide-content">
+
+    <header class="slide-header">
+      <span class="overline">05 / 10　·　自动驾驶技术栈</span>
+      <h1 class="page-title">决策与规划——自车的行动指南</h1>
+    </header>
+<div class="primary-secondary">
+      <div class="card card-anchor" data-card-id="s5-anchor-1" style="background:linear-gradient(135deg,#0E2A47 0%,#1F6FEB 100%);border:1px solid #0E2A47;">
+        <span class="card-rule" aria-hidden="true"></span>
+        <div class="card-inner">
+          <h3 class="card-h">决策：行为逻辑层</h3>
+          <div class="card-body"><p>依预测与目标做宏观决策</p><p>左转/直行、超车或礼让</p></div>
+        </div>
+      </div><div class="ps-side">
+      <div class="card card-support" data-card-id="s5-support-1" style="background:#EEF3FB;border:1px solid #CFE0F5;">
+        
+        <div class="card-inner">
+          <h3 class="card-h">规划：变路径</h3>
+          <div class="card-body"><p>把决策变成现实可执行路径</p><p>生成轨迹与速度曲线</p></div>
+        </div>
+      </div>
+      <div class="card card-support" data-card-id="s5-support-2" style="background:#FFFFFF;border:1px solid #DCE4EE;">
+        
+        <div class="card-inner">
+          <h3 class="card-h">四重约束</h3>
+          <div class="card-body"><p>安全性、舒适性、高效性</p><p>与运动学约束（车辆能执行）</p></div>
+        </div>
+      </div></div></div>
+<footer class="slide-footer"><span>预测 · 决策 · 规划 · 仿真</span><span class="foot-page">决策与规划——自车的行动指南</span></footer>
+</div>
+</body>
+</html>

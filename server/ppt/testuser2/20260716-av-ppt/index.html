@@ -1,0 +1,262 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<title>PPT</title><style>
+body{background:#0b0e14;margin:0;padding:20px;font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;}
+.slidewrap{margin:0 auto 16px;max-width:1280px;}
+.slidewrap .slide{height:720px;}</style></head><body>
+<div style="position:fixed;top:10px;right:16px;z-index:99;background:#11182a;color:#cfe;padding:8px 12px;border-radius:8px;font-size:13px;">PPT · 15 页</div>
+<section class="slidewrap"><div class="slide">
+<div style="position:absolute; top:54px; right:64px; text-align:right;">
+  <div class="chip">2026 · TECH REVIEW</div>
+</div>
+<div style="margin-top:120px;">
+  <div class="kicker" style="margin-bottom:22px;">AUTONOMOUS DRIVING</div>
+  <div class="title" style="font-size:62px; line-height:1.08;">自动驾驶<br>驶向无人之境</div>
+  <div class="sub" style="margin-top:26px; font-size:20px; max-width:760px; color:#B9CCE0;">
+    从辅助驾驶到 Robotaxi —— 技术架构、自动化分级与产业未来的全景解读
+  </div>
+</div>
+<div style="position:absolute; left:64px; bottom:96px; display:flex; gap:14px;">
+  <span class="chip">SAE L0–L5</span>
+  <span class="chip">感知 · 规划 · 控制</span>
+  <span class="chip">Robotaxi 商业化</span>
+</div>
+<div style="position:absolute; right:0; bottom:0; width:520px; height:320px;
+  background:radial-gradient(circle at 70% 60%, rgba(56,189,248,0.22), transparent 60%); pointer-events:none;"></div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">1 / 15</div></section><section class="slidewrap"><div class="slide">
+<div class="kicker">CONTENTS</div>
+<div class="title">目录</div>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:40px;">
+  <div class="card"><div class="card-h">01 · 概念与价值</div>
+    <div class="sub">什么是自动驾驶 · 为什么重要</div></div>
+  <div class="card"><div class="card-h">02 · 自动化分级</div>
+    <div class="sub">SAE L0–L5 · 责任与边界</div></div>
+  <div class="card"><div class="card-h">03 · 技术内核</div>
+    <div class="sub">系统架构 · 感知路线</div></div>
+  <div class="card"><div class="card-h">04 · 市场与未来</div>
+    <div class="sub">玩家图鉴 · 趋势与挑战</div></div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">2 / 15</div></section><section class="slidewrap"><div class="slide">
+<div class="kicker">01 · 概念</div>
+<div class="title">什么是自动驾驶？</div>
+<div style="display:grid; grid-template-columns:1.1fr 1fr; gap:28px; margin-top:34px;">
+  <div>
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-h">定义</div>
+      <div class="sub">无需人类<span class="accent">持续操作</span>的机动车辆驾驶能力，由车载软硬件系统完成动态驾驶任务（DDT）。</div>
+    </div>
+    <div class="card">
+      <div class="card-h">一句话理解</div>
+      <div class="sub">自动驾驶不是"一键魔法"，而是把<span class="accent">"驾驶"从人渐进转移到系统</span>的工程过程。</div>
+    </div>
+  </div>
+  <div>
+    <div class="card" style="height:100%;">
+      <div class="card-h">两个核心术语</div>
+      <div style="margin-top:6px;">
+        <div style="margin-bottom:18px;"><span class="accent mono" style="font-size:20px;">DDT</span>
+          <div class="sub" style="margin-top:4px;">动态驾驶任务：转向、加减速、目标与事件探测响应（OEDR）。</div></div>
+        <div><span class="accent-g mono" style="font-size:20px;">ODD</span>
+          <div class="sub" style="margin-top:4px;">运行设计域：系统被设计可安全工作的边界（地理、天气、时段、路况）。</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">3 / 15</div></section><section class="slidewrap"><div class="slide">
+<div class="kicker">01 · 价值</div>
+<div class="title">为什么自动驾驶重要？</div>
+<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:36px;">
+  <div class="card"><div class="card-h">安全</div>
+    <div class="sub">人为失误是交通事故主要根源。自动驾驶以稳定感知与决策，系统性降低致命风险。</div></div>
+  <div class="card"><div class="card-h">效率</div>
+    <div class="sub">协同驾驶减少急刹与拥堵，优化路网通行效率与能源消耗。</div></div>
+  <div class="card"><div class="card-h">普惠</div>
+    <div class="sub">出行即服务（MaaS），让老人、无驾照人群同样享受自由出行。</div></div>
+</div>
+<div class="card" style="margin-top:24px; display:flex; align-items:center; gap:28px;">
+  <div style="text-align:center;"><div class="big accent">130<span class="unit">万</span></div><div class="metric-label">全球每年交通事故死亡（背景参考）</div></div>
+  <div style="width:1px; height:54px; background:rgba(120,160,210,0.2);"></div>
+  <div style="text-align:center;"><div class="big accent-g">↓</div><div class="metric-label">自动驾驶的核心承诺：减少人为事故</div></div>
+  <div style="width:1px; height:54px; background:rgba(120,160,210,0.2);"></div>
+  <div style="text-align:center;"><div class="big accent-a">24/7</div><div class="metric-label">不受疲劳影响的出行服务</div></div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">4 / 15</div></section><section class="slidewrap"><div class="slide">
+<div class="kicker">02 · 分级</div>
+<div class="title">SAE 自动化分级 L0–L5</div>
+<div style="margin-top:26px;">
+<table class="table">
+  <tr><th style="width:90px;">等级</th><th style="width:150px;">名称</th><th style="width:170px;">谁在开</th>
+      <th style="width:160px;">法律责任</th><th>代表系统</th></tr>
+  <tr><td class="accent">L0</td><td>无自动化</td><td>人</td><td>驾驶员</td><td>仅预警 / AEB</td></tr>
+  <tr><td class="accent">L1</td><td>驾驶辅助</td><td>人（偶尔）</td><td>驾驶员</td><td>自适应巡航 ACC</td></tr>
+  <tr><td class="accent">L2</td><td>部分自动化</td><td>车（转向+速度）</td><td>驾驶员监督</td><td>Tesla AP、Super Cruise</td></tr>
+  <tr style="background:rgba(52,211,153,0.06);"><td class="accent-g">L3</td><td>有条件自动化</td><td>车</td><td>车企（限 ODD）</td><td>奔驰 Drive Pilot</td></tr>
+  <tr style="background:rgba(52,211,153,0.06);"><td class="accent-g">L4</td><td>高度自动化</td><td>车（全）</td><td>车企（限 ODD）</td><td>Waymo、Apollo Go</td></tr>
+  <tr style="background:rgba(52,211,153,0.06);"><td class="accent-g">L5</td><td>完全自动化</td><td>车（全）</td><td>车企（无限）</td><td>暂无量产</td></tr>
+</table>
+</div>
+<div style="display:flex; gap:12px; margin-top:18px; align-items:center;">
+  <span class="chip" style="border-color:rgba(56,189,248,.4);">蓝色 = 驾驶辅助（人负责）</span>
+  <span class="chip" style="border-color:rgba(52,211,153,.4); color:#34D399;">绿色 = 自动驾驶（车负责）</span>
+  <span class="chip accent-a" style="border-color:rgba(251,191,36,.4); color:#FBBF24;">临界点 L2→L3：责任转移</span>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">5 / 15</div></section><section class="slidewrap"><div class="slide">
+<div class="kicker">02 · 分级</div>
+<div class="title">L0–L2：辅助驾驶时代</div>
+<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:34px;">
+  <div class="card"><div class="card-h">L0 · 无自动化</div>
+    <div class="sub">人掌控一切；车辆仅提供预警或瞬时干预（AEB、盲区提醒）。<br><span class="accent">警告 ≠ 自动化。</span></div></div>
+  <div class="card"><div class="card-h">L1 · 驾驶辅助</div>
+    <div class="sub">系统辅助<span class="accent">转向</span>或<span class="accent">加减速</span>之一（ACC 或车道保持），人始终主导。</div></div>
+  <div class="card"><div class="card-h">L2 · 部分自动化</div>
+    <div class="sub">转向+速度<span class="accent">同时</span>由车控制，但人须持续监督并随时接管。</div></div>
+</div>
+<div class="card" style="margin-top:24px; display:flex; align-items:center; gap:20px;">
+  <div style="font-size:22px; font-weight:800;" class="accent-a">关键认知</div>
+  <div class="sub" style="flex:1;">在 L2 下，<span class="accent">"你就是司机"</span>——无论营销话术如何，法律责任与 OEDR 始终在人。Tesla FSD、Super Cruise 均属 L2。</div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">6 / 15</div></section><section class="slidewrap"><div class="slide">
+<div class="kicker">02 · 分级</div>
+<div class="title">L3–L5：迈向真正无人</div>
+<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:34px;">
+  <div class="card"><div class="card-h accent">L3 · 有条件自动化</div>
+    <div class="sub">车内可脱眼、可看屏幕；系统遇困时请求接管，人须数秒内响应。<br><span class="accent">认证案例：奔驰 Drive Pilot。</span></div></div>
+  <div class="card"><div class="card-h accent-g">L4 · 高度自动化</div>
+    <div class="sub">ODD 内全程无人，系统自处最小风险（自动靠边停车）。<br><span class="accent-g">Robotaxi 的基石。</span></div></div>
+  <div class="card"><div class="card-h accent-a">L5 · 完全自动化</div>
+    <div class="sub">无限 ODD，任何天气路况皆可行驶，无方向盘要求。<br><span class="accent-a">尚无量产，仍是理论目标。</span></div></div>
+</div>
+<div class="card" style="margin-top:24px;">
+  <div class="sub"><span class="accent">ODD 是核心边界：</span>有地理围栏即 L4，无 ODD 限制才是 L5。今天的"全无人"都发生在受限区域内。</div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">7 / 15</div></section><section class="slidewrap"><div class="slide">
+<div class="kicker">03 · 技术内核</div>
+<div class="title">系统架构：两种范式</div>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:32px;">
+  <div class="card"><div class="card-h">模块化流水线</div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin:14px 0;">
+      <span class="chip">感知</span><span class="chip">↓</span><span class="chip">预测</span><span class="chip">↓</span><span class="chip">规划</span><span class="chip">↓</span><span class="chip">控制</span>
+    </div>
+    <div class="sub">各模块职责清晰、可解释、易调试；主流 L4 车队采用。</div></div>
+  <div class="card"><div class="card-h">端到端 E2E</div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin:14px 0;">
+      <span class="chip">传感器</span><span class="chip">→</span><span class="chip">神经网络</span><span class="chip">→</span><span class="chip">轨迹/控制</span>
+    </div>
+    <div class="sub">直接从原始数据映射驾驶动作，联合优化、适应性强（Tesla 路线）。</div></div>
+</div>
+<div class="card" style="margin-top:22px; display:flex; align-items:center; gap:24px;">
+  <div style="text-align:center;"><div class="h2 accent">BEV</div><div class="metric-label">鸟瞰图统一融合空间</div></div>
+  <div style="width:1px; height:50px; background:rgba(120,160,210,0.2);"></div>
+  <div class="sub" style="flex:1;">前沿方向：<span class="accent">Occupancy Networks</span>（占据栅格）、<span class="accent">UniAD</span>（感知-预测-规划统一）、<span class="accent">World Model</span>（世界模型规划）。</div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">8 / 15</div></section><section class="slidewrap"><div class="slide">
+<div class="kicker">03 · 技术内核</div>
+<div class="title">感知：车辆的眼睛与大脑</div>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:26px; margin-top:30px;">
+  <div>
+    <div class="card" style="margin-bottom:18px;"><div class="card-h">传感器四件套</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span class="chip">摄像头</span><span class="chip">LiDAR</span><span class="chip">Radar</span><span class="chip">GNSS/IMU</span>
+      </div>
+    </div>
+    <div class="card"><div class="card-h">成本锚点</div>
+      <div class="sub">消费级 ADAS <span class="accent">&lt; $500</span>；Robotaxi 方案 <span class="accent">&lt; $15,000</span>；L4 系统 2027 预计降至 <span class="accent">~$18,000</span>。</div>
+    </div>
+  </div>
+  <div class="card" style="height:100%;">
+    <div class="card-h">两条技术路线</div>
+    <div style="margin-top:6px;">
+      <div style="margin-bottom:16px;"><span class="accent mono" style="font-size:17px;">LiDAR 中心融合</span> · Waymo
+        <div class="sub" style="margin-top:3px;">5 个 LiDAR + 8 摄像头，雨天目标召回率 <span class="accent">95.2%</span>。高精度、高成本。</div></div>
+      <div><span class="accent-g mono" style="font-size:17px;">纯视觉端到端</span> · Tesla
+        <div class="sub" style="margin-top:3px;">8 摄像头 + 神经网络，低成本消费级路线，依赖海量数据迭代。</div></div>
+    </div>
+  </div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">9 / 15</div></section><section class="slidewrap"><div class="slide">
+<div class="kicker">04 · 市场</div>
+<div class="title">市场与商业拐点</div>
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-top:34px;">
+  <div class="card"><div class="big accent">$214B</div><div class="metric-label">自动驾驶市场 2030（2024 $68B，CAGR 19.9%）</div></div>
+  <div class="card"><div class="big accent-g">$45.7B</div><div class="metric-label">Robotaxi 市场 2030（2023 $0.4B，CAGR 91.8%）</div></div>
+  <div class="card"><div class="big accent-a">35k</div><div class="metric-label">美国 Robotaxi 车辆 2030（现 &gt;1,500 辆）</div></div>
+  <div class="card"><div class="big">40-50%</div><div class="metric-label">垂直整合运营商毛利率预期</div></div>
+</div>
+<div class="card" style="margin-top:24px; display:flex; align-items:center; gap:22px;">
+  <div class="sub" style="flex:1;">美国 robotaxi 到 2030 预计占网约车 <span class="accent">8%</span> 份额，年营收约 <span class="accent">$70 亿</span>。规模化正从"演示"走向"生意"。</div>
+  <span class="chip">资料来源：Goldman Sachs · Grand View · McKinsey 2025–2026</span>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">10 / 15</div></section><section class="slidewrap"><div class="slide">
+<div class="kicker">04 · 玩家</div>
+<div class="title">谁在牌桌上？</div>
+<div style="display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-top:32px;">
+  <div class="card"><div class="card-h">Waymo（Alphabet）</div>
+    <div class="sub">L4 标杆，~3,500 辆车、&gt;2,000 万次行程；多传感器融合 + 6 代 Driver。</div></div>
+  <div class="card"><div class="card-h">Tesla</div>
+    <div class="sub">纯视觉端到端；Robotaxi 小规模扩张，FSD 仍属 L2。</div></div>
+  <div class="card"><div class="card-h">Baidu Apollo Go</div>
+    <div class="sub">中国规模第一，RT6 原生车；瑞士/中东出海，累计 &gt;2,200 万次。</div></div>
+  <div class="card"><div class="card-h">Zoox（Amazon）</div>
+    <div class="sub">无方向盘双向原生车，拉斯维加斯/旧金山公众试乘。</div></div>
+</div>
+<div class="card" style="margin-top:20px;">
+  <div class="sub"><span class="accent">中国军团</span>：Pony.ai、WeRide 与 Uber 合作进入中东；广州/深圳获全域运营许可，扩张速度领先。</div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">11 / 15</div></section><section class="slidewrap"><div class="slide">
+<div class="kicker">04 · 里程碑</div>
+<div class="title">时间线：关键节点</div>
+<div style="position:relative; margin-top:46px; padding-left:10px;">
+  <div style="position:absolute; left:18px; top:6px; bottom:6px; width:2px; background:linear-gradient(180deg,#38BDF8,#22D3EE,#34D399);"></div>
+  <div style="display:grid; grid-template-columns:90px 1fr; gap:18px; align-items:start; margin-bottom:20px;">
+    <div class="accent mono" style="font-weight:700;">2020</div><div class="sub">Waymo One 商用落地，Robotaxi 从实验走向运营。</div></div>
+  <div style="display:grid; grid-template-columns:90px 1fr; gap:18px; align-items:start; margin-bottom:20px;">
+    <div class="accent mono" style="font-weight:700;">2021</div><div class="sub">本田 Legend、奔驰 Drive Pilot 获批 L3，责任首次转向车企。</div></div>
+  <div style="display:grid; grid-template-columns:90px 1fr; gap:18px; align-items:start; margin-bottom:20px;">
+    <div class="accent-g mono" style="font-weight:700;">2025</div><div class="sub">Tesla Robotaxi 奥斯汀上线；Waymo 5 城商用、~45 万次/周。</div></div>
+  <div style="display:grid; grid-template-columns:90px 1fr; gap:18px; align-items:start; margin-bottom:20px;">
+    <div class="accent-g mono" style="font-weight:700;">2026</div><div class="sub">Waymo 14+ 城全无人、目标 100 万次/周、$16B 融资（$126B 估值）。</div></div>
+  <div style="display:grid; grid-template-columns:90px 1fr; gap:18px; align-items:start;">
+    <div class="accent-a mono" style="font-weight:700;">2030</div><div class="sub">Robotaxi 全球大规模商用预期，美国车辆达 ~35,000 辆。</div></div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">12 / 15</div></section><section class="slidewrap"><div class="slide">
+<div class="kicker">04 · 边界</div>
+<div class="title">挑战与未解之题</div>
+<div style="display:grid; grid-template-columns:repeat(2,1fr); gap:22px; margin-top:34px;">
+  <div class="card"><div class="card-h">法规碎片化</div><div class="sub">各国监管不一，L3/L4 落地节奏差异巨大，欧洲尤为审慎。</div></div>
+  <div class="card"><div class="card-h">责任与保险</div><div class="sub">L3 责任转移引发保险重构；"谁为事故买单"仍是核心法律难题。</div></div>
+  <div class="card"><div class="card-h">边缘场景</div><div class="sub">极端天气、罕见事件、未映射道路，仍是系统可靠性的最大考验。</div></div>
+  <div class="card"><div class="card-h">信任与基建</div><div class="sub">公众信任、车路协同基础设施、远程接管体系尚需时间沉淀。</div></div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">13 / 15</div></section><section class="slidewrap"><div class="slide">
+<div class="kicker">04 · 趋势</div>
+<div class="title">未来往何处去？</div>
+<div style="display:grid; grid-template-columns:repeat(2,1fr); gap:22px; margin-top:34px;">
+  <div class="card"><div class="card-h accent">成本骤降</div><div class="sub">L4 系统成本 2027 预计降至 ~$18,000，固态 LiDAR、4D 雷达持续压价。</div></div>
+  <div class="card"><div class="card-h accent-g">多模态融合</div><div class="sub">相机+LiDAR+Radar 统一 BEV 融合，兼顾精度与冗余可靠。</div></div>
+  <div class="card"><div class="card-h accent-a">World Model</div><div class="sub">以世界模型想象未来、评估轨迹，迈向可解释端到端规划。</div></div>
+  <div class="card"><div class="card-h">中美双引擎</div><div class="sub">Robotaxi 先行，中国规模化、美国技术出海，欧洲节奏更稳。</div></div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">14 / 15</div></section><section class="slidewrap"><div class="slide">
+<div style="margin-top:130px; text-align:center;">
+  <div class="kicker" style="justify-content:center;">THE ROAD AHEAD</div>
+  <div class="title" style="font-size:40px; line-height:1.25;">自动驾驶不是"某一天"，<br>而是<span class="accent">"每一天都在扩展的地理围栏"</span></div>
+  <div class="sub" style="margin-top:28px; font-size:19px; color:#B9CCE0;">关注你所在城市的 Robotaxi —— 无人之境，正在上路。</div>
+  <div style="margin-top:40px; display:flex; gap:14px; justify-content:center;">
+    <span class="chip">Q &amp; A</span><span class="chip">谢谢观看</span>
+  </div>
+</div>
+</div><div class="footer"><span class="dot"></span>AUTONOMOUS DRIVING · 自动驾驶技术全景</div>
+<div class="pagenum">15 / 15</div></section></body></html>

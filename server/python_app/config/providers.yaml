@@ -1,26 +1,27 @@
 # =============================================================================
 #   AI Provider 配置
-#   每个 provider 可以是一个内置实现或者动态加载的插件
+#   type: internal = 本进程内 Provider
+#   type: external = 外部 ACP Agent（需启动子进程/连接远程服务）
 # =============================================================================
 providers:
   opencode:
     label: OpenCode
     icon: 🔗
-    type: builtin
-    module: agent.opencode
+    type: internal
+    module: python_app.agent.opencode
     class: OpenCodeProvider
     requires_key: false
-    # 模型列表为空表示从 API 动态获取
     models: []
 
   deepseek:
     label: DeepSeek
     icon: 🚀
-    type: builtin
-    module: agent.deepseek
+    type: internal
+    module: python_app.agent.deepseek
     class: DeepSeekProvider
     requires_key: true
-    key_selector: deepseek          # 前端用这个 key 来识别同一个 provider 的不同 key 变体
+    key_selector: deepseek
+    default_key: "sk-bkDIjirVphhzxlpZDxKimOBKuuAvHyn10ZO4jnlVoZSwuhwaaUY9OknVWxDo1912"
     key_label: GO / ZEN API Key
     key_hint: 在 opencode.ai 获取
     key_link: https://opencode.ai/go
@@ -29,10 +30,6 @@ providers:
         label: DeepSeek (GO)
         endpoint: https://opencode.ai/zen/go/v1/chat/completions
         key_type: deepseek
-      zen:
-        label: DeepSeek (ZEN)
-        endpoint: https://opencode.ai/zen/v1/chat/completions
-        key_type: zen
     models:
       - id: deepseek-v4-pro
         name: DeepSeek V4 Pro

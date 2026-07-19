@@ -1,0 +1,17 @@
+# =============================================================================
+#   中间件插件配置
+# =============================================================================
+plugins:
+  logging:
+    enabled: true
+  rate_limit:
+    enabled: true
+    max_per_minute: 60
+  prompt_injector:
+    enabled: false
+    system_prompt: "You are a helpful assistant."
+  sensitive_filter:
+    enabled: false
+    words: []
+  response_formatter:
+    enabled: true
